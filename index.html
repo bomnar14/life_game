@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="광주에서 태어난 박유성의 한평생을 선택지로 키워 가는 인생 시뮬레이션 게임">
+<title>유성, 광주에서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: 왼쪽 인생 계기판(나이·스탯) + 오른쪽 이야기 카드와 연표. 폰에서는 위아래로 쌓임. 빛고을의 '빛'을 앰버 하이라이트로, 무등산 숲을 초록 액센트로. */
+:root{
+  --bg:#EDF0EE; --surface:#F8FAF9; --line:#D3D9D6; --fg:#1B232B; --muted:#5E6A70;
+  --accent:#2E6A4F; --accent-soft:#DCE9E2; --light:#C68716; --light-soft:#F6E9CF;
+  --bad:#B4443A; --good:#2E6A4F;
+  --f-story:"Gowun Batang", "Noto Serif KR", serif;
+  --f-ui:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --f-num:"IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161B; --surface:#182027; --line:#2A343D; --fg:#E4E8EA; --muted:#93A0A6;
+  --accent:#72B693; --accent-soft:#1F3229; --light:#E6AC45; --light-soft:#3A2E17;
+  --bad:#E07A6F; --good:#72B693; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161B; --surface:#182027; --line:#2A343D; --fg:#E4E8EA; --muted:#93A0A6;
+  --accent:#72B693; --accent-soft:#1F3229; --light:#E6AC45; --light-soft:#3A2E17;
+  --bad:#E07A6F; --good:#72B693; color-scheme:dark}
+body{margin:0}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-ui);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.app{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:800px){.app{grid-template-columns:minmax(0,1fr)}}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--light);outline-offset:2px}
+
+/* 계기판 */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
+@media (max-width:800px){.panel{position:static}}
+.who{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.who h1{font-family:var(--f-story);font-weight:700;font-size:28px;margin:0;line-height:1.1;letter-spacing:-.01em}
+.who .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.age{text-align:right}
+.age b{font-family:var(--f-num);font-size:40px;line-height:1;display:block;font-variant-numeric:tabular-nums}
+.age span{font-size:12px;color:var(--muted)}
+.stages{display:flex;gap:2px;position:relative;margin-top:2px}
+.stages div{height:6px;border-radius:2px;background:var(--line)}
+.stages div.on{background:var(--accent)}
+.stages div.now{background:var(--light)}
+.stage-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.stage-label strong{color:var(--fg);font-weight:600}
+.stats{display:grid;gap:11px}
+.stat{display:grid;grid-template-columns:52px 1fr 44px;align-items:center;gap:10px;font-size:13px}
+.stat .bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.stat .bar i{display:block;height:100%;background:var(--accent);transition:width .5s ease}
+.stat .bar i.low{background:var(--bad)}
+.stat .v{font-family:var(--f-num);text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+.money{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line);padding-top:12px}
+.money span{font-size:13px;color:var(--muted)}
+.money b{font-family:var(--f-num);font-size:20px;font-variant-numeric:tabular-nums}
+.money b.neg{color:var(--bad)}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;margin:0}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-weight:500;min-width:0}
+.ctrl{display:flex;gap:6px;flex-wrap:wrap}
+.ctrl button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 12px;font-size:13px}
+.ctrl button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* 이야기 */
+.main{display:flex;flex-direction:column;gap:20px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 28px 24px;position:relative;overflow:hidden}
+@media (max-width:500px){.card{padding:22px 18px 20px}}
+.card::before{content:"";position:absolute;top:-80px;right:-60px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,var(--light-soft) 0%,transparent 70%);pointer-events:none}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--light);font-weight:600;position:relative}
+.card h2{font-family:var(--f-story);font-size:26px;font-weight:700;margin:6px 0 12px;text-wrap:balance;line-height:1.3;position:relative}
+.story{font-family:var(--f-story);font-size:17px;line-height:1.8;max-width:62ch;margin:0;position:relative}
+.choices{display:grid;gap:10px;margin-top:22px;position:relative}
+.choice{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:baseline;transition:border-color .15s,background .15s}
+.choice:hover{border-color:var(--accent);background:var(--accent-soft)}
+.choice .k{font-family:var(--f-num);font-size:12px;color:var(--muted)}
+.choice.locked{opacity:.45;cursor:not-allowed}
+.choice.locked:hover{border-color:var(--line);background:var(--bg)}
+.choice small{display:block;color:var(--muted);font-size:12px}
+.deltas{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;position:relative}
+.deltas span{font-family:var(--f-num);font-size:12px;padding:3px 8px;border-radius:20px;background:var(--bg);border:1px solid var(--line)}
+.deltas .up{color:var(--good)} .deltas .dn{color:var(--bad)}
+.primary{margin-top:20px;background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:12px 22px;font-weight:600;position:relative}
+.primary:hover{opacity:.9}
+.ticker{font-family:var(--f-story);font-size:17px;color:var(--muted);min-height:3.4em;position:relative}
+.ticker b{color:var(--fg);font-family:var(--f-num);font-weight:500;font-size:14px;margin-right:8px}
+
+/* 연표 */
+.log h3{font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:600;margin:0 0 10px}
+.log ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);max-height:420px;overflow:auto}
+.log li{padding:6px 0 6px 16px;position:relative;font-size:14px}
+.log li::before{content:"";position:absolute;left:-5px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--line)}
+.log li.key::before{background:var(--light)}
+.log li.key{font-weight:500}
+.log li em{font-style:normal;font-family:var(--f-num);color:var(--muted);font-size:12px;margin-right:8px;font-variant-numeric:tabular-nums}
+
+.end-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px;position:relative}
+.end-grid div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.end-grid span{display:block;font-size:12px;color:var(--muted)}
+.end-grid b{font-family:var(--f-num);font-size:18px}
+.epitaph{font-family:var(--f-story);font-size:20px;border-left:3px solid var(--light);padding-left:14px;margin:18px 0 0;position:relative}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="panel" aria-label="박유성의 현재 상태">
+    <div class="who">
+      <div><h1>박유성</h1><div class="sub" id="sub">광주광역시 · 2026년생</div></div>
+      <div class="age"><b id="age">0</b><span>세 · <span id="year">2026</span>년</span></div>
+    </div>
+    <div>
+      <div class="stages" id="stages"></div>
+      <div class="stage-label"><strong id="stageName">유아기</strong><span id="stageRange">0–6세</span></div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="money"><span>자산</span><b id="money">부모님 품</b></div>
+    <dl class="facts" id="facts"></dl>
+    <div class="ctrl" role="group" aria-label="시간 속도">
+      <button id="pauseBtn" aria-pressed="false">일시정지</button>
+      <button data-speed="1" aria-pressed="true">1배</button>
+      <button data-speed="2" aria-pressed="false">2배</button>
+      <button data-speed="4" aria-pressed="false">4배</button>
+    </div>
+  </aside>
+  <main class="main">
+    <section class="card" id="card" aria-live="polite"></section>
+    <section class="log"><h3>인생 연표</h3><ol id="log"></ol></section>
+  </main>
+</div>
+
+<script>
+const BIRTH=2026;
+const STAGES=[["유아기",0,6],["아동기",7,12],["청소년기",13,18],["청년기",19,34],["장년기",35,49],["중년기",50,64],["노년기",65,100]];
+const STATDEF=[["h","건강"],["p","행복"],["r","평판"],["s","역량"]];
+const INCOME={none:0,student:-150,part:350,kia:1900,samsung:2200,gov:1200,research:1700,art:450,council:1500,retired:300,
+  startup:()=>rnd(-900,3600),cafe:()=>rnd(-700,1700),shop:()=>rnd(-300,900),stall:()=>rnd(-200,700)};
+const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
+const chance=p=>Math.random()<p;
+const clamp=v=>Math.max(0,Math.min(100,v));
+
+let S, timer=null, speed=1, paused=false, mode="intro", current=null, lastResult=null;
+
+function fresh(){
+  return {age:0,m:0,h:72,p:60,r:40,s:30,job:"none",work:"—",edu:"—",marry:"미혼",partner:null,kids:0,home:"남구 양림동",flags:{},log:[],dead:false};
+}
+
+/* ---------- 이벤트 ---------- */
+// e: 효과 {m,h,p,r,s}, f: 상태 변경, r: 결과 문장. 선택지 자체가 함수면 실행 결과를 반환.
+const EVENTS=[
+{age:1,title:"돌잡이",text:"양림동 할머니 댁 마당에 상이 차려졌다. 친척들이 숨을 죽이고 유성이의 손끝을 본다.",ch:[
+ {t:"연필을 잡는다",e:{s:6},f:s=>s.flags.pencil=1,r:"연필을 꽉 쥐었다. 할머니가 \"판사 되겄네\" 하신다."},
+ {t:"오만원권을 잡는다",e:{p:3},f:s=>s.flags.luck=1,r:"돈을 잡았다. 아버지가 제일 크게 웃었다."},
+ {t:"기아 타이거즈 야구공을 잡는다",e:{h:6,p:4},f:s=>s.flags.tigers=1,r:"야구공을 입에 넣으려다 삼촌이 \"평생 기아 팬 확정\"이라고 외쳤다."}]},
+{age:3,title:"이사",text:"아버지가 직장을 옮기면서 가족이 이사를 고민한다. 어머니는 아이 키우기 좋은 동네가 먼저라고 한다.",ch:[
+ {t:"양림동 오래된 주택에 남는다",e:{p:5,r:3},f:s=>s.home="남구 양림동",r:"선교사 사택 골목과 담쟁이 사이에서 자라게 됐다."},
+ {t:"광산구 수완지구 신축 아파트",e:{s:3,p:2},f:s=>s.home="광산구 수완지구",r:"놀이터가 세 개 있는 단지. 학원 버스가 아파트 앞까지 온다."},
+ {t:"북구 첨단지구",e:{h:4},f:s=>s.home="북구 첨단지구",r:"쌍암공원 호수 옆으로 이사했다. 산책이 일상이 됐다."}]},
+{age:5,title:"첫 무등산",text:"아버지가 \"무등산 정상 보러 갈래?\" 하고 묻는다. 원효사 주차장에서 올려다본 산이 끝도 없다.",ch:[
+ {t:"서석대까지 끝까지 오른다",e:{h:8,p:3},f:s=>s.flags.hiker=1,r:"울면서 올랐는데, 주상절리를 보고 울음을 그쳤다."},
+ {t:"증심사 계곡에서 물놀이만",e:{p:6,h:3},r:"발 담그고 수박 먹은 기억만 오래 남았다."},
+ {t:"집에서 태블릿 본다",e:{h:-4,p:2},r:"아버지 혼자 다녀왔다. 사진 속 하늘이 예뻤다."}]},
+{age:7,title:"초등학교 입학",text:s=>`${s.home.split(" ")[1]}의 초등학교에 입학했다. 어머니가 방과 후를 어떻게 보낼지 묻는다.`,ch:[
+ {t:"영어·수학 학원",e:{s:8,p:-4},f:s=>{s.job="student";s.work="초등학생"},r:"받아쓰기 100점이 늘었다. 놀이터 친구는 줄었다."},
+ {t:"태권도장",e:{h:6,r:2},f:s=>{s.job="student";s.work="초등학생"},r:"노란띠를 매고 동네를 뛰어다녔다."},
+ {t:"골목에서 실컷 논다",e:{p:7,s:-2},f:s=>{s.job="student";s.work="초등학생"},r:"해 질 녘까지 술래잡기. 저녁마다 무릎이 까져 있었다."}]},
+{age:9,title:"챔피언스필드",text:s=>`삼촌이 광주-기아 챔피언스필드 표를 구해왔다.${s.flags.tigers?" 돌잡이 때 잡은 야구공 이야기가 또 나온다.":""}`,ch:[
+ {t:"응원단 앞에서 목청껏 응원",e:{p:8,r:2},r:"목이 쉬었다. 기아가 9회말에 이겼다."},
+ {t:"리틀야구단에 들어간다",e:{h:8,s:-2},f:s=>s.flags.baseball=1,r:"주말마다 그라운드에서 흙투성이가 됐다."},
+ {t:"숙제 때문에 안 간다",e:{s:4,p:-5},r:"그날 기아는 끝내기 홈런을 쳤다고 한다."}]},
+{age:11,title:"반장 선거",text:"5학년 2학기 반장 선거. 짝꿍이 \"너 나가면 찍어줄게\"라고 속삭인다.",ch:[
+ {t:"출마해서 연설한다",x:s=>chance(.45+s.r/200)?{e:{r:9,p:6},r:"한 표 차이로 반장이 됐다. 연설에서 무등산 이야기를 한 게 먹혔다."}:{e:{r:3,p:-4},r:"두 표 차이로 떨어졌다. 그래도 연설은 잘했다는 말을 들었다."}},
+ {t:"친구를 밀어준다",e:{r:4,p:3},r:"친구가 반장이 됐고, 유성이는 부반장이 됐다."},
+ {t:"관심 없다",e:{p:1},r:"선거 날 급식에 나온 치킨이 더 중요했다."}]},
+{age:13,title:"학원 땡땡이",text:"중학교 1학년. 친구 준호가 학원 빠지고 상무지구 PC방에 가자고 한다.",ch:[
+ {t:"따라간다",e:{p:6,s:-5,r:-2},f:s=>s.flags.junho=1,r:"학원에서 집으로 전화가 왔다. 그래도 준호와는 평생 친구가 됐다."},
+ {t:"거절하고 학원에 간다",e:{s:6,p:-3},r:"준호는 다음 날 혼자 혼났다."},
+ {t:"대신 광주천 자전거를 타자고 한다",e:{h:5,p:3},f:s=>s.flags.junho=1,r:"둘이서 광주천을 따라 영산강 합류점까지 달렸다."}]},
+{age:15,title:"오월",text:"5월, 역사 수행평가로 5·18민주광장과 옛 전남도청을 찾았다. 분수대 앞에 사람들이 모여 있다.",ch:[
+ {t:"해설사 이야기를 끝까지 듣고 기록한다",e:{s:5,r:6},f:s=>s.flags.history=1,r:"보고서가 교내 대회에서 상을 받았다."},
+ {t:"할아버지께 그때 이야기를 여쭙는다",e:{p:4,r:4},f:s=>s.flags.history=1,r:"할아버지는 한참 말이 없다가 금남로 이야기를 꺼내셨다."},
+ {t:"사진만 찍고 돌아간다",e:{p:2,r:-3},r:"과제는 냈지만 기억에 남는 건 별로 없다."}]},
+{age:16,title:"고등학교 진학",text:"담임 선생님이 진학 상담을 하자고 한다.",ch:[
+ {t:"인문계 고등학교",e:{s:5},f:s=>{s.edu="일반고";s.work="고등학생"},r:"야간 자율학습의 세계가 열렸다."},
+ {t:"자동차 특성화고",e:{s:3,p:2},f:s=>{s.edu="특성화고";s.work="고등학생";s.flags.tech=1},r:"기아 오토랜드 광주 견학이 1학년 첫 행사였다."},
+ {t:"예술고 미술과",e:{p:6},f:s=>{s.edu="예술고";s.work="고등학생";s.flags.art=1},r:"양림동 펭귄마을 골목을 스케치북에 담기 시작했다."}]},
+{age:17,title:"충장로의 오후",text:"충장로 버스킹 공연에서 옆 학교 학생과 눈이 마주쳤다. 노래가 끝나간다.",ch:[
+ {t:"용기 내서 번호를 묻는다",x:()=>chance(.6)?{e:{p:10},r:"번호를 받았다. 그날 밤 문자를 열 번쯤 썼다 지웠다."}:{e:{p:-4,r:1},r:"웃으면서 거절당했다. 그래도 용기 낸 자신이 좀 좋았다."}},
+ {t:"친구에게 대신 물어봐 달라고 한다",e:{r:-2,p:2},r:"친구가 번호를 받아왔는데, 친구 번호였다."},
+ {t:"공부에 집중한다",e:{s:4},r:"모의고사 성적이 조금 올랐다."}]},
+{age:19,title:"스무 살의 갈림길",text:"졸업이 다가온다. 앞으로 무엇을 할지 정해야 한다.",ch:[
+ {t:"광주과학기술원(GIST)",req:s=>s.s>=72,lock:"역량 72 이상",e:{s:10,r:5},f:s=>{s.edu="GIST";s.job="student";s.work="GIST 재학"},r:"오룡동 캠퍼스 기숙사에 입사했다."},
+ {t:"전남대학교",req:s=>s.s>=50,lock:"역량 50 이상",e:{s:5,r:3},f:s=>{s.edu="전남대";s.job="student";s.work="전남대 재학"},r:"용봉동 캠퍼스, 후문 밥집이 새 단골이 됐다."},
+ {t:"조선대학교",req:s=>!s.flags.tech,e:{s:3,p:3},f:s=>{s.edu=s.flags.art?"조선대 미대":"조선대";s.job="student";s.work="조선대 재학"},r:"하얀 본관이 보이는 캠퍼스에서 새내기가 됐다."},
+ {t:"기아 오토랜드 광주 고졸 공채",req:s=>s.flags.tech,lock:"특성화고 출신",x:s=>chance(.55+s.s/250)?{e:{r:5,p:4},f:s=>{s.job="kia";s.work="기아 오토랜드 광주"},r:"합격 문자를 받고 어머니가 울었다."}:{e:{p:-6},f:s=>{s.job="part";s.work="대인시장 아르바이트"},r:"아깝게 떨어졌다. 대인시장 가게에서 일을 시작했다."}},
+ {t:"바로 돈을 번다",e:{m:300,p:-2},f:s=>{s.job="part";s.work="대인시장 아르바이트"},r:"대인시장 국밥집에서 일을 시작했다. 사장님이 손이 빠르다고 칭찬한다."}]},
+{age:21,title:"입영 통지서",text:"병무청에서 입영 통지서가 날아왔다.",ch:[
+ {t:"바로 입대한다",e:{h:5,r:3,p:-4},r:"31사단에서 복무했다. 주말 외박이면 집이 가까워서 좋았다."},
+ {t:"학업을 마치고 장교로 간다",req:s=>s.s>=55,lock:"역량 55 이상",e:{r:6,s:3,m:300},r:"상무대에서 교육을 받고 소위로 임관했다."},
+ {t:"최대한 미룬다",e:{p:3,r:-3},r:"결국 스물여섯에 갔다. 동기들이 다 형이라고 불렀다."}]},
+{age:23,title:"스물셋",text:s=>s.job==="student"?"학교생활이 반쯤 지났다. 남은 시간을 어디에 쓸지 고민이다.":`${s.work}에서 일한 지 몇 해가 지났다.`,ch:s=>s.job==="student"?[
+ {t:"창업 동아리",e:{s:4,r:3},f:s=>s.flags.startup=1,r:"첨단 창업보육센터에서 밤을 새우는 날이 많아졌다."},
+ {t:"밴드 동아리",e:{p:8,s:-2},r:"양림동 작은 공연장에서 첫 공연을 했다. 관객이 열두 명이었다."},
+ {t:"학점 관리",e:{s:8,p:-3},r:"장학금을 받았다. 도서관 자리 하나가 유성이 자리처럼 됐다."}]:[
+ {t:"야간 대학에 등록한다",e:{s:7,p:-2,m:-400},f:s=>s.edu=s.edu+" · 야간대",r:"일 끝나고 수업 듣는 생활. 피곤하지만 뿌듯하다."},
+ {t:"악착같이 저축한다",e:{m:800,p:-2},r:"통장 잔고가 처음으로 네 자리가 됐다."},
+ {t:"동료들과 즐겁게 산다",e:{p:7,r:3,m:-200},r:"퇴근 후 송정역시장 떡갈비집이 아지트가 됐다."}]},
+{age:26,title:"첫 직장",req:s=>["student","part","none"].includes(s.job),text:"졸업장을 받아 들었다. 이제 진짜 일을 구해야 한다.",ch:[
+ {t:"삼성전자 광주사업장",req:s=>s.s>=60,lock:"역량 60 이상",x:s=>chance(.5+s.s/300)?{e:{r:6,p:5},f:s=>{s.job="samsung";s.work="삼성전자 광주사업장"},r:"하남산단 출근길이 시작됐다. 첫 월급으로 부모님 내복을 샀다."}:{e:{p:-6},f:s=>{s.job="part";s.work="편의점 아르바이트"},r:"최종 면접에서 떨어졌다. 편의점 야간 아르바이트로 버틴다."}},
+ {t:"광주광역시청 공무원 시험",x:s=>chance(.3+s.s/200)?{e:{r:5,p:3},f:s=>{s.job="gov";s.work="광주광역시청"},r:"합격. 상무지구 시청으로 출근한다."}:{e:{p:-8,m:-300},f:s=>{s.job="part";s.work="독서실 총무"},r:"두 점 차이로 떨어졌다. 독서실 총무를 하며 다시 준비한다."}},
+ {t:"첨단 AI 스타트업",req:s=>s.flags.startup||s.s>=55,lock:"창업 경험 또는 역량 55",e:{s:6,p:4},f:s=>{s.job="startup";s.work="첨단 AI 스타트업"},r:"직원 일곱 명. 직함이 세 개다."},
+ {t:"GIST 연구원",req:s=>s.edu==="GIST",lock:"GIST 출신",e:{s:8,r:6},f:s=>{s.job="research";s.work="GIST 연구원"},r:"연구실 창밖으로 무등산이 보인다."},
+ {t:"동명동 카페 창업 (대출 3천)",e:{m:-3000,p:6},f:s=>{s.job="cafe";s.work="동명동 카페 사장"},r:"동명동 골목 2층에 작은 카페를 열었다. 간판은 직접 칠했다."},
+ {t:"광주비엔날레재단",req:s=>s.flags.art,lock:"예술 전공",e:{p:7,r:4},f:s=>{s.job="art";s.work="광주비엔날레재단"},r:"전시장 벽에 작품을 거는 일부터 시작했다."}]},
+{age:28,title:"인연",req:s=>s.marry==="미혼",text:"주변에서 하나둘 결혼 소식이 들린다. 어머니의 잔소리도 늘었다.",ch:[
+ {t:"친구 소개팅에 나간다",x:()=>chance(.7)?{e:{p:9},f:s=>{s.marry="연애중";s.partner="이서연"},r:"초등학교 교사 이서연. 광주천 산책길에서 손을 잡았다."}:{e:{p:-3},r:"대화가 이어지지 않았다. 파스타만 맛있었다."}},
+ {t:"무등산 산악회에 가입한다",e:{h:5},x:()=>chance(.6)?{e:{h:5,p:8},f:s=>{s.marry="연애중";s.partner="정하은"},r:"간호사 정하은과 중머리재에서 김밥을 나눠 먹었다."}:{e:{h:6,p:2},r:"인연은 없었지만 다리가 튼튼해졌다."}},
+ {t:"지금은 일이 먼저",e:{s:5,m:400,p:-4},r:"주말에도 노트북을 켰다."}]},
+{age:30,title:"프러포즈",req:s=>s.marry==="연애중",text:s=>`${s.partner}와 만난 지 2년. 반지를 샀다. 어디서 말할까.`,ch:[
+ {t:"무등산 서석대 일출 앞에서",x:s=>chance(.85)?{e:{p:14,m:-2500,r:4},f:s=>s.marry="기혼",r:`해가 뜨는 순간 ${s.partner}가 고개를 끄덕였다. 결혼식은 김대중컨벤션센터에서 했다.`}:{e:{p:-10},f:s=>{s.marry="미혼";s.partner=null},r:"새벽 산행에 지친 상대가 \"생각해 볼게\"라고 했다. 몇 달 뒤 헤어졌다."}},
+ {t:"광주호 호수생태원 피크닉",x:s=>chance(.8)?{e:{p:12,m:-2000},f:s=>s.marry="기혼",r:"버드나무 아래에서 반지를 꺼냈다. 결혼식은 양림동 작은 교회에서 했다."}:{e:{p:-10},f:s=>{s.marry="미혼";s.partner=null},r:"\"아직은 아닌 것 같아.\" 그 말이 오래 남았다."}},
+ {t:"아직은 아니다",x:s=>chance(.5)?{e:{p:-8},f:s=>{s.marry="미혼";s.partner=null},r:"기다리다 지친 상대가 먼저 이별을 말했다."}:{e:{m:500},r:"1년을 더 미뤘다. 상대는 아직 기다려 준다."}}]},
+{age:32,title:"내 집",text:"전세 계약이 끝나 간다. 집을 어떻게 할지 정해야 한다.",ch:[
+ {t:"수완지구 아파트 매수 (대출)",e:{m:-1500,p:4},f:s=>{s.flags.house=1;s.home="광산구 수완지구"},r:"30년 대출. 그래도 내 이름 문패가 생겼다."},
+ {t:"봉선동 전세로 산다",e:{m:-300,p:2},f:s=>s.home="남구 봉선동",r:"학군 좋다는 봉선동. 나중을 생각하면 나쁘지 않다."},
+ {t:"부모님 집으로 들어간다",e:{m:900,p:-3,r:-2},r:"돈은 모였다. 저녁 반찬 메뉴 결정권은 없다."}]},
+{age:33,title:"아이",req:s=>s.marry==="기혼",text:"아이 이야기가 나왔다. 둘 다 서른을 넘겼다.",ch:[
+ {t:"아이를 갖자",e:{p:12,h:-2},f:s=>{s.kids=1;s.flags.kidAge=33},r:"전남대병원에서 딸 박하늘이 태어났다. 이름은 무등산 하늘에서 땄다."},
+ {t:"둘을 낳고 싶다",e:{p:14,h:-4,m:-500},f:s=>{s.kids=2;s.flags.kidAge=33},r:"하늘이, 그리고 2년 뒤 아들 박빛찬. 집이 시끄러워졌다."},
+ {t:"둘이서 행복하게 살자",e:{p:4,m:600},r:"주말마다 광주 곳곳을 둘이서 걸었다."}]},
+{age:34,title:"혼자의 서른넷",req:s=>s.marry==="미혼",text:"친구들은 다 결혼했다. 단톡방엔 아이 사진뿐이다.",ch:[
+ {t:"결혼정보회사에 가입한다",e:{m:-300},x:()=>chance(.5)?{e:{m:-300,p:8},f:s=>{s.marry="기혼";s.partner="한지원"},r:"한지원을 만나 1년 만에 결혼했다. 조용한 결혼식이었다."}:{e:{m:-300,p:-3},r:"가입비만 냈다."}},
+ {t:"혼자의 삶을 즐긴다",e:{p:6,m:500},r:"원룸을 예쁘게 꾸미고 주말엔 국립아시아문화전당 공연을 본다."},
+ {t:"오래 연락 끊긴 첫사랑에게 연락",x:()=>chance(.25)?{e:{p:12},f:s=>{s.marry="기혼";s.partner="윤가람"},r:"충장로에서 다시 만났다. 둘 다 웃었다. 이듬해 결혼했다."}:{e:{p:-5},r:"읽음 표시만 남았다."}}]},
+{age:37,title:"직장의 바람",req:s=>!["none","part","student"].includes(s.job),text:s=>`${s.work}에 변화가 찾아왔다.`,ch:s=>({
+ samsung:[{t:"라인 이전 희망퇴직, 위로금을 받는다",e:{m:9000,p:-3},f:s=>{s.job="none";s.work="퇴직 후 구직 중"},r:"큰돈이 들어왔지만 아침에 갈 곳이 없어졌다."},{t:"남아서 버틴다",e:{h:-6,m:500,r:3},r:"주말 출근이 늘었다. 그래도 자리를 지켰다."},{t:"사내 재교육으로 반도체 직무 전환",e:{s:8,p:2},r:"마흔을 앞두고 다시 공부했다."}],
+ gov:[{t:"승진 시험을 준비한다",x:()=>chance(.6)?{e:{r:8,m:300},r:"사무관으로 승진했다."}:{e:{p:-5},r:"이번엔 떨어졌다."}},{t:"민원 많은 부서를 자원한다",e:{r:9,h:-5},r:"5·18 기념사업 업무를 맡았다."},{t:"조용히 정년을 바라본다",e:{p:3},r:"평온한 나날."}],
+ startup:[{t:"투자 유치에 올인한다",x:()=>chance(.4)?{e:{m:12000,r:10,p:8},r:"시리즈 B 투자 유치 성공. 지분이 갑자기 큰돈이 됐다."}:{e:{m:-4000,p:-10,h:-5},f:s=>{s.job="none";s.work="폐업 후 구직 중"},r:"투자 무산. 회사를 정리했다."}},{t:"대기업에 회사를 매각한다",e:{m:5000,p:-2},f:s=>{s.job="samsung";s.work="대기업 광주 R&D센터"},r:"인수되면서 대기업 직원이 됐다."},{t:"작게 오래 간다",e:{p:4,h:2},r:"직원 열두 명. 무리하지 않기로 했다."}],
+ cafe:[{t:"2호점을 낸다",x:()=>chance(.5)?{e:{m:3000,r:5},r:"상무지구 2호점이 대박 났다."}:{e:{m:-3500,h:-4},r:"2호점은 1년 만에 문을 닫았다."}},{t:"원두 로스팅 납품으로 바꾼다",e:{s:6,m:800},r:"광주 카페 서른 곳에 원두를 댄다."},{t:"가게를 정리한다",e:{m:1000,p:-6},f:s=>{s.job="none";s.work="구직 중"},r:"마지막 영업일에 단골들이 꽃을 들고 왔다."}],
+ kia:[{t:"전기차 라인 교육을 자원한다",e:{s:7,r:4},r:"광주 공장 첫 전기차 생산 라인에 배치됐다."},{t:"노조 대의원에 출마한다",e:{r:8,p:2,h:-2},r:"동료들의 표로 대의원이 됐다."},{t:"그대로 묵묵히 일한다",e:{m:400,h:-3},r:"20년 근속 패를 받았다."}],
+ research:[{t:"연구소 기업을 창업한다",e:{m:-2000,s:6},f:s=>{s.job="startup";s.work="GIST 연구소 기업 대표"},r:"첨단3지구에 사무실을 얻었다."},{t:"교수직에 지원한다",x:()=>chance(.45)?{e:{r:10,p:6},f:s=>s.work="전남대 교수",r:"전남대 교수로 임용됐다."}:{e:{p:-4},r:"최종에서 떨어졌다. 다시 논문을 쓴다."}},{t:"연구에만 몰두한다",e:{s:8,h:-4},r:"논문 인용 수가 늘었다."}],
+ art:[{t:"본전시 큐레이터에 도전한다",e:{r:9,h:-4},r:"비엔날레 보조 큐레이터로 이름이 올라갔다."},{t:"개인 작업실을 연다",e:{p:7,m:-800},f:s=>s.work="양림동 작업실 작가",r:"양림동에 작업실을 냈다."},{t:"안정적인 학원 강사로 옮긴다",e:{m:900,p:-3},f:s=>{s.job="gov";s.work="미술학원 강사"},r:"월급이 일정해졌다."}],
+ council:[{t:"재선에 도전한다",x:s=>chance(s.r/120)?{e:{r:6},r:"재선 성공."}:{e:{r:-4,p:-6},f:s=>{s.job="none";s.work="낙선 후 휴식"},r:"낙선했다."}},{t:"정치를 그만둔다",e:{p:6},f:s=>{s.job="none";s.work="구직 중"},r:"다시 평범한 주민으로."},{t:"지역 현안에 집중한다",e:{r:5,h:-3},r:"광주천 정비 조례를 통과시켰다."}],
+ shop:[{t:"확장한다",e:{m:-1000,r:3},r:"가게가 넓어졌다."},{t:"그대로 간다",e:{p:3},r:"단골이 늘었다."},{t:"접는다",e:{m:500},f:s=>{s.job="none";s.work="구직 중"},r:"가게를 정리했다."}]
+}[s.job]||[{t:"버틴다",e:{h:-3},r:"그럭저럭 버텼다."},{t:"새로 시작한다",e:{p:3,m:-500},r:"새 출발."}])},
+{age:38,title:"다시 일자리",req:s=>s.job==="none"||s.job==="part",text:"쉬는 시간이 길어지고 있다. 통장이 줄어드는 게 보인다.",ch:[
+ {t:"광주형 일자리 공장에 지원한다",e:{r:3},f:s=>{s.job="kia";s.work="광주글로벌모터스"},r:"빛그린산단 공장으로 출근하게 됐다."},
+ {t:"송정역 앞 떡갈비 가게를 차린다",e:{m:-2500,p:5},f:s=>{s.job="shop";s.work="송정역 떡갈비집 사장"},r:"KTX 손님이 줄을 섰다. 가끔은."},
+ {t:"자격증을 따서 재취업",e:{s:6,p:-2},f:s=>{s.job="gov";s.work="광주도시공사 계약직"},r:"공인중개사 자격증으로 도시공사에 들어갔다."}]},
+{age:40,title:"건강검진",text:"전남대병원 건강검진 결과지에 빨간 글씨가 세 줄이다.",ch:[
+ {t:"광주천 자전거로 출퇴근한다",e:{h:8,p:2},f:s=>s.flags.exercise=1,r:"타는 날보다 비 오는 날이 많았지만, 뱃살이 줄었다."},
+ {t:"술·담배를 끊는다",e:{h:7,p:-3,m:200},r:"대인시장 막걸리 모임에서 사이다만 마셨다."},
+ {t:"바쁘니까 다음에",e:{h:-6},f:s=>s.flags.neglect=1,r:"결과지는 서랍 속으로 들어갔다."}]},
+{age:42,title:"솔깃한 제안",text:s=>`${s.flags.junho?"오랜 친구 준호":"고등학교 동창"}가 술자리에서 투자 이야기를 꺼낸다.`,ch:[
+ {t:"코인에 3천만 원 넣는다",x:s=>chance(s.flags.luck?.42:.3)?{e:{m:7000,p:6},r:"세 배가 됐다. 돌잡이 때 돈을 잡은 덕일까."}:{e:{m:-3000,p:-9},r:"반의 반 토막. 아내에게 말하지 못했다."}},
+ {t:"송정역 근처 상가에 투자한다",x:()=>chance(.6)?{e:{m:2500},r:"KTX 역세권 상가 월세가 꼬박꼬박 들어온다."}:{e:{m:-1200,p:-4},r:"공실이 1년째다."}},
+ {t:"정중히 거절하고 적금을 든다",e:{m:400,p:1},r:"재미는 없지만 마음은 편하다."}]},
+{age:45,title:"부모님",text:"어머니가 쓰러지셨다는 전화를 받았다. 뇌경색 초기라고 한다.",ch:[
+ {t:"직접 모시고 간병한다",e:{p:-6,h:-5,r:8,m:-1000},r:"2년 동안 어머니 곁을 지켰다. 어머니는 웃으며 고맙다고 하셨다."},
+ {t:"요양병원에 모시고 주말마다 찾아간다",e:{m:-2000,p:-2,r:2},r:"일요일 오후는 늘 요양병원에서 보냈다."},
+ {t:"형제와 간병인에게 맡긴다",e:{m:-600,r:-6,p:-3},r:"마음 한구석이 오래 무거웠다."}]},
+{age:47,title:"동네 일",text:s=>`${s.home} 주민들이 주민자치회 일을 맡아 달라고 한다.`,ch:[
+ {t:"맡는다",e:{r:10,p:3,h:-2},r:"마을 축제를 다시 살렸다. 동네 사람들이 이름을 알아본다."},
+ {t:"아예 구의원에 출마한다",x:s=>chance(s.r/110)?{e:{r:15,m:-1500},f:s=>{s.job="council";s.work="구의회 의원"},r:"당선. 현수막에 이름이 걸렸다."}:{e:{r:-3,m:-3000,p:-8},r:"낙선. 선거 빚이 남았다."}},
+ {t:"정중히 거절한다",e:{p:2},r:"저녁 시간은 지켰다."}]},
+{age:50,title:"쉰",text:"쉰 번째 생일. 거울 속 얼굴이 아버지를 닮았다. 오래 묻어 둔 꿈이 떠오른다.",ch:[
+ {t:"일을 그만두고 동명동에 책방을 연다",e:{m:-2000,p:12,r:3},f:s=>{s.job="shop";s.work="동명동 책방 주인"},r:"손님은 적지만 하루가 짧다."},
+ {t:"지금 자리에서 버틴다",e:{m:1000,p:-5},r:"꿈은 은퇴 후로 미뤘다."},
+ {t:"한 달 휴가로 빛고을 둘레길을 완주한다",e:{h:6,p:7,m:-300},r:"광주를 한 바퀴 걸었다. 몰랐던 골목이 많았다."}]},
+{age:52,title:"아이의 입시",req:s=>s.kids>0,text:"하늘이가 고3이 됐다. 진로 이야기로 저녁 식탁이 조용하다.",ch:[
+ {t:"봉선동 학원가에 집중 투자",e:{m:-3000,p:-2},r:"하늘이는 서울의 대학에 붙었다. 송정역에서 배웅했다."},
+ {t:"하고 싶은 걸 하게 둔다",e:{p:6,r:2},r:"하늘이는 조선대 간호학과에 갔다. 광주에 남았다."},
+ {t:"해외 유학을 보낸다",e:{m:-8000,p:2},r:"공항 가는 길이 길었다."}]},
+{age:55,title:"충장로 동창회",text:"30년 만의 고등학교 동창회가 충장로에서 열렸다.",ch:[
+ {t:"2차, 3차까지 간다",e:{p:7,h:-3},r:"새벽 세 시, 금남로를 걸으며 교가를 불렀다."},
+ {t:"동창들 사업을 도와준다",e:{r:6,m:-500},r:"친구 가게 개업식 화환을 보냈다."},
+ {t:"1차만 하고 일찍 귀가한다",e:{p:2,h:1},r:"집에 오니 마음이 편했다."}]},
+{age:57,title:"식탁의 침묵",req:s=>s.marry==="기혼",text:s=>`${s.partner}가 요즘 둘이 대화가 줄었다고 말한다.`,ch:[
+ {t:"원효사 템플스테이를 함께 간다",e:{p:8,m:-200},r:"무등산 새벽 예불 소리에 둘 다 오래 앉아 있었다."},
+ {t:"부부 상담을 받는다",e:{p:5,m:-150},r:"서로 몰랐던 이야기가 많았다."},
+ {t:"바빠서 넘긴다",x:()=>chance(.4)?{e:{p:-15,m:-5000,r:-4},f:s=>{s.marry="이혼";s.partner=null},r:"이듬해 이혼 서류에 도장을 찍었다."}:{e:{p:-4},r:"불편한 침묵이 이어졌다."}}]},
+{age:61,title:"은퇴",req:s=>!["none","retired"].includes(s.job),text:s=>`${s.work}에서 은퇴 이야기가 나온다.`,ch:[
+ {t:"연장 근무를 신청한다",e:{m:2500,h:-4},r:"3년을 더 일했다."},
+ {t:"은퇴하고 연금 생활",e:{p:6,h:2},f:s=>{s.job="retired";s.work="은퇴"},r:"송별회에서 꽃다발을 받았다."},
+ {t:"대인시장에 작은 가게를 연다",e:{m:-1000,p:5,r:4},f:s=>{s.job="stall";s.work="대인시장 상인"},r:"야시장 날이면 손님이 꽤 온다."}]},
+{age:62,title:"쉬는 날들",req:s=>s.job==="none",text:"일자리가 없는 채로 예순을 넘겼다.",ch:[
+ {t:"노인 일자리 사업에 지원한다",e:{p:3,m:300},f:s=>{s.job="retired";s.work="광주천 환경지킴이"},r:"광주천 쓰레기를 줍는 일. 생각보다 좋다."},
+ {t:"그냥 쉰다",e:{p:2},f:s=>{s.job="retired";s.work="은퇴"},r:"오후엔 사직공원 벤치에 앉는다."}]},
+{age:64,title:"손주",req:s=>s.kids>0,text:"하늘이가 아이를 낳았다. 할아버지가 됐다.",ch:[
+ {t:"손주를 돌봐준다",e:{p:10,h:-3},r:"유모차를 밀고 펭귄마을을 매일 걸었다."},
+ {t:"용돈과 선물로 챙긴다",e:{m:-500,p:3},r:"영상통화로 자주 얼굴을 본다."},
+ {t:"내 시간이 우선이다",e:{p:2,r:-3},r:"서운하다는 말을 들었다."}]},
+{age:67,title:"노년의 하루",text:"매일 아침이 길어졌다. 무엇으로 하루를 채울까.",ch:[
+ {t:"5·18 기념공원 해설 자원봉사",e:{r:10,p:6},x:s=>({e:{r:s.flags.history?14:8,p:6},r:s.flags.history?"열다섯 살 때 들은 해설이 이제 유성이의 입에서 나온다.":"공부해서 해설사가 됐다. 학생들이 귀를 기울인다."})},
+ {t:"무등산 산악회",e:{h:6,p:4},r:s=>"한 달에 한 번 무등산을 오른다. 서석대는 여전하다."},
+ {t:"경로당 바둑",e:{p:4,h:-1},r:"동네 최강자가 됐다."}]},
+{age:70,title:"수술",text:"전남대병원 의사가 큰 수술을 권했다. 회복이 길 거라고 한다.",ch:[
+ {t:"수술을 받는다",x:()=>chance(.75)?{e:{h:15,m:-1500},r:"수술은 잘 끝났다. 창밖 무등산이 반가웠다."}:{e:{h:-22,m:-1500},r:"합병증이 왔다. 회복이 더디다."}},
+ {t:"약물 치료로 지켜본다",e:{h:-8,m:-400},r:"조금씩 숨이 찬다."},
+ {t:"민간요법에 기댄다",e:{h:-12,m:-600},r:"효과는 잘 모르겠다."}]},
+{age:73,title:"남길 것",text:"통장과 집 문서를 정리할 때가 됐다.",ch:[
+ {t:"자녀에게 미리 증여한다",req:s=>s.kids>0,lock:"자녀 있음",x:s=>({e:{m:-Math.max(0,Math.round(s.m*.5)),p:4,r:2},r:"아이들이 고맙다고 했다. 홀가분하다."})},
+ {t:"모교에 장학금을 기부한다",x:s=>({e:{m:-Math.max(0,Math.round(s.m*.3)),r:15,p:5},r:`'박유성 장학금'이 생겼다. 첫 장학생이 편지를 보내왔다.`})},
+ {t:"남은 인생 내가 쓴다",e:{p:8,m:-2000},r:"좋은 옷을 사고, 좋은 걸 먹었다."}]},
+{age:77,title:"양림동 골목",text:"양림동 펭귄마을 골목을 천천히 걷는다. 어릴 적 담벼락이 그대로다.",ch:[
+ {t:"자서전을 쓴다",e:{r:4,p:6},r:"제목은 '광주에서 한 평생'. 동네 책방에 열 권을 놓았다."},
+ {t:s=>S.flags.junho?"준호를 찾아간다":"오랜 친구를 찾아간다",e:{p:8},r:"둘이서 광주천 벤치에 앉아 해가 질 때까지 이야기했다."},
+ {t:"국립아시아문화전당 공연을 본다",e:{p:6},r:"처음 보는 나라의 음악이었다. 아직 처음인 게 남아 있다."}]}
+];
+
+const AMBIENT=[
+ [0,12,"충장축제 퍼레이드를 아버지 목말을 타고 봤다.",{p:2}],
+ [0,12,"할머니 댁 김장 날, 수육을 얻어먹었다.",{p:2}],
+ [3,12,"감기에 걸려 일주일을 앓았다.",{h:-2}],
+ [6,18,"사직공원 전망대에서 광주 야경을 봤다.",{p:2}],
+ [7,18,"광주천에서 자전거를 배웠다.",{h:2}],
+ [13,18,"시험 기간, 밤새 공부했다.",{s:2,h:-1}],
+ [0,99,"기아 타이거즈가 한국시리즈에서 우승했다.",{p:4}],
+ [19,99,"대인시장 야시장에서 친구들과 막걸리를 마셨다.",{p:2,h:-1}],
+ [10,99,"광주비엔날레가 열렸다. 주말에 들러봤다.",{p:2,s:1}],
+ [0,99,"폭염 경보. 광주는 역시 덥다.",{h:-1}],
+ [5,99,"1913송정역시장에서 떡갈비를 먹었다.",{p:2}],
+ [0,99,"무등산에 첫눈이 내렸다.",{p:1}],
+ [19,99,"금남로 차 없는 거리 행사를 걸었다.",{p:1}],
+ [19,64,"야근이 이어진 한 해였다.",{h:-2,m:200}],
+ [19,64,"보너스가 조금 나왔다.",{m:300,p:1}],
+ [50,99,"무릎이 시큰거린다.",{h:-2}],
+ [60,99,"사직공원 벤치에서 오후를 보냈다.",{p:1}],
+ [65,99,"양동시장에서 옛날 단골집 사장님과 인사를 나눴다.",{p:2,r:1}]
+];
+
+/* ---------- 엔진 ---------- */
+const $=id=>document.getElementById(id);
+const val=(v,s)=>typeof v==="function"?v(s):v;
+function stageOf(a){return STAGES.find(x=>a>=x[1]&&a<=x[2])||STAGES[6]}
+function won(m){
+  const neg=m<0, a=Math.abs(m), eok=Math.floor(a/10000), man=a%10000;
+  let t=eok?`${eok}억${man?" "+man.toLocaleString()+"만":""}`:`${man.toLocaleString()}만`;
+  return (neg?"−":"")+t+"원";
+}
+function apply(e){
+  if(!e)return;
+  for(const k of ["h","p","r","s"]) if(e[k]) S[k]=clamp(S[k]+e[k]);
+  if(e.m) S.m+=e.m;
+}
+function addLog(t,key){S.log.unshift({a:S.age,t,key});renderLog()}
+
+function render(){
+  $("age").textContent=S.age; $("year").textContent=BIRTH+S.age;
+  const st=stageOf(S.age);
+  $("stageName").textContent=st[0]; $("stageRange").textContent=st[2]>=100?"65세 이상":`${st[1]}–${st[2]}세`;
+  $("stages").innerHTML=STAGES.map(x=>{const w=Math.min(x[2],90)-x[1]+1;const cls=S.age>x[2]?"on":(S.age>=x[1]?"now":"");return `<div class="${cls}" style="flex:${w}" title="${x[0]}"></div>`}).join("");
+  $("stats").innerHTML=STATDEF.map(([k,n])=>`<div class="stat"><span>${n}</span><div class="bar"><i class="${S[k]<25?"low":""}" style="width:${S[k]}%"></i></div><span class="v">${Math.round(S[k])}</span></div>`).join("");
+  const mEl=$("money");
+  if(S.age<19&&S.m===0){mEl.textContent="부모님 품";mEl.className=""}
+  else{mEl.textContent=won(S.m);mEl.className=S.m<0?"neg":""}
+  $("sub").textContent=`광주광역시 ${S.home} · ${BIRTH}년생`;
+  const jobName={none:"없음",student:"학생",part:"아르바이트",kia:"생산직",samsung:"회사원",gov:"공공기관",research:"연구원",art:"예술가",council:"정치인",retired:"은퇴",startup:"스타트업",cafe:"자영업",shop:"자영업",stall:"상인"}[S.job]||"—";
+  $("facts").innerHTML=[["직업",S.age<7?"—":jobName],["직장",S.work],["학력",S.edu],["결혼",S.marry+(S.partner&&S.marry!=="이혼"?` · ${S.partner}`:"")],["자녀",S.kids?`${S.kids}명`:"없음"]].map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join("");
+}
+function renderLog(){
+  $("log").innerHTML=S.log.slice(0,120).map(l=>`<li class="${l.key?"key":""}"><em>${String(l.a).padStart(2," ")}세</em>${l.t}</li>`).join("");
+}
+
+function setCard(html){$("card").innerHTML=html}
+
+function intro(){
+  mode="intro";
+  setCard(`<div class="eyebrow">2026년 · 광주광역시 남구 양림동</div>
+  <h2>박유성이 태어났다</h2>
+  <p class="story">3.2kg, 울음소리가 컸다. 아버지 박태수와 어머니 김정희의 첫아이. 창밖으로 무등산 능선이 보인다.<br>이 아이의 한평생을 광주에서 함께 지켜본다. 시간이 흐르다 갈림길이 오면 멈추고, 당신이 고른다.</p>
+  <button class="primary" id="startBtn">인생 시작하기</button>`);
+  $("startBtn").onclick=start;
+}
+function start(){
+  S=fresh(); renderLog(); addLog("광주 양림동에서 태어났다.",true); render();
+  mode="run"; tickerCard("응애. 세상에 나왔다."); schedule();
+}
+function tickerCard(line){
+  setCard(`<div class="eyebrow">${stageOf(S.age)[0]} · ${BIRTH+S.age}년</div><p class="ticker"><b>${S.age}세</b>${line}</p>`);
+}
+function schedule(){
+  clearTimeout(timer);
+  if(paused||mode!=="run")return;
+  timer=setTimeout(year,1100/speed);
+}
+function year(){
+  S.age++;
+  // 수입과 흐름
+  if(S.age>=19){
+    let inc=val(INCOME[S.job]??0); S.m+=inc;
+    if(S.kids&&S.age<S.flags.kidAge+24) S.m-=350*S.kids;
+    if(S.flags.house) S.m+=280;
+    if(S.age>=75) S.m-=250;
+  }
+  if(S.age>=7&&S.age<=18) S.s=clamp(S.s+1);
+  let dh=0; if(S.age>=40)dh-=1; if(S.age>=60)dh-=1.5; if(S.age>=75)dh-=1;
+  if(S.flags.exercise)dh+=1; if(S.flags.neglect)dh-=1; if(S.p>75)dh+=.5;
+  S.h=clamp(S.h+dh);
+  S.p=clamp(S.p+(S.p>55?-1:S.p<45?1:0));
+  if(S.age>=72&&S.marry==="기혼"&&chance(.04)){S.marry="사별";S.p=clamp(S.p-15);addLog(`${S.partner}가 먼저 세상을 떠났다.`,true)}
+  if(checkDeath())return;
+  // 이벤트
+  const ev=EVENTS.find(e=>e.age===S.age&&(!e.req||e.req(S)));
+  render();
+  if(ev){openEvent(ev);return}
+  const pool=AMBIENT.filter(a=>S.age>=a[0]&&S.age<=a[1]);
+  let line="조용히 한 해가 지나갔다.";
+  if(pool.length&&chance(.65)){const a=pool[Math.floor(Math.random()*pool.length)];apply(a[3]);line=a[2];addLog(line)}
+  render(); tickerCard(line); schedule();
+}
+function checkDeath(){
+  let die=S.h<=0||S.age>=100;
+  if(!die&&S.age>=62){const p=Math.max(0,S.age-68)*.012+Math.max(0,40-S.h)*.005;die=chance(p)}
+  if(die){end();return true}
+  return false;
+}
+function openEvent(ev){
+  mode="event"; current=ev;
+  const list=val(ev.ch,S);
+  setCard(`<div class="eyebrow">${S.age}세 · ${BIRTH+S.age}년 · ${stageOf(S.age)[0]}</div>
+  <h2>${ev.title}</h2><p class="story">${val(ev.text,S)}</p>
+  <div class="choices">${list.map((c,i)=>{const ok=!c.req||c.req(S);return `<button class="choice${ok?"":" locked"}" data-i="${i}" ${ok?"":"aria-disabled=\"true\""}><span class="k">${i+1}</span><span>${val(c.t,S)}${ok?"":`<small>조건: ${c.lock||"충족 안 됨"}</small>`}</span></button>`}).join("")}</div>`);
+  current.list=list;
+  document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{if(!b.classList.contains("locked"))choose(+b.dataset.i)});
+}
+function choose(i){
+  const c=current.list[i];
+  const before={m:S.m,h:S.h,p:S.p,r:S.r,s:S.s};
+  let out=c.x?c.x(S):{e:c.e,f:c.f,r:c.r};
+  apply(out.e); if(out.f)out.f(S);
+  const res=val(out.r,S)||"";
+  addLog(`${current.title} — ${val(c.t,S)}. ${res}`,true);
+  render();
+  const names={m:"자산",h:"건강",p:"행복",r:"평판",s:"역량"};
+  const ds=Object.keys(before).map(k=>{const d=Math.round((S[k]-before[k]));if(!d)return"";const up=d>0;return `<span class="${up?"up":"dn"}">${names[k]} ${up?"+":"−"}${k==="m"?won(Math.abs(d)):Math.abs(d)}</span>`}).join("");
+  mode="result";
+  setCard(`<div class="eyebrow">${S.age}세 · ${current.title}</div>
+  <h2>${val(c.t,S)}</h2><p class="story">${res}</p>
+  ${ds?`<div class="deltas">${ds}</div>`:""}
+  <button class="primary" id="contBtn">시간 흘려보내기</button>`);
+  $("contBtn").onclick=()=>{if(checkDeath())return;mode="run";tickerCard("시간이 흐른다.");schedule()};
+  $("contBtn").focus();
+}
+function end(){
+  mode="end"; clearTimeout(timer); S.dead=true;
+  const cause=S.h<=5?"오랜 투병 끝에":S.age>=90?"가족들 곁에서 잠든 채로 평온하게":"어느 봄날 아침, 조용히";
+  addLog(`${cause} 눈을 감았다.`,true); render();
+  const top=[["r","광주가 오래 기억할 사람"],["p","웃음이 많았던 사람"],["h","무등산처럼 단단했던 사람"],["s","끝까지 배우던 사람"]].sort((a,b)=>S[b[0]]-S[a[0]])[0];
+  const epi=S.m>=30000?"알뜰하게 일군 것을 나누고 간 사람":top[1];
+  const score=Math.round(S.p*.35+S.h*.15+S.r*.25+S.s*.1+Math.min(15,Math.max(0,S.m/2000)));
+  const grade=score>=70?"빛나는 삶":score>=55?"단단한 삶":score>=40?"평범하고 고운 삶":"고단했던 삶";
+  setCard(`<div class="eyebrow">${BIRTH}–${BIRTH+S.age} · 향년 ${S.age}세</div>
+  <h2>박유성, ${cause} 눈을 감다</h2>
+  <p class="story">광주에서 태어나 광주에서 ${S.age}년을 살았다. ${S.marry==="미혼"?"평생 혼자였지만 외롭지만은 않았다.":S.marry==="이혼"?"한 번의 이별이 있었다.":`${S.partner||"배우자"}와 함께한 세월이 길었다.`} ${S.kids?`자녀 ${S.kids}명이 장례식장을 지켰다.`:""} 마지막 직장은 ${S.work}.</p>
+  <p class="epitaph">“${epi}”</p>
+  <div class="end-grid">
+   <div><span>평가</span><b style="font-family:var(--f-story)">${grade}</b></div>
+   <div><span>최종 자산</span><b>${won(S.m)}</b></div>
+   <div><span>행복</span><b>${Math.round(S.p)}</b></div>
+   <div><span>평판</span><b>${Math.round(S.r)}</b></div>
+   <div><span>건강</span><b>${Math.round(S.h)}</b></div>
+  </div>
+  <button class="primary" id="againBtn">다시 태어나기</button>`);
+  $("againBtn").onclick=start;
+  try{const k="yuseong-lives";const arr=JSON.parse(localStorage.getItem(k)||"[]");arr.unshift({age:S.age,grade,m:S.m,t:Date.now()});localStorage.setItem(k,JSON.stringify(arr.slice(0,20)))}catch(e){}
+}
+
+/* 컨트롤 */
+$("pauseBtn").onclick=()=>{paused=!paused;$("pauseBtn").setAttribute("aria-pressed",paused);$("pauseBtn").textContent=paused?"계속":"일시정지";schedule()};
+document.querySelectorAll("[data-speed]").forEach(b=>b.onclick=()=>{speed=+b.dataset.speed;document.querySelectorAll("[data-speed]").forEach(x=>x.setAttribute("aria-pressed",x===b));schedule()});
+document.addEventListener("keydown",e=>{
+  if(mode==="event"&&/^[1-6]$/.test(e.key)){const b=document.querySelector(`.choice[data-i="${+e.key-1}"]`);if(b&&!b.classList.contains("locked"))b.click()}
+  else if(mode==="result"&&(e.key==="Enter"||e.key===" ")&&document.activeElement.id!=="contBtn"){e.preventDefault();$("contBtn").click()}
+});
+
+S=fresh(); render(); addLog("광주 양림동에서 태어날 예정이다."); intro();
+</script>
+
+</body>
+</html>
