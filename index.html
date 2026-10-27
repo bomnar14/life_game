@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: 왼쪽 인생 계기판(나이·스탯) + 오른쪽 이야기 카드와 연표. 폰에서는 위아래로 쌓임. 빛고을의 '빛'을 앰버 하이라이트로, 무등산 숲을 초록 액센트로. */
+/* Layout: 왼쪽 인생 계기판 + 오른쪽 이야기 카드·연표·걷는 캐릭터. 빛고을의 '빛'은 앰버, 무등산 숲은 초록. */
 :root{
   --bg:#EDF0EE; --surface:#F8FAF9; --line:#D3D9D6; --fg:#1B232B; --muted:#5E6A70;
   --accent:#2E6A4F; --accent-soft:#DCE9E2; --light:#C68716; --light-soft:#F6E9CF;
@@ -25,25 +25,24 @@
   --bg:#11161B; --surface:#182027; --line:#2A343D; --fg:#E4E8EA; --muted:#93A0A6;
   --accent:#72B693; --accent-soft:#1F3229; --light:#E6AC45; --light-soft:#3A2E17;
   --bad:#E07A6F; --good:#72B693; color-scheme:dark}
-body{margin:0}
 html,body{background:var(--bg);color:var(--fg)}
-body{font-family:var(--f-ui);font-size:15px;line-height:1.55;
+body{margin:0;font-family:var(--f-ui);font-size:15px;line-height:1.55;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
 .app{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:320px minmax(0,1fr);gap:24px;align-items:start}
 @media (max-width:800px){.app{grid-template-columns:minmax(0,1fr)}}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible{outline:2px solid var(--light);outline-offset:2px}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outline-offset:2px}
 
-/* 계기판 */
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:18px;position:sticky;top:16px}
 @media (max-width:800px){.panel{position:static}}
 .who{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
-.who h1{font-family:var(--f-story);font-weight:700;font-size:28px;margin:0;line-height:1.1;letter-spacing:-.01em}
+.who h1{font-family:var(--f-story);font-weight:700;font-size:28px;margin:0;line-height:1.1;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+.ver{font-family:var(--f-num);font-size:11px;font-weight:500;color:var(--light);border:1px solid var(--light);border-radius:4px;padding:1px 5px;letter-spacing:.02em}
 .who .sub{color:var(--muted);font-size:13px;margin-top:4px}
 .age{text-align:right}
 .age b{font-family:var(--f-num);font-size:40px;line-height:1;display:block;font-variant-numeric:tabular-nums}
 .age span{font-size:12px;color:var(--muted)}
-.stages{display:flex;gap:2px;position:relative;margin-top:2px}
+.stages{display:flex;gap:2px}
 .stages div{height:6px;border-radius:2px;background:var(--line)}
 .stages div.on{background:var(--accent)}
 .stages div.now{background:var(--light)}
@@ -62,57 +61,76 @@ button:focus-visible{outline:2px solid var(--light);outline-offset:2px}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:13px;margin:0}
 .facts dt{color:var(--muted)}
 .facts dd{margin:0;font-weight:500;min-width:0}
+.facts dd.warn{color:var(--bad)}
 .ctrl{display:flex;gap:6px;flex-wrap:wrap}
 .ctrl button{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:6px 12px;font-size:13px}
 .ctrl button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
-/* 이야기 */
 .main{display:flex;flex-direction:column;gap:20px;min-width:0}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px 28px 24px;position:relative;overflow:hidden}
 @media (max-width:500px){.card{padding:22px 18px 20px}}
-.card::before{content:"";position:absolute;top:-80px;right:-60px;width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle,var(--light-soft) 0%,transparent 70%);pointer-events:none}
+.card::before{content:"";position:absolute;top:-80px;right:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,var(--light-soft) 0%,transparent 70%);pointer-events:none}
 .eyebrow{font-size:12px;letter-spacing:.08em;color:var(--light);font-weight:600;position:relative}
 .card h2{font-family:var(--f-story);font-size:26px;font-weight:700;margin:6px 0 12px;text-wrap:balance;line-height:1.3;position:relative}
 .story{font-family:var(--f-story);font-size:17px;line-height:1.8;max-width:62ch;margin:0;position:relative}
+.story+.story{margin-top:10px}
 .choices{display:grid;gap:10px;margin-top:22px;position:relative}
 .choice{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:baseline;transition:border-color .15s,background .15s}
 .choice:hover{border-color:var(--accent);background:var(--accent-soft)}
 .choice .k{font-family:var(--f-num);font-size:12px;color:var(--muted)}
-.choice.locked{opacity:.45;cursor:not-allowed}
-.choice.locked:hover{border-color:var(--line);background:var(--bg)}
-.choice small{display:block;color:var(--muted);font-size:12px}
+.choice small{display:block;color:var(--light);font-size:11px;font-weight:600;letter-spacing:.04em;margin-top:2px}
+.reroll{position:relative;margin-top:10px;font-size:12px;color:var(--muted)}
 .deltas{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;position:relative}
 .deltas span{font-family:var(--f-num);font-size:12px;padding:3px 8px;border-radius:20px;background:var(--bg);border:1px solid var(--line)}
 .deltas .up{color:var(--good)} .deltas .dn{color:var(--bad)}
-.primary{margin-top:20px;background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:12px 22px;font-weight:600;position:relative}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;position:relative}
+.primary{background:var(--fg);color:var(--bg);border:0;border-radius:10px;padding:12px 22px;font-weight:600}
 .primary:hover{opacity:.9}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:10px;padding:12px 18px}
 .ticker{font-family:var(--f-story);font-size:17px;color:var(--muted);min-height:3.4em;position:relative}
 .ticker b{color:var(--fg);font-family:var(--f-num);font-weight:500;font-size:14px;margin-right:8px}
 
-/* 연표 */
-.log h3{font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:600;margin:0 0 10px}
-.log ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);max-height:420px;overflow:auto}
+.pickgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:18px;position:relative}
+.pick{text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.pick:hover{border-color:var(--accent);background:var(--accent-soft)}
+.pick b{font-size:15px}
+.pick em{font-style:normal;font-size:11px;color:var(--muted);letter-spacing:.03em}
+.pick span{font-size:12px;color:var(--muted);line-height:1.45}
+.pick .cls{color:var(--light);font-weight:600}
+
+.log h3,.walk h3{font-size:13px;letter-spacing:.06em;color:var(--muted);font-weight:600;margin:0 0 10px}
+.log ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--line);max-height:280px;overflow:auto}
 .log li{padding:6px 0 6px 16px;position:relative;font-size:14px}
 .log li::before{content:"";position:absolute;left:-5px;top:13px;width:8px;height:8px;border-radius:50%;background:var(--line)}
 .log li.key::before{background:var(--light)}
 .log li.key{font-weight:500}
 .log li em{font-style:normal;font-family:var(--f-num);color:var(--muted);font-size:12px;margin-right:8px;font-variant-numeric:tabular-nums}
 
+.walk{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px 10px}
+.walk canvas{display:block;width:100%;height:130px}
+.walk-cap{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
+.walk-cap strong{color:var(--fg);font-weight:600}
+
 .end-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:18px;position:relative}
-.end-grid div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.end-grid div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
 .end-grid span{display:block;font-size:12px;color:var(--muted)}
-.end-grid b{font-family:var(--f-num);font-size:18px}
-.epitaph{font-family:var(--f-story);font-size:20px;border-left:3px solid var(--light);padding-left:14px;margin:18px 0 0;position:relative}
+.end-grid b{font-family:var(--f-num);font-size:17px}
+.lesson{font-family:var(--f-story);font-size:20px;border-left:3px solid var(--light);padding-left:14px;margin:20px 0 0;position:relative;line-height:1.6}
+.words{font-family:var(--f-story);color:var(--muted);margin:12px 0 0;position:relative}
+
+.notes{max-width:1080px;margin:24px auto 0;font-size:13px;color:var(--muted)}
+.notes summary{cursor:pointer;font-weight:600;color:var(--fg)}
+.notes h4{margin:14px 0 4px;color:var(--fg);font-size:13px;font-family:var(--f-num)}
+.notes ul{margin:0;padding-left:18px}
+.notes li{margin:2px 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-
 <div class="app">
   <aside class="panel" aria-label="박유성의 현재 상태">
     <div class="who">
-      <div><h1>박유성</h1><div class="sub" id="sub">광주광역시 · 2026년생</div></div>
+      <div><h1>박유성 <span class="ver" id="ver">v0.01</span></h1><div class="sub" id="sub">광주광역시</div></div>
       <div class="age"><b id="age">0</b><span>세 · <span id="year">2026</span>년</span></div>
     </div>
     <div>
@@ -132,356 +150,1524 @@ button:focus-visible{outline:2px solid var(--light);outline-offset:2px}
   <main class="main">
     <section class="card" id="card" aria-live="polite"></section>
     <section class="log"><h3>인생 연표</h3><ol id="log"></ol></section>
+    <section class="walk" aria-label="유성이의 걸음">
+      <canvas id="walk" aria-hidden="true"></canvas>
+      <div class="walk-cap"><strong id="walkStage">유아기</strong><span id="walkState">출발 전</span></div>
+    </section>
   </main>
 </div>
+<details class="notes">
+  <summary>패치 노트</summary>
+  <h4>v0.01</h4>
+  <ul>
+    <li>시작할 때 광주 동네(11곳)와 집(6종)을 직접 고를 수 있음. 집에 따라 집안 형편이 정해짐</li>
+    <li>모든 사건은 10개 이상의 선택지 중 3개가 무작위로 등장. 앞선 선택에서 이어지는 선택지는 표시와 함께 우선 등장</li>
+    <li>돌잡이 12종이 꿈으로 이어짐 (예: 야구공 → 리틀야구 → 야구 명문고 → 기아 타이거즈 드래프트 → 프로 → 은퇴 후 코치)</li>
+    <li>군 입대 선택지 추가: 해병대, 특전사, 공군, 해군, 카투사, 군악대, 상무, 입영 거부·도주, 면제 시도, 해외 도피 등</li>
+    <li>범죄 갈래 추가: 횡령, 마약 밀거래, 도박, 승부조작, 살인 등. 수사 → 재판 → 수감 → 출소로 이어짐</li>
+    <li>대학 선택지 확대: 서울대·연세대·고려대·KAIST·GIST·하버드·도쿄대·홍익대 미대 등</li>
+    <li>돌발 사건 추가: 강도 침입, 교통사고, 화재, 물난리, 보이스피싱, 돈가방, 복권 등</li>
+    <li>연애 스토리 확대: 헌팅포차 실패, 클럽에서 뺨 맞기, 로맨스 스캠, 키스캠, 경로당 로맨스·불륜 등</li>
+    <li>본격 노화는 70세부터. 노년기 선택지 확대</li>
+    <li>생애 단계별로 걷거나 뛰는 캐릭터 애니메이션 추가</li>
+    <li>결혼하지 않았는데 배우자가 언급되던 문제 수정</li>
+    <li>엔딩에 인생 회고와 교훈, 마지막 한마디 추가</li>
+    <li>자산 모으기 난이도 상승 (생활비, 자녀 양육비, 빚 이자, 파산)</li>
+  </ul>
+  <h4>v0.00</h4>
+  <ul><li>첫 버전: 0세부터 노년까지 광주 배경 인생 시뮬레이션</li></ul>
+</details>
 
 <script>
+/* ===== 유성, 광주에서 — 엔진 ===== */
+const VERSION="0.01";
 const BIRTH=2026;
-const STAGES=[["유아기",0,6],["아동기",7,12],["청소년기",13,18],["청년기",19,34],["장년기",35,49],["중년기",50,64],["노년기",65,100]];
-const STATDEF=[["h","건강"],["p","행복"],["r","평판"],["s","역량"]];
-const INCOME={none:0,student:-150,part:350,kia:1900,samsung:2200,gov:1200,research:1700,art:450,council:1500,retired:300,
-  startup:()=>rnd(-900,3600),cafe:()=>rnd(-700,1700),shop:()=>rnd(-300,900),stall:()=>rnd(-200,700)};
+const STAGES=[["유아기",0,6,"toddler"],["아동기",7,12,"child"],["청소년기",13,18,"teen"],["청년기",19,34,"young"],["장년기",35,54,"adult"],["중년기",55,69,"adult"],["노년기",70,120,"elder"]];
 const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
 const chance=p=>Math.random()<p;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
 const clamp=v=>Math.max(0,Math.min(100,v));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const val=(v,...x)=>typeof v==="function"?v(...x):v;
+const O=(t,e,r,o)=>Object.assign({t,e,r},o||{});
+const hasJong=w=>{if(!w)return false;const c=w.charCodeAt(w.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28>0};
+const JS=(w,a,b)=>w+(hasJong(w)?a:b);
+const callName=n=>n+(hasJong(n)?"이":"");
 
-let S, timer=null, speed=1, paused=false, mode="intro", current=null, lastResult=null;
-
-function fresh(){
-  return {age:0,m:0,h:72,p:60,r:40,s:30,job:"none",work:"—",edu:"—",marry:"미혼",partner:null,kids:0,home:"남구 양림동",flags:{},log:[],dead:false};
-}
-
-/* ---------- 이벤트 ---------- */
-// e: 효과 {m,h,p,r,s}, f: 상태 변경, r: 결과 문장. 선택지 자체가 함수면 실행 결과를 반환.
-const EVENTS=[
-{age:1,title:"돌잡이",text:"양림동 할머니 댁 마당에 상이 차려졌다. 친척들이 숨을 죽이고 유성이의 손끝을 본다.",ch:[
- {t:"연필을 잡는다",e:{s:6},f:s=>s.flags.pencil=1,r:"연필을 꽉 쥐었다. 할머니가 \"판사 되겄네\" 하신다."},
- {t:"오만원권을 잡는다",e:{p:3},f:s=>s.flags.luck=1,r:"돈을 잡았다. 아버지가 제일 크게 웃었다."},
- {t:"기아 타이거즈 야구공을 잡는다",e:{h:6,p:4},f:s=>s.flags.tigers=1,r:"야구공을 입에 넣으려다 삼촌이 \"평생 기아 팬 확정\"이라고 외쳤다."}]},
-{age:3,title:"이사",text:"아버지가 직장을 옮기면서 가족이 이사를 고민한다. 어머니는 아이 키우기 좋은 동네가 먼저라고 한다.",ch:[
- {t:"양림동 오래된 주택에 남는다",e:{p:5,r:3},f:s=>s.home="남구 양림동",r:"선교사 사택 골목과 담쟁이 사이에서 자라게 됐다."},
- {t:"광산구 수완지구 신축 아파트",e:{s:3,p:2},f:s=>s.home="광산구 수완지구",r:"놀이터가 세 개 있는 단지. 학원 버스가 아파트 앞까지 온다."},
- {t:"북구 첨단지구",e:{h:4},f:s=>s.home="북구 첨단지구",r:"쌍암공원 호수 옆으로 이사했다. 산책이 일상이 됐다."}]},
-{age:5,title:"첫 무등산",text:"아버지가 \"무등산 정상 보러 갈래?\" 하고 묻는다. 원효사 주차장에서 올려다본 산이 끝도 없다.",ch:[
- {t:"서석대까지 끝까지 오른다",e:{h:8,p:3},f:s=>s.flags.hiker=1,r:"울면서 올랐는데, 주상절리를 보고 울음을 그쳤다."},
- {t:"증심사 계곡에서 물놀이만",e:{p:6,h:3},r:"발 담그고 수박 먹은 기억만 오래 남았다."},
- {t:"집에서 태블릿 본다",e:{h:-4,p:2},r:"아버지 혼자 다녀왔다. 사진 속 하늘이 예뻤다."}]},
-{age:7,title:"초등학교 입학",text:s=>`${s.home.split(" ")[1]}의 초등학교에 입학했다. 어머니가 방과 후를 어떻게 보낼지 묻는다.`,ch:[
- {t:"영어·수학 학원",e:{s:8,p:-4},f:s=>{s.job="student";s.work="초등학생"},r:"받아쓰기 100점이 늘었다. 놀이터 친구는 줄었다."},
- {t:"태권도장",e:{h:6,r:2},f:s=>{s.job="student";s.work="초등학생"},r:"노란띠를 매고 동네를 뛰어다녔다."},
- {t:"골목에서 실컷 논다",e:{p:7,s:-2},f:s=>{s.job="student";s.work="초등학생"},r:"해 질 녘까지 술래잡기. 저녁마다 무릎이 까져 있었다."}]},
-{age:9,title:"챔피언스필드",text:s=>`삼촌이 광주-기아 챔피언스필드 표를 구해왔다.${s.flags.tigers?" 돌잡이 때 잡은 야구공 이야기가 또 나온다.":""}`,ch:[
- {t:"응원단 앞에서 목청껏 응원",e:{p:8,r:2},r:"목이 쉬었다. 기아가 9회말에 이겼다."},
- {t:"리틀야구단에 들어간다",e:{h:8,s:-2},f:s=>s.flags.baseball=1,r:"주말마다 그라운드에서 흙투성이가 됐다."},
- {t:"숙제 때문에 안 간다",e:{s:4,p:-5},r:"그날 기아는 끝내기 홈런을 쳤다고 한다."}]},
-{age:11,title:"반장 선거",text:"5학년 2학기 반장 선거. 짝꿍이 \"너 나가면 찍어줄게\"라고 속삭인다.",ch:[
- {t:"출마해서 연설한다",x:s=>chance(.45+s.r/200)?{e:{r:9,p:6},r:"한 표 차이로 반장이 됐다. 연설에서 무등산 이야기를 한 게 먹혔다."}:{e:{r:3,p:-4},r:"두 표 차이로 떨어졌다. 그래도 연설은 잘했다는 말을 들었다."}},
- {t:"친구를 밀어준다",e:{r:4,p:3},r:"친구가 반장이 됐고, 유성이는 부반장이 됐다."},
- {t:"관심 없다",e:{p:1},r:"선거 날 급식에 나온 치킨이 더 중요했다."}]},
-{age:13,title:"학원 땡땡이",text:"중학교 1학년. 친구 준호가 학원 빠지고 상무지구 PC방에 가자고 한다.",ch:[
- {t:"따라간다",e:{p:6,s:-5,r:-2},f:s=>s.flags.junho=1,r:"학원에서 집으로 전화가 왔다. 그래도 준호와는 평생 친구가 됐다."},
- {t:"거절하고 학원에 간다",e:{s:6,p:-3},r:"준호는 다음 날 혼자 혼났다."},
- {t:"대신 광주천 자전거를 타자고 한다",e:{h:5,p:3},f:s=>s.flags.junho=1,r:"둘이서 광주천을 따라 영산강 합류점까지 달렸다."}]},
-{age:15,title:"오월",text:"5월, 역사 수행평가로 5·18민주광장과 옛 전남도청을 찾았다. 분수대 앞에 사람들이 모여 있다.",ch:[
- {t:"해설사 이야기를 끝까지 듣고 기록한다",e:{s:5,r:6},f:s=>s.flags.history=1,r:"보고서가 교내 대회에서 상을 받았다."},
- {t:"할아버지께 그때 이야기를 여쭙는다",e:{p:4,r:4},f:s=>s.flags.history=1,r:"할아버지는 한참 말이 없다가 금남로 이야기를 꺼내셨다."},
- {t:"사진만 찍고 돌아간다",e:{p:2,r:-3},r:"과제는 냈지만 기억에 남는 건 별로 없다."}]},
-{age:16,title:"고등학교 진학",text:"담임 선생님이 진학 상담을 하자고 한다.",ch:[
- {t:"인문계 고등학교",e:{s:5},f:s=>{s.edu="일반고";s.work="고등학생"},r:"야간 자율학습의 세계가 열렸다."},
- {t:"자동차 특성화고",e:{s:3,p:2},f:s=>{s.edu="특성화고";s.work="고등학생";s.flags.tech=1},r:"기아 오토랜드 광주 견학이 1학년 첫 행사였다."},
- {t:"예술고 미술과",e:{p:6},f:s=>{s.edu="예술고";s.work="고등학생";s.flags.art=1},r:"양림동 펭귄마을 골목을 스케치북에 담기 시작했다."}]},
-{age:17,title:"충장로의 오후",text:"충장로 버스킹 공연에서 옆 학교 학생과 눈이 마주쳤다. 노래가 끝나간다.",ch:[
- {t:"용기 내서 번호를 묻는다",x:()=>chance(.6)?{e:{p:10},r:"번호를 받았다. 그날 밤 문자를 열 번쯤 썼다 지웠다."}:{e:{p:-4,r:1},r:"웃으면서 거절당했다. 그래도 용기 낸 자신이 좀 좋았다."}},
- {t:"친구에게 대신 물어봐 달라고 한다",e:{r:-2,p:2},r:"친구가 번호를 받아왔는데, 친구 번호였다."},
- {t:"공부에 집중한다",e:{s:4},r:"모의고사 성적이 조금 올랐다."}]},
-{age:19,title:"스무 살의 갈림길",text:"졸업이 다가온다. 앞으로 무엇을 할지 정해야 한다.",ch:[
- {t:"광주과학기술원(GIST)",req:s=>s.s>=72,lock:"역량 72 이상",e:{s:10,r:5},f:s=>{s.edu="GIST";s.job="student";s.work="GIST 재학"},r:"오룡동 캠퍼스 기숙사에 입사했다."},
- {t:"전남대학교",req:s=>s.s>=50,lock:"역량 50 이상",e:{s:5,r:3},f:s=>{s.edu="전남대";s.job="student";s.work="전남대 재학"},r:"용봉동 캠퍼스, 후문 밥집이 새 단골이 됐다."},
- {t:"조선대학교",req:s=>!s.flags.tech,e:{s:3,p:3},f:s=>{s.edu=s.flags.art?"조선대 미대":"조선대";s.job="student";s.work="조선대 재학"},r:"하얀 본관이 보이는 캠퍼스에서 새내기가 됐다."},
- {t:"기아 오토랜드 광주 고졸 공채",req:s=>s.flags.tech,lock:"특성화고 출신",x:s=>chance(.55+s.s/250)?{e:{r:5,p:4},f:s=>{s.job="kia";s.work="기아 오토랜드 광주"},r:"합격 문자를 받고 어머니가 울었다."}:{e:{p:-6},f:s=>{s.job="part";s.work="대인시장 아르바이트"},r:"아깝게 떨어졌다. 대인시장 가게에서 일을 시작했다."}},
- {t:"바로 돈을 번다",e:{m:300,p:-2},f:s=>{s.job="part";s.work="대인시장 아르바이트"},r:"대인시장 국밥집에서 일을 시작했다. 사장님이 손이 빠르다고 칭찬한다."}]},
-{age:21,title:"입영 통지서",text:"병무청에서 입영 통지서가 날아왔다.",ch:[
- {t:"바로 입대한다",e:{h:5,r:3,p:-4},r:"31사단에서 복무했다. 주말 외박이면 집이 가까워서 좋았다."},
- {t:"학업을 마치고 장교로 간다",req:s=>s.s>=55,lock:"역량 55 이상",e:{r:6,s:3,m:300},r:"상무대에서 교육을 받고 소위로 임관했다."},
- {t:"최대한 미룬다",e:{p:3,r:-3},r:"결국 스물여섯에 갔다. 동기들이 다 형이라고 불렀다."}]},
-{age:23,title:"스물셋",text:s=>s.job==="student"?"학교생활이 반쯤 지났다. 남은 시간을 어디에 쓸지 고민이다.":`${s.work}에서 일한 지 몇 해가 지났다.`,ch:s=>s.job==="student"?[
- {t:"창업 동아리",e:{s:4,r:3},f:s=>s.flags.startup=1,r:"첨단 창업보육센터에서 밤을 새우는 날이 많아졌다."},
- {t:"밴드 동아리",e:{p:8,s:-2},r:"양림동 작은 공연장에서 첫 공연을 했다. 관객이 열두 명이었다."},
- {t:"학점 관리",e:{s:8,p:-3},r:"장학금을 받았다. 도서관 자리 하나가 유성이 자리처럼 됐다."}]:[
- {t:"야간 대학에 등록한다",e:{s:7,p:-2,m:-400},f:s=>s.edu=s.edu+" · 야간대",r:"일 끝나고 수업 듣는 생활. 피곤하지만 뿌듯하다."},
- {t:"악착같이 저축한다",e:{m:800,p:-2},r:"통장 잔고가 처음으로 네 자리가 됐다."},
- {t:"동료들과 즐겁게 산다",e:{p:7,r:3,m:-200},r:"퇴근 후 송정역시장 떡갈비집이 아지트가 됐다."}]},
-{age:26,title:"첫 직장",req:s=>["student","part","none"].includes(s.job),text:"졸업장을 받아 들었다. 이제 진짜 일을 구해야 한다.",ch:[
- {t:"삼성전자 광주사업장",req:s=>s.s>=60,lock:"역량 60 이상",x:s=>chance(.5+s.s/300)?{e:{r:6,p:5},f:s=>{s.job="samsung";s.work="삼성전자 광주사업장"},r:"하남산단 출근길이 시작됐다. 첫 월급으로 부모님 내복을 샀다."}:{e:{p:-6},f:s=>{s.job="part";s.work="편의점 아르바이트"},r:"최종 면접에서 떨어졌다. 편의점 야간 아르바이트로 버틴다."}},
- {t:"광주광역시청 공무원 시험",x:s=>chance(.3+s.s/200)?{e:{r:5,p:3},f:s=>{s.job="gov";s.work="광주광역시청"},r:"합격. 상무지구 시청으로 출근한다."}:{e:{p:-8,m:-300},f:s=>{s.job="part";s.work="독서실 총무"},r:"두 점 차이로 떨어졌다. 독서실 총무를 하며 다시 준비한다."}},
- {t:"첨단 AI 스타트업",req:s=>s.flags.startup||s.s>=55,lock:"창업 경험 또는 역량 55",e:{s:6,p:4},f:s=>{s.job="startup";s.work="첨단 AI 스타트업"},r:"직원 일곱 명. 직함이 세 개다."},
- {t:"GIST 연구원",req:s=>s.edu==="GIST",lock:"GIST 출신",e:{s:8,r:6},f:s=>{s.job="research";s.work="GIST 연구원"},r:"연구실 창밖으로 무등산이 보인다."},
- {t:"동명동 카페 창업 (대출 3천)",e:{m:-3000,p:6},f:s=>{s.job="cafe";s.work="동명동 카페 사장"},r:"동명동 골목 2층에 작은 카페를 열었다. 간판은 직접 칠했다."},
- {t:"광주비엔날레재단",req:s=>s.flags.art,lock:"예술 전공",e:{p:7,r:4},f:s=>{s.job="art";s.work="광주비엔날레재단"},r:"전시장 벽에 작품을 거는 일부터 시작했다."}]},
-{age:28,title:"인연",req:s=>s.marry==="미혼",text:"주변에서 하나둘 결혼 소식이 들린다. 어머니의 잔소리도 늘었다.",ch:[
- {t:"친구 소개팅에 나간다",x:()=>chance(.7)?{e:{p:9},f:s=>{s.marry="연애중";s.partner="이서연"},r:"초등학교 교사 이서연. 광주천 산책길에서 손을 잡았다."}:{e:{p:-3},r:"대화가 이어지지 않았다. 파스타만 맛있었다."}},
- {t:"무등산 산악회에 가입한다",e:{h:5},x:()=>chance(.6)?{e:{h:5,p:8},f:s=>{s.marry="연애중";s.partner="정하은"},r:"간호사 정하은과 중머리재에서 김밥을 나눠 먹었다."}:{e:{h:6,p:2},r:"인연은 없었지만 다리가 튼튼해졌다."}},
- {t:"지금은 일이 먼저",e:{s:5,m:400,p:-4},r:"주말에도 노트북을 켰다."}]},
-{age:30,title:"프러포즈",req:s=>s.marry==="연애중",text:s=>`${s.partner}와 만난 지 2년. 반지를 샀다. 어디서 말할까.`,ch:[
- {t:"무등산 서석대 일출 앞에서",x:s=>chance(.85)?{e:{p:14,m:-2500,r:4},f:s=>s.marry="기혼",r:`해가 뜨는 순간 ${s.partner}가 고개를 끄덕였다. 결혼식은 김대중컨벤션센터에서 했다.`}:{e:{p:-10},f:s=>{s.marry="미혼";s.partner=null},r:"새벽 산행에 지친 상대가 \"생각해 볼게\"라고 했다. 몇 달 뒤 헤어졌다."}},
- {t:"광주호 호수생태원 피크닉",x:s=>chance(.8)?{e:{p:12,m:-2000},f:s=>s.marry="기혼",r:"버드나무 아래에서 반지를 꺼냈다. 결혼식은 양림동 작은 교회에서 했다."}:{e:{p:-10},f:s=>{s.marry="미혼";s.partner=null},r:"\"아직은 아닌 것 같아.\" 그 말이 오래 남았다."}},
- {t:"아직은 아니다",x:s=>chance(.5)?{e:{p:-8},f:s=>{s.marry="미혼";s.partner=null},r:"기다리다 지친 상대가 먼저 이별을 말했다."}:{e:{m:500},r:"1년을 더 미뤘다. 상대는 아직 기다려 준다."}}]},
-{age:32,title:"내 집",text:"전세 계약이 끝나 간다. 집을 어떻게 할지 정해야 한다.",ch:[
- {t:"수완지구 아파트 매수 (대출)",e:{m:-1500,p:4},f:s=>{s.flags.house=1;s.home="광산구 수완지구"},r:"30년 대출. 그래도 내 이름 문패가 생겼다."},
- {t:"봉선동 전세로 산다",e:{m:-300,p:2},f:s=>s.home="남구 봉선동",r:"학군 좋다는 봉선동. 나중을 생각하면 나쁘지 않다."},
- {t:"부모님 집으로 들어간다",e:{m:900,p:-3,r:-2},r:"돈은 모였다. 저녁 반찬 메뉴 결정권은 없다."}]},
-{age:33,title:"아이",req:s=>s.marry==="기혼",text:"아이 이야기가 나왔다. 둘 다 서른을 넘겼다.",ch:[
- {t:"아이를 갖자",e:{p:12,h:-2},f:s=>{s.kids=1;s.flags.kidAge=33},r:"전남대병원에서 딸 박하늘이 태어났다. 이름은 무등산 하늘에서 땄다."},
- {t:"둘을 낳고 싶다",e:{p:14,h:-4,m:-500},f:s=>{s.kids=2;s.flags.kidAge=33},r:"하늘이, 그리고 2년 뒤 아들 박빛찬. 집이 시끄러워졌다."},
- {t:"둘이서 행복하게 살자",e:{p:4,m:600},r:"주말마다 광주 곳곳을 둘이서 걸었다."}]},
-{age:34,title:"혼자의 서른넷",req:s=>s.marry==="미혼",text:"친구들은 다 결혼했다. 단톡방엔 아이 사진뿐이다.",ch:[
- {t:"결혼정보회사에 가입한다",e:{m:-300},x:()=>chance(.5)?{e:{m:-300,p:8},f:s=>{s.marry="기혼";s.partner="한지원"},r:"한지원을 만나 1년 만에 결혼했다. 조용한 결혼식이었다."}:{e:{m:-300,p:-3},r:"가입비만 냈다."}},
- {t:"혼자의 삶을 즐긴다",e:{p:6,m:500},r:"원룸을 예쁘게 꾸미고 주말엔 국립아시아문화전당 공연을 본다."},
- {t:"오래 연락 끊긴 첫사랑에게 연락",x:()=>chance(.25)?{e:{p:12},f:s=>{s.marry="기혼";s.partner="윤가람"},r:"충장로에서 다시 만났다. 둘 다 웃었다. 이듬해 결혼했다."}:{e:{p:-5},r:"읽음 표시만 남았다."}}]},
-{age:37,title:"직장의 바람",req:s=>!["none","part","student"].includes(s.job),text:s=>`${s.work}에 변화가 찾아왔다.`,ch:s=>({
- samsung:[{t:"라인 이전 희망퇴직, 위로금을 받는다",e:{m:9000,p:-3},f:s=>{s.job="none";s.work="퇴직 후 구직 중"},r:"큰돈이 들어왔지만 아침에 갈 곳이 없어졌다."},{t:"남아서 버틴다",e:{h:-6,m:500,r:3},r:"주말 출근이 늘었다. 그래도 자리를 지켰다."},{t:"사내 재교육으로 반도체 직무 전환",e:{s:8,p:2},r:"마흔을 앞두고 다시 공부했다."}],
- gov:[{t:"승진 시험을 준비한다",x:()=>chance(.6)?{e:{r:8,m:300},r:"사무관으로 승진했다."}:{e:{p:-5},r:"이번엔 떨어졌다."}},{t:"민원 많은 부서를 자원한다",e:{r:9,h:-5},r:"5·18 기념사업 업무를 맡았다."},{t:"조용히 정년을 바라본다",e:{p:3},r:"평온한 나날."}],
- startup:[{t:"투자 유치에 올인한다",x:()=>chance(.4)?{e:{m:12000,r:10,p:8},r:"시리즈 B 투자 유치 성공. 지분이 갑자기 큰돈이 됐다."}:{e:{m:-4000,p:-10,h:-5},f:s=>{s.job="none";s.work="폐업 후 구직 중"},r:"투자 무산. 회사를 정리했다."}},{t:"대기업에 회사를 매각한다",e:{m:5000,p:-2},f:s=>{s.job="samsung";s.work="대기업 광주 R&D센터"},r:"인수되면서 대기업 직원이 됐다."},{t:"작게 오래 간다",e:{p:4,h:2},r:"직원 열두 명. 무리하지 않기로 했다."}],
- cafe:[{t:"2호점을 낸다",x:()=>chance(.5)?{e:{m:3000,r:5},r:"상무지구 2호점이 대박 났다."}:{e:{m:-3500,h:-4},r:"2호점은 1년 만에 문을 닫았다."}},{t:"원두 로스팅 납품으로 바꾼다",e:{s:6,m:800},r:"광주 카페 서른 곳에 원두를 댄다."},{t:"가게를 정리한다",e:{m:1000,p:-6},f:s=>{s.job="none";s.work="구직 중"},r:"마지막 영업일에 단골들이 꽃을 들고 왔다."}],
- kia:[{t:"전기차 라인 교육을 자원한다",e:{s:7,r:4},r:"광주 공장 첫 전기차 생산 라인에 배치됐다."},{t:"노조 대의원에 출마한다",e:{r:8,p:2,h:-2},r:"동료들의 표로 대의원이 됐다."},{t:"그대로 묵묵히 일한다",e:{m:400,h:-3},r:"20년 근속 패를 받았다."}],
- research:[{t:"연구소 기업을 창업한다",e:{m:-2000,s:6},f:s=>{s.job="startup";s.work="GIST 연구소 기업 대표"},r:"첨단3지구에 사무실을 얻었다."},{t:"교수직에 지원한다",x:()=>chance(.45)?{e:{r:10,p:6},f:s=>s.work="전남대 교수",r:"전남대 교수로 임용됐다."}:{e:{p:-4},r:"최종에서 떨어졌다. 다시 논문을 쓴다."}},{t:"연구에만 몰두한다",e:{s:8,h:-4},r:"논문 인용 수가 늘었다."}],
- art:[{t:"본전시 큐레이터에 도전한다",e:{r:9,h:-4},r:"비엔날레 보조 큐레이터로 이름이 올라갔다."},{t:"개인 작업실을 연다",e:{p:7,m:-800},f:s=>s.work="양림동 작업실 작가",r:"양림동에 작업실을 냈다."},{t:"안정적인 학원 강사로 옮긴다",e:{m:900,p:-3},f:s=>{s.job="gov";s.work="미술학원 강사"},r:"월급이 일정해졌다."}],
- council:[{t:"재선에 도전한다",x:s=>chance(s.r/120)?{e:{r:6},r:"재선 성공."}:{e:{r:-4,p:-6},f:s=>{s.job="none";s.work="낙선 후 휴식"},r:"낙선했다."}},{t:"정치를 그만둔다",e:{p:6},f:s=>{s.job="none";s.work="구직 중"},r:"다시 평범한 주민으로."},{t:"지역 현안에 집중한다",e:{r:5,h:-3},r:"광주천 정비 조례를 통과시켰다."}],
- shop:[{t:"확장한다",e:{m:-1000,r:3},r:"가게가 넓어졌다."},{t:"그대로 간다",e:{p:3},r:"단골이 늘었다."},{t:"접는다",e:{m:500},f:s=>{s.job="none";s.work="구직 중"},r:"가게를 정리했다."}]
-}[s.job]||[{t:"버틴다",e:{h:-3},r:"그럭저럭 버텼다."},{t:"새로 시작한다",e:{p:3,m:-500},r:"새 출발."}])},
-{age:38,title:"다시 일자리",req:s=>s.job==="none"||s.job==="part",text:"쉬는 시간이 길어지고 있다. 통장이 줄어드는 게 보인다.",ch:[
- {t:"광주형 일자리 공장에 지원한다",e:{r:3},f:s=>{s.job="kia";s.work="광주글로벌모터스"},r:"빛그린산단 공장으로 출근하게 됐다."},
- {t:"송정역 앞 떡갈비 가게를 차린다",e:{m:-2500,p:5},f:s=>{s.job="shop";s.work="송정역 떡갈비집 사장"},r:"KTX 손님이 줄을 섰다. 가끔은."},
- {t:"자격증을 따서 재취업",e:{s:6,p:-2},f:s=>{s.job="gov";s.work="광주도시공사 계약직"},r:"공인중개사 자격증으로 도시공사에 들어갔다."}]},
-{age:40,title:"건강검진",text:"전남대병원 건강검진 결과지에 빨간 글씨가 세 줄이다.",ch:[
- {t:"광주천 자전거로 출퇴근한다",e:{h:8,p:2},f:s=>s.flags.exercise=1,r:"타는 날보다 비 오는 날이 많았지만, 뱃살이 줄었다."},
- {t:"술·담배를 끊는다",e:{h:7,p:-3,m:200},r:"대인시장 막걸리 모임에서 사이다만 마셨다."},
- {t:"바쁘니까 다음에",e:{h:-6},f:s=>s.flags.neglect=1,r:"결과지는 서랍 속으로 들어갔다."}]},
-{age:42,title:"솔깃한 제안",text:s=>`${s.flags.junho?"오랜 친구 준호":"고등학교 동창"}가 술자리에서 투자 이야기를 꺼낸다.`,ch:[
- {t:"코인에 3천만 원 넣는다",x:s=>chance(s.flags.luck?.42:.3)?{e:{m:7000,p:6},r:"세 배가 됐다. 돌잡이 때 돈을 잡은 덕일까."}:{e:{m:-3000,p:-9},r:"반의 반 토막. 아내에게 말하지 못했다."}},
- {t:"송정역 근처 상가에 투자한다",x:()=>chance(.6)?{e:{m:2500},r:"KTX 역세권 상가 월세가 꼬박꼬박 들어온다."}:{e:{m:-1200,p:-4},r:"공실이 1년째다."}},
- {t:"정중히 거절하고 적금을 든다",e:{m:400,p:1},r:"재미는 없지만 마음은 편하다."}]},
-{age:45,title:"부모님",text:"어머니가 쓰러지셨다는 전화를 받았다. 뇌경색 초기라고 한다.",ch:[
- {t:"직접 모시고 간병한다",e:{p:-6,h:-5,r:8,m:-1000},r:"2년 동안 어머니 곁을 지켰다. 어머니는 웃으며 고맙다고 하셨다."},
- {t:"요양병원에 모시고 주말마다 찾아간다",e:{m:-2000,p:-2,r:2},r:"일요일 오후는 늘 요양병원에서 보냈다."},
- {t:"형제와 간병인에게 맡긴다",e:{m:-600,r:-6,p:-3},r:"마음 한구석이 오래 무거웠다."}]},
-{age:47,title:"동네 일",text:s=>`${s.home} 주민들이 주민자치회 일을 맡아 달라고 한다.`,ch:[
- {t:"맡는다",e:{r:10,p:3,h:-2},r:"마을 축제를 다시 살렸다. 동네 사람들이 이름을 알아본다."},
- {t:"아예 구의원에 출마한다",x:s=>chance(s.r/110)?{e:{r:15,m:-1500},f:s=>{s.job="council";s.work="구의회 의원"},r:"당선. 현수막에 이름이 걸렸다."}:{e:{r:-3,m:-3000,p:-8},r:"낙선. 선거 빚이 남았다."}},
- {t:"정중히 거절한다",e:{p:2},r:"저녁 시간은 지켰다."}]},
-{age:50,title:"쉰",text:"쉰 번째 생일. 거울 속 얼굴이 아버지를 닮았다. 오래 묻어 둔 꿈이 떠오른다.",ch:[
- {t:"일을 그만두고 동명동에 책방을 연다",e:{m:-2000,p:12,r:3},f:s=>{s.job="shop";s.work="동명동 책방 주인"},r:"손님은 적지만 하루가 짧다."},
- {t:"지금 자리에서 버틴다",e:{m:1000,p:-5},r:"꿈은 은퇴 후로 미뤘다."},
- {t:"한 달 휴가로 빛고을 둘레길을 완주한다",e:{h:6,p:7,m:-300},r:"광주를 한 바퀴 걸었다. 몰랐던 골목이 많았다."}]},
-{age:52,title:"아이의 입시",req:s=>s.kids>0,text:"하늘이가 고3이 됐다. 진로 이야기로 저녁 식탁이 조용하다.",ch:[
- {t:"봉선동 학원가에 집중 투자",e:{m:-3000,p:-2},r:"하늘이는 서울의 대학에 붙었다. 송정역에서 배웅했다."},
- {t:"하고 싶은 걸 하게 둔다",e:{p:6,r:2},r:"하늘이는 조선대 간호학과에 갔다. 광주에 남았다."},
- {t:"해외 유학을 보낸다",e:{m:-8000,p:2},r:"공항 가는 길이 길었다."}]},
-{age:55,title:"충장로 동창회",text:"30년 만의 고등학교 동창회가 충장로에서 열렸다.",ch:[
- {t:"2차, 3차까지 간다",e:{p:7,h:-3},r:"새벽 세 시, 금남로를 걸으며 교가를 불렀다."},
- {t:"동창들 사업을 도와준다",e:{r:6,m:-500},r:"친구 가게 개업식 화환을 보냈다."},
- {t:"1차만 하고 일찍 귀가한다",e:{p:2,h:1},r:"집에 오니 마음이 편했다."}]},
-{age:57,title:"식탁의 침묵",req:s=>s.marry==="기혼",text:s=>`${s.partner}가 요즘 둘이 대화가 줄었다고 말한다.`,ch:[
- {t:"원효사 템플스테이를 함께 간다",e:{p:8,m:-200},r:"무등산 새벽 예불 소리에 둘 다 오래 앉아 있었다."},
- {t:"부부 상담을 받는다",e:{p:5,m:-150},r:"서로 몰랐던 이야기가 많았다."},
- {t:"바빠서 넘긴다",x:()=>chance(.4)?{e:{p:-15,m:-5000,r:-4},f:s=>{s.marry="이혼";s.partner=null},r:"이듬해 이혼 서류에 도장을 찍었다."}:{e:{p:-4},r:"불편한 침묵이 이어졌다."}}]},
-{age:61,title:"은퇴",req:s=>!["none","retired"].includes(s.job),text:s=>`${s.work}에서 은퇴 이야기가 나온다.`,ch:[
- {t:"연장 근무를 신청한다",e:{m:2500,h:-4},r:"3년을 더 일했다."},
- {t:"은퇴하고 연금 생활",e:{p:6,h:2},f:s=>{s.job="retired";s.work="은퇴"},r:"송별회에서 꽃다발을 받았다."},
- {t:"대인시장에 작은 가게를 연다",e:{m:-1000,p:5,r:4},f:s=>{s.job="stall";s.work="대인시장 상인"},r:"야시장 날이면 손님이 꽤 온다."}]},
-{age:62,title:"쉬는 날들",req:s=>s.job==="none",text:"일자리가 없는 채로 예순을 넘겼다.",ch:[
- {t:"노인 일자리 사업에 지원한다",e:{p:3,m:300},f:s=>{s.job="retired";s.work="광주천 환경지킴이"},r:"광주천 쓰레기를 줍는 일. 생각보다 좋다."},
- {t:"그냥 쉰다",e:{p:2},f:s=>{s.job="retired";s.work="은퇴"},r:"오후엔 사직공원 벤치에 앉는다."}]},
-{age:64,title:"손주",req:s=>s.kids>0,text:"하늘이가 아이를 낳았다. 할아버지가 됐다.",ch:[
- {t:"손주를 돌봐준다",e:{p:10,h:-3},r:"유모차를 밀고 펭귄마을을 매일 걸었다."},
- {t:"용돈과 선물로 챙긴다",e:{m:-500,p:3},r:"영상통화로 자주 얼굴을 본다."},
- {t:"내 시간이 우선이다",e:{p:2,r:-3},r:"서운하다는 말을 들었다."}]},
-{age:67,title:"노년의 하루",text:"매일 아침이 길어졌다. 무엇으로 하루를 채울까.",ch:[
- {t:"5·18 기념공원 해설 자원봉사",e:{r:10,p:6},x:s=>({e:{r:s.flags.history?14:8,p:6},r:s.flags.history?"열다섯 살 때 들은 해설이 이제 유성이의 입에서 나온다.":"공부해서 해설사가 됐다. 학생들이 귀를 기울인다."})},
- {t:"무등산 산악회",e:{h:6,p:4},r:s=>"한 달에 한 번 무등산을 오른다. 서석대는 여전하다."},
- {t:"경로당 바둑",e:{p:4,h:-1},r:"동네 최강자가 됐다."}]},
-{age:70,title:"수술",text:"전남대병원 의사가 큰 수술을 권했다. 회복이 길 거라고 한다.",ch:[
- {t:"수술을 받는다",x:()=>chance(.75)?{e:{h:15,m:-1500},r:"수술은 잘 끝났다. 창밖 무등산이 반가웠다."}:{e:{h:-22,m:-1500},r:"합병증이 왔다. 회복이 더디다."}},
- {t:"약물 치료로 지켜본다",e:{h:-8,m:-400},r:"조금씩 숨이 찬다."},
- {t:"민간요법에 기댄다",e:{h:-12,m:-600},r:"효과는 잘 모르겠다."}]},
-{age:73,title:"남길 것",text:"통장과 집 문서를 정리할 때가 됐다.",ch:[
- {t:"자녀에게 미리 증여한다",req:s=>s.kids>0,lock:"자녀 있음",x:s=>({e:{m:-Math.max(0,Math.round(s.m*.5)),p:4,r:2},r:"아이들이 고맙다고 했다. 홀가분하다."})},
- {t:"모교에 장학금을 기부한다",x:s=>({e:{m:-Math.max(0,Math.round(s.m*.3)),r:15,p:5},r:`'박유성 장학금'이 생겼다. 첫 장학생이 편지를 보내왔다.`})},
- {t:"남은 인생 내가 쓴다",e:{p:8,m:-2000},r:"좋은 옷을 사고, 좋은 걸 먹었다."}]},
-{age:77,title:"양림동 골목",text:"양림동 펭귄마을 골목을 천천히 걷는다. 어릴 적 담벼락이 그대로다.",ch:[
- {t:"자서전을 쓴다",e:{r:4,p:6},r:"제목은 '광주에서 한 평생'. 동네 책방에 열 권을 놓았다."},
- {t:s=>S.flags.junho?"준호를 찾아간다":"오랜 친구를 찾아간다",e:{p:8},r:"둘이서 광주천 벤치에 앉아 해가 질 때까지 이야기했다."},
- {t:"국립아시아문화전당 공연을 본다",e:{p:6},r:"처음 보는 나라의 음악이었다. 아직 처음인 게 남아 있다."}]}
+const DISTRICTS=[
+ {id:"yangnim",gu:"남구",dong:"양림동",desc:"선교사 사택과 펭귄마을 골목. 담쟁이가 오래된 동네.",e:"p3 r2"},
+ {id:"suwan",gu:"광산구",dong:"수완지구",desc:"대단지 아파트와 학원 버스가 줄 선 신도시.",e:"s3"},
+ {id:"cheomdan",gu:"북구",dong:"첨단지구",desc:"과학단지와 쌍암공원 호수가 있는 동네.",e:"s2 h2"},
+ {id:"bongseon",gu:"남구",dong:"봉선동",desc:"광주의 대치동. 학원 간판이 하늘을 가린다.",e:"s5 p-2"},
+ {id:"sangmu",gu:"서구",dong:"상무지구",desc:"시청과 유흥가가 한 블록 차이로 붙어 있다.",e:"r1 p1",set:{night:1}},
+ {id:"chungjang",gu:"동구",dong:"충장로",desc:"한때 광주의 명동. 조용해진 구도심 상권.",e:"r3"},
+ {id:"songjeong",gu:"광산구",dong:"송정동",desc:"KTX 광주송정역과 떡갈비 거리.",e:"p2"},
+ {id:"hakdong",gu:"동구",dong:"학동",desc:"재개발 소문이 십 년째 도는 오래된 동네.",e:"p1 h-1",set:{redevStake:1}},
+ {id:"yongbong",gu:"북구",dong:"용봉동",desc:"전남대 정문 앞, 자취방과 술집이 섞인 대학가.",e:"s2 p2"},
+ {id:"pungam",gu:"서구",dong:"풍암동",desc:"풍암호수공원 옆 조용한 주택가.",e:"h3"},
+ {id:"bangnim",gu:"남구",dong:"방림동",desc:"무등산 자락, 경사진 골목의 오래된 집들.",e:"h2 p1",set:{hiker:1}}
 ];
-
-const AMBIENT=[
- [0,12,"충장축제 퍼레이드를 아버지 목말을 타고 봤다.",{p:2}],
- [0,12,"할머니 댁 김장 날, 수육을 얻어먹었다.",{p:2}],
- [3,12,"감기에 걸려 일주일을 앓았다.",{h:-2}],
- [6,18,"사직공원 전망대에서 광주 야경을 봤다.",{p:2}],
- [7,18,"광주천에서 자전거를 배웠다.",{h:2}],
- [13,18,"시험 기간, 밤새 공부했다.",{s:2,h:-1}],
- [0,99,"기아 타이거즈가 한국시리즈에서 우승했다.",{p:4}],
- [19,99,"대인시장 야시장에서 친구들과 막걸리를 마셨다.",{p:2,h:-1}],
- [10,99,"광주비엔날레가 열렸다. 주말에 들러봤다.",{p:2,s:1}],
- [0,99,"폭염 경보. 광주는 역시 덥다.",{h:-1}],
- [5,99,"1913송정역시장에서 떡갈비를 먹었다.",{p:2}],
- [0,99,"무등산에 첫눈이 내렸다.",{p:1}],
- [19,99,"금남로 차 없는 거리 행사를 걸었다.",{p:1}],
- [19,64,"야근이 이어진 한 해였다.",{h:-2,m:200}],
- [19,64,"보너스가 조금 나왔다.",{m:300,p:1}],
- [50,99,"무릎이 시큰거린다.",{h:-2}],
- [60,99,"사직공원 벤치에서 오후를 보냈다.",{p:1}],
- [65,99,"양동시장에서 옛날 단골집 사장님과 인사를 나눴다.",{p:2,r:1}]
+const HOUSES=[
+ {id:"pent",name:"대형 아파트 펜트하우스",cls:3,desc:"넉넉한 집안. 출발선이 남보다 앞에 있다.",e:"p2 s3"},
+ {id:"apt",name:"30평대 아파트",cls:2,desc:"평범한 중산층 가정.",e:"s1"},
+ {id:"hanok",name:"마당 있는 단독주택",cls:2,desc:"마당에 감나무가 서 있는 집.",e:"p3 h1"},
+ {id:"shop",name:"1층이 가게인 상가주택",cls:2,desc:"부모님이 아래층에서 장사를 한다.",e:"r2",set:{familyShop:1}},
+ {id:"villa",name:"오래된 빌라 2층",cls:1,desc:"빠듯하지만 화목한 집.",e:"p1"},
+ {id:"banjiha",name:"반지하 단칸방",cls:0,desc:"어려운 형편. 비 오는 날이 무섭다.",e:"h-3 p-2 s2",set:{grit:1}}
 ];
+const CLS=["어려운 형편","빠듯한 형편","보통 형편","넉넉한 형편"];
+const NAMES_F=["이서연","정하은","최민지","김다은","윤가람","한지원","오세린","장예린","문채원","송하율","임나래","배수아","고은비","노유진"];
+const KID_NAMES=["하늘","빛찬","새봄","다온","이안","서우","지유","도윤","루아","한결","나린","시온"];
+const JOBS={none:["무직",0],student:["학생",-250],part:["아르바이트",120],kia:["생산직",1000],samsung:["회사원",1200],seoulcorp:["대기업 직원",950],gov:["공공 부문",650],teacher:["교사",700],doctor:["의사",2400],lawyer:["법조인",1800],research:["연구원",950],dev:["개발자",1100],art:["작가",()=>rnd(-500,600)],music:["음악인",()=>rnd(-600,1600)],athlete:["프로 선수",()=>rnd(200,4500)],coach:["지도자",550],startup:["창업가",()=>rnd(-1600,3600)],cafe:["자영업",()=>rnd(-1000,1000)],shop:["자영업",()=>rnd(-600,800)],chef:["요리사",()=>rnd(0,1000)],creator:["방송·유튜브",()=>rnd(-400,2400)],gang:["조직원",()=>rnd(200,2200)],council:["정치인",850],retired:["은퇴",60],stall:["자영업",()=>rnd(-300,400)],prisoner:["수감 중",0]};
+const JOB_DREAM={athlete:["baseball","soccer"],doctor:["doctor"],lawyer:["law"],dev:["coder"],chef:["chef"],art:["art"],music:["music"]};
+const DREAMS={baseball:["야구공","야구선수"],soccer:["축구공","축구선수"],study:["연필","공부로 이름난 사람"],money:["오만원권","부자"],art:["붓","화가"],music:["마이크","가수"],doctor:["청진기","의사"],law:["판사봉","법조인"],coder:["마우스","개발자"],chef:["주걱","요리사"],health:["실타래","오래 사는 사람"],gamble:["화투패","노름꾼"]};
+const CRIME={embezzle:"횡령",fix:"승부조작",tax:"탈세",gambleBiz:"불법 도박장 운영",loanShark:"불법 사채",drug:"마약 밀거래",fraud:"사기",bribe:"뇌물",assault:"폭행"};
+const SEV={embezzle:4,fix:2,tax:2,gambleBiz:3,loanShark:3,drug:7,fraud:3,bribe:2,assault:2};
 
-/* ---------- 엔진 ---------- */
-const $=id=>document.getElementById(id);
-const val=(v,s)=>typeof v==="function"?v(s):v;
+let S=null;
+const MAIN=[],PATHS=[],SUDDEN=[],EV={};
+let AMBIENT=[],JAIL_AMB=[];
+function addMain(l){l.forEach(e=>{MAIN.push(e);EV[e.id]=e})}
+function addPath(l){l.forEach(e=>{PATHS.push(e);EV[e.id]=e})}
+function addSudden(l){l.forEach(e=>{SUDDEN.push(e);EV[e.id]=e})}
+
+/* 텍스트 도우미 */
+const HOME=()=>S.home.split(" ")[1]||S.home;
+const FR=()=>S.flags.junho?"오랜 친구 준호":"고등학교 동창";
+const SPN=()=>S.partner||S.ex||"그 사람";
+const K=(i=0)=>{const k=S.kids.at(i);return k?callName(k.name):"아이"};
+const SPT=()=>S.flags.dream==="soccer"?{n:"축구",team:"광주FC",club:"축구부",ground:"광주축구전용구장"}:{n:"야구",team:"기아 타이거즈",club:"야구부",ground:"챔피언스필드"};
+const FAMSHOP=()=>({songjeong:"송정 떡갈비집",chungjang:"충장로 옷가게",yongbong:"용봉동 하숙집",sangmu:"상무지구 횟집"})[S.dist]||"동네 슈퍼";
+const INH=s=>[-500,800,6000,25000][s.cls];
+const sev=s=>SEV[s.flags.lastCrime]||2;
+const crimeName=s=>CRIME[s.flags.lastCrime]||"과거의 일";
+/* 조건 도우미 */
+const D=d=>s=>s.flags.dream===d;
+const F=k=>s=>!!s.flags[k];
+const STU=s=>s.job==="student";
+const MARRIED=s=>s.marry==="기혼";
+const SINGLE=s=>["미혼","이혼","사별"].includes(s.marry);
+const EMP=s=>["samsung","seoulcorp","kia","research","dev","teacher","gov","doctor","lawyer","coach"].includes(s.job);
+const BIZ=s=>["cafe","shop","startup","chef","stall"].includes(s.job);
+const ART=s=>["art","music","creator"].includes(s.job);
+const ILL=s=>s.job==="gang";
+
+function won(m){const neg=m<0,a=Math.abs(Math.round(m)),eok=Math.floor(a/10000),man=a%10000;const t=eok?`${eok}억${man?" "+man.toLocaleString()+"만":""}`:`${man.toLocaleString()}만`;return(neg?"−":"")+t+"원"}
 function stageOf(a){return STAGES.find(x=>a>=x[1]&&a<=x[2])||STAGES[6]}
-function won(m){
-  const neg=m<0, a=Math.abs(m), eok=Math.floor(a/10000), man=a%10000;
-  let t=eok?`${eok}억${man?" "+man.toLocaleString()+"만":""}`:`${man.toLocaleString()}만`;
-  return (neg?"−":"")+t+"원";
+
+function fresh(d,h){
+ return {age:0,m:0,h:72,p:60,r:40,s:30,job:"none",work:"—",edu:"—",marry:"미혼",partner:null,ex:null,late:null,kids:[],
+  dist:d.id,distName:`${d.gu} ${d.dong}`,house:h.id,houseName:h.name,cls:h.cls,home:`${d.gu} ${d.dong}`,loc:"광주",
+  flags:{},log:[],queue:[],agenda:[],jail:0,served:0,nextSudden:4,dead:false,cause:""};
 }
-function apply(e){
-  if(!e)return;
-  for(const k of ["h","p","r","s"]) if(e[k]) S[k]=clamp(S[k]+e[k]);
-  if(e.m) S.m+=e.m;
+function newLife(d,h){
+ S=fresh(d,h);applyEff(d.e);applyEff(h.e);
+ if(d.set)Object.assign(S.flags,d.set);if(h.set)Object.assign(S.flags,h.set);
+ addLog(`${BIRTH}년, ${S.home} ${S.houseName}에서 태어났다.`,true);
 }
-function addLog(t,key){S.log.unshift({a:S.age,t,key});renderLog()}
+function addLog(t,key){S.log.unshift({a:S.age,t,key:!!key});if(S.log.length>400)S.log.length=400}
+function applyEff(e){e=val(e,S);if(!e)return;const re=/([hprsm])(-?\d+)/g;let mm;while((mm=re.exec(e))){const k=mm[1],v=+mm[2];if(k==="m")S.m+=v;else S[k]=clamp(S[k]+v)}}
+function setJob(id,work){S.job=id;S.work=work||JOBS[id][0];if((JOB_DREAM[id]||[]).includes(S.flags.dream))S.flags.dreamDone=1}
+function baseSingle(){return S.flags.widowed?"사별":S.flags.divorces?"이혼":"미혼"}
+function setMarry(m){
+ if(m==="기혼"){if(!S.partner)S.partner=pick(NAMES_F);if(S.marry!=="기혼")S.flags.marriedAt=S.age;S.flags.everMarried=1;S.marry="기혼";return}
+ if(m==="이혼"){if(S.partner)S.ex=S.partner;S.partner=null;if(S.marry==="기혼")S.flags.divorces=(S.flags.divorces||0)+1;S.marry=S.flags.divorces?"이혼":baseSingle();return}
+ if(m==="미혼"){if(S.partner)S.ex=S.partner;S.partner=null;S.marry=baseSingle();return}
+ S.marry=m;
+}
+function addKids(n){for(let i=0;i<n;i++){const free=KID_NAMES.filter(x=>!S.kids.some(k=>k.name===x));S.kids.push({name:pick(free.length?free:KID_NAMES),born:S.age})}}
+function sendJail(y,reason){
+ S.jail=(S.jail||0)+y;S.flags.jailReason=reason;S.flags.exCon=1;S.r=clamp(S.r-12);S.p=clamp(S.p-8);
+ setJob("prisoner","광주교도소 수감");S.loc="광주";
+ S.queue=S.queue.filter(q=>q.id!=="probe");
+ addLog(`${reason} 혐의로 징역 ${y}년을 선고받았다.`,true);
+ if(S.marry==="기혼"&&y>=4&&chance(.55)){setMarry("이혼");addLog(`수감 중에 ${S.ex}에게서 이혼 서류가 왔다.`,true)}
+ if(S.marry==="연애중")setMarry("미혼");
+}
+function releaseNow(){S.jail=0;setJob("none","출소 후 구직 중");S.agenda.unshift("release");addLog("형기를 마치고 출소했다.",true)}
+function doOps(o){
+ if(!o)return;
+ if(o.job)setJob(o.job[0],o.job[1]);
+ if(o.set)Object.assign(S.flags,o.set);
+ if(o.inc)for(const k in o.inc)S.flags[k]=(S.flags[k]||0)+o.inc[k];
+ if(o.edu)S.edu=o.edu;
+ if(o.loc)S.loc=o.loc;
+ if(o.home)S.home=o.home;
+ if(o.partner){S.partner=o.partner===true?pick(NAMES_F.filter(n=>n!==S.partner&&n!==S.ex&&n!==S.late)):val(o.partner,S)}
+ if(o.marry)setMarry(o.marry);
+ if(o.kids)addKids(o.kids);
+ if(o.crime){S.flags.lastCrime=o.crime;S.flags.crimes=(S.flags.crimes||0)+1}
+ if(o.q)(Array.isArray(o.q[0])?o.q:[o.q]).forEach(([id,d])=>S.queue.push({id,at:S.age+d}));
+ if(o.f)o.f(S);
+ if(o.jail)sendJail(o.jail[0],o.jail[1]);
+ if(o.die){S.cause=o.die;S.h=0}
+}
+
+/* 한 해 흐름 */
+function economy(){
+ if(S.age<19)return;
+ if(!S.flags.startMoney){S.flags.startMoney=1;S.m+=[-300,0,400,2500][S.cls]}
+ let inc=S.jail>0?0:val(JOBS[S.job]?JOBS[S.job][1]:0);
+ if(S.jail<=0){
+  if(S.loc!=="광주")inc-=300;
+  if(S.marry==="기혼")inc+=150;
+  S.kids.forEach(k=>{if(S.age-k.born<25)inc-=550});
+  if(S.flags.house)inc+=rnd(-500,800)-350;
+  if(S.flags.gambleAdd>0)inc-=500*Math.min(3,S.flags.gambleAdd);
+  if(S.flags.drugUse)inc-=300;
+ }
+ if(S.age>=75)inc-=300;
+ inc+=Math.round(S.m*(S.m<0?.04:.012));
+ S.m+=inc;
+ if(S.m<-40000){S.m=-8000;S.p=clamp(S.p-10);S.r=clamp(S.r-6);S.flags.bankrupt=(S.flags.bankrupt||0)+1;addLog("빚을 감당할 수 없어 파산을 신청했다. 빚 대부분을 탕감받았지만 신용이 바닥났다.",true)}
+}
+function drift(){
+ if(S.age>=7&&S.age<=18&&!S.flags.delinq)S.s=clamp(S.s+1);
+ let dh=0;
+ if(S.age<20)dh+=.3;
+ if(S.age>=45)dh-=.5;if(S.age>=70)dh-=2.2;if(S.age>=80)dh-=1.3;
+ if(S.flags.exercise)dh+=.7;if(S.flags.neglect)dh-=.7;if(S.flags.smoke)dh-=.7;if(S.flags.drugUse)dh-=1.5;
+ if(S.jail>0)dh-=.5;if(S.p>75)dh+=.4;if(S.p<25)dh-=.6;
+ S.h=clamp(S.h+dh);
+ S.p=clamp(S.p+(S.p>55?-1:S.p<45?1:0)+(S.jail>0?-1:0));
+}
+function isDead(){
+ if(S.h<=0){if(!S.cause)S.cause=S.jail>0?"prison":"ill";return true}
+ if(S.age>=105){S.cause="old";return true}
+ if(S.age>=70){const p=(S.age-70)*.012+Math.max(0,45-S.h)*.006+(S.age>=90?.06:0);if(chance(p)){S.cause=S.jail>0?"prison":S.h<25?"ill":"old";return true}}
+ return false;
+}
+function pullDue(){if(S.jail>0)return;const due=S.queue.filter(q=>q.at<=S.age);S.queue=S.queue.filter(q=>q.at>S.age);due.forEach(q=>S.agenda.push(q.id))}
+function nextEvent(){
+ pullDue();
+ while(S.agenda.length){const id=S.agenda.shift();const ev=EV[id];if(!ev)continue;if(S.jail>0&&!ev.jailOK)continue;if(ev.req&&!ev.req(S))continue;return ev}
+ return null;
+}
+function ambient(){
+ if(S.jail>0){const a=pick(JAIL_AMB);applyEff(a[1]);addLog(a[0]);return a[0]}
+ const pool=AMBIENT.filter(a=>S.age>=a[0]&&S.age<=a[1]&&(!a[4]||a[4](S)));
+ if(pool.length&&chance(.65)){const a=pick(pool);const t=val(a[2],S);applyEff(a[3]);addLog(t);return t}
+ return "조용히 한 해가 지나갔다.";
+}
+function yearTick(){
+ S.age++;
+ if(S.jail>0){S.jail--;S.served++;if(S.jail===0)releaseNow()}
+ economy();drift();
+ if(S.age>=72&&S.marry==="기혼"&&chance(.03)){S.late=S.partner;S.partner=null;S.flags.widowed=1;S.marry="사별";S.p=clamp(S.p-15);addLog(`${S.late}${hasJong(S.late)?"이":"가"} 먼저 세상을 떠났다.`,true)}
+ if(isDead())return{type:"end"};
+ if(S.jail<=0){const m=MAIN.find(e=>(e.age===S.age||(e.ages&&e.ages.includes(S.age)))&&(!e.req||e.req(S)));if(m)S.agenda.push(m.id)}
+ else if(chance(.35))S.agenda.push("prison");
+ let ev=nextEvent();
+ if(!ev&&S.jail<=0&&S.age>=S.nextSudden&&chance(.15)){
+  const pool=SUDDEN.filter(e=>S.age>=e.min&&S.age<=e.max&&(!e.req||e.req(S)));
+  if(pool.length){ev=pick(pool);S.nextSudden=S.age+rnd(3,7)}
+ }
+ if(ev)return{type:"event",ev};
+ return{type:"tick",line:ambient()};
+}
+function drawOptions(ev){
+ const pool=val(ev.pool,S).filter(o=>!o.req||o.req(S));
+ const pins=shuffle(pool.filter(o=>o.pin&&val(o.pin,S))).slice(0,2);
+ const rest=shuffle(pool.filter(o=>!pins.includes(o)));
+ return shuffle([...pins,...rest].slice(0,3));
+}
+function resolve(ev,o){
+ const b={m:S.m,h:S.h,p:S.p,r:S.r,s:S.s};
+ let eff=o.e,r=o.r,bops=null;
+ if(o.odds){const win=chance(Math.max(0,Math.min(1,val(o.odds[0],S))));const br=win?o.odds[1]:o.odds[2];eff=br[0];r=br[1];bops=br[2]}
+ const t=val(o.t,S);
+ applyEff(eff);doOps(o);doOps(bops);
+ const text=val(r,S)||"그렇게 결정했다.";
+ addLog(`${val(ev.title,S)} — ${t}. ${text}`,true);
+ if(S.h<=0&&!S.cause)S.cause=S.jail>0?"prison":S.age<60?"accident":"ill";
+ const d={};["m","h","p","r","s"].forEach(k=>{const v=Math.round(S[k]-b[k]);if(v)d[k]=v});
+ return{t,text,d};
+}
+function dreamDone(){
+ const d=S.flags.dream,f=S.flags;if(!d)return false;if(f.dreamDone)return true;
+ return !!({study:/서울대|KAIST|하버드|도쿄대|연세대|고려대|GIST|의대/.test(S.edu),money:S.m>=50000,health:S.age>=88})[d];
+}
+
+/* 엔딩 */
+const CAUSES={old:"가족들 곁에서 잠든 채로 평온하게",ill:"오랜 투병 끝에",accident:"갑작스러운 사고로",prison:"교도소 의무실에서",violence:"뜻밖의 폭력으로"};
+function epilogue(){
+ const f=S.flags,paras=[];
+ paras.push(`${BIRTH}년, ${S.distName}의 ${S.houseName}에서 태어난 아이는 ${S.age}년을 살았다.${f.outside?" 한때 광주를 떠나 살았지만, 마음은 늘 무등산 쪽을 향해 있었다.":""}`);
+ const d=f.dream,dr=DREAMS[d];
+ if(d==="gamble") paras.push(f.gambleAdd||f.gambled?"돌잡이 날 화투패를 잡았던 아이는 정말로 노름에 인생의 한 토막을 잃었다. 그날 할머니의 굳은 얼굴은 틀리지 않았다.":"돌잡이 날 화투패를 잡았던 아이는 평생 노름판에 앉지 않았다. 할머니가 아셨다면 크게 웃으셨을 것이다.");
+ else if(dr&&dreamDone()) paras.push(`돌잡이 날 ${JS(dr[0],"을","를")} 잡았던 아이는 정말로 ${JS(dr[1],"이","가")} 되었다.${d==="baseball"||d==="soccer"?` ${SPT().team} 유니폼을 입고 ${SPT().ground}에 섰던 날을 평생 이야기했다.`:""}`);
+ else if(dr) paras.push(`돌잡이 날 ${JS(dr[0],"을","를")} 잡았던 아이는 끝내 ${JS(dr[1],"이","가")} 되지 못했다.${f.dreamLate?" 그래도 늙어서 그 꿈을 작게나마 다시 꺼내 들었고, 그날만큼은 다섯 살처럼 웃었다.":" 그래도 그 꿈 덕분에 버틴 날들이 있었다."}`);
+ if(S.served>0) paras.push(`인생의 ${S.served}년을 광주교도소 담장 안에서 보냈다. ${f.reconciled?"늦게나마 고개를 숙여 사과했다. 용서를 받았는지는 모르지만, 그 뒤로 잠은 조금 편해졌다.":"끝내 누구에게도 제대로 사과하지 못했다."}`);
+ else if(f.murder) paras.push("누구도 모르는 죄 하나를 무덤까지 가져갔다. 잠들기 전마다 그 밤이 떠올랐다.");
+ else if(f.guilt&&!f.reconciled) paras.push("들키지 않은 잘못들이 있었다. 들키지 않았다고 사라지는 건 아니었다.");
+ let fam="";
+ if(S.marry==="기혼")fam=`${JS(S.partner,"과","와")} ${S.age-(f.marriedAt||S.age)}년을 함께 살았다.`;
+ else if(S.marry==="사별")fam=`${JS(S.late,"을","를")} 먼저 보내고 남은 날들을 혼자 걸었다.`;
+ else if(f.divorces)fam=`${f.divorces>1?"두 번의":"한 번의"} 이혼이 있었다.`;
+ else fam=f.junho?"평생 혼자였지만, 광주천 벤치에 함께 앉아 줄 준호가 있었다.":"평생 혼자였다. 외로움과 자유를 함께 누렸다.";
+ if(S.kids.length)fam+=` ${S.kids.length>1?"아이들 ":"아이 "}${S.kids.map(k=>callName(k.name)).join(", ")}를 키웠다.`;
+ paras.push(fam);
+ paras.push(`마지막 직함은 '${S.work}'. 남긴 재산은 ${won(S.m)}.`);
+ let scene;
+ if(S.cause==="prison")scene="마지막 겨울은 교도소 의무실에서 맞았다. 창살 너머로 무등산 능선이 희미하게 보였다.";
+ else if(S.kids.length)scene=`${K(0)}${hasJong(K(0))?"이":"가"} 손을 꼭 잡고 있었다. 창밖으로 무등산 능선이 보였다.`;
+ else if(S.marry==="기혼")scene=`${JS(S.partner,"이","가")} 곁에 있었다. 둘이 처음 만났던 날 이야기를 하다가 잠이 들었다.`;
+ else scene=S.r>=65?"혼자였지만 동네 사람들이 장례식장을 가득 채웠다.":"장례식장은 조용했다. 국화 몇 송이가 놓였다.";
+ paras.push(scene);
+ let lesson;
+ if(S.served>=10)lesson="잃어버린 시간은 어떤 돈으로도 다시 살 수 없었다.";
+ else if(f.murder)lesson="한순간의 분노는 평생의 무게가 되었다.";
+ else if((f.gambleAdd||0)>=2)lesson="'한 번만 더'라는 말이 인생에서 가장 비쌌다.";
+ else if(S.m>=50000&&S.p<45)lesson="통장의 숫자는 장례식장에 오지 않았다.";
+ else if(S.kids.length&&S.p>=60)lesson="가장 오래 남은 건 함께 먹은 평범한 저녁들이었다.";
+ else if(dreamDone()&&d!=="gamble")lesson="어릴 적 손에 쥔 것을 끝까지 놓지 않으면, 삶은 결국 그쪽으로 기운다.";
+ else if(S.r>=75)lesson="사람은 이름보다 남긴 온기로 기억된다. 광주는 그가 한 일을 기억했다.";
+ else if(S.age>=88)lesson="몸을 아낀 만큼 삶은 길었고, 긴 삶은 더 많은 사람을 만나게 했다.";
+ else if(S.p>=65)lesson="대단한 일은 없었지만 웃은 날이 많았다. 그것으로 충분했다.";
+ else lesson="누구나 처음 살아 보는 인생이었다. 서툴렀던 선택들도 결국 그 사람을 만들었다.";
+ let words;
+ if(S.cause==="prison")words="미안하다고, 꼭 전해 주시오.";
+ else if(S.kids.length)words=`${K(0)}야, 밥은 꼭 챙겨 먹어라.`;
+ else if(f.tigers)words="올해는… 기아가 우승하겄제.";
+ else if(f.hiker)words="무등산 한 번만 더 올라가 보고 싶네.";
+ else if(S.marry==="기혼")words=`${S.partner}, 고마웠어.`;
+ else words="재밌었다. 진짜로.";
+ const top=[["r","광주가 오래 기억할 사람"],["p","웃음이 많았던 사람"],["h","무등산처럼 단단했던 사람"],["s","끝까지 배우던 사람"]].sort((a,b)=>S[b[0]]-S[a[0]])[0];
+ const epitaph=S.served>=10?"늦게라도 돌아오려 했던 사람":S.m>=50000?"알뜰하게 일군 것을 남기고 간 사람":top[1];
+ const score=Math.round(S.p*.35+S.h*.1+S.r*.25+S.s*.1+Math.min(15,Math.max(0,S.m/3000))-Math.min(20,S.served*1.5));
+ const grade=score>=70?"빛나는 삶":score>=55?"단단한 삶":score>=40?"평범하고 고운 삶":score>=25?"고단했던 삶":"어두운 골목을 지난 삶";
+ return{title:`박유성, ${CAUSES[S.cause]||CAUSES.old} 눈을 감다`,paras,lesson,words,epitaph,grade};
+}
+
+/* ===== 0~19세 ===== */
+addMain([
+{id:"dol",age:1,title:"돌잡이",text:s=>`${s.home} ${s.houseName}. 돌상이 차려졌다. 친척들이 숨을 죽이고 유성이의 손끝을 본다.`,pool:[
+ O("야구공을 잡는다","h4 p3","야구공을 놓지 않았다. 삼촌이 '기아 타이거즈 에이스 나왔다'고 외쳤다.",{set:{dream:"baseball",tigers:1}}),
+ O("연필을 잡는다","s6","연필을 꽉 쥐었다. 할머니가 '공부로 크겄네' 하신다.",{set:{dream:"study"}}),
+ O("오만원권을 잡는다","p3","돈을 잡았다. 아버지가 제일 크게 웃었다.",{set:{dream:"money",luck:1}}),
+ O("붓을 잡는다","p4","붓으로 떡을 찔렀다. 어머니는 화가가 될 거라고 믿기로 했다.",{set:{dream:"art"}}),
+ O("마이크를 잡는다","p5 r2","마이크를 잡고 옹알이를 했다. 큰고모가 '가수 나왔네' 한다.",{set:{dream:"music"}}),
+ O("청진기를 잡는다","s4","청진기를 목에 걸었다. 외할머니가 전남대병원 의사 되라고 하신다.",{set:{dream:"doctor"}}),
+ O("판사봉을 잡는다","s3 r3","판사봉으로 상을 탕탕 두드렸다. 다들 웃었다.",{set:{dream:"law"}}),
+ O("마우스를 잡는다","s4","마우스 줄을 잡아당겼다. 아버지가 '개발자 되겄다' 한다.",{set:{dream:"coder"}}),
+ O("주걱을 잡는다","p4","주걱을 휘둘렀다. 할머니가 '먹고는 살겄다' 하신다.",{set:{dream:"chef"}}),
+ O("실타래를 잡는다","h8","실을 잡았다. 오래 살 거라며 다들 안심했다.",{set:{dream:"health"}}),
+ O("화투패를 잡는다","p2 r-2","작은삼촌이 장난으로 올려 둔 화투패를 잡았다. 할머니 얼굴이 굳었다.",{set:{dream:"gamble"}}),
+ O("축구공을 잡는다","h5","축구공을 굴리며 깔깔 웃었다. '광주FC 가겄네.'",{set:{dream:"soccer"}})]},
+
+{id:"tot",age:3,title:"세 살",text:s=>`${HOME()} 골목에도 봄이 왔다. 부모님은 유성이를 어떻게 키울지 고민 중이다.`,pool:[
+ O("영어유치원에 보낸다","s5 p-3","원어민 선생님 앞에서 울다가, 석 달 뒤엔 영어로 떼를 썼다.",{req:s=>s.cls>=2}),
+ O("무등산 숲유치원","h5 p3","도토리와 솔방울이 장난감이었다."),
+ O("할머니 손에서 자란다","p5 r1","할머니 무릎에서 옛날이야기를 들으며 잠들었다."),
+ O("피아노 학원","p3","건반을 두드리며 노래를 흥얼거렸다.",{pin:D("music"),set:{music:1}}),
+ O("미술 학원","p3","벽지에 그린 그림을 어머니가 액자에 넣었다.",{pin:D("art"),set:{art:1}}),
+ O("아빠와 매일 캐치볼","h5 p3","저녁마다 공터에서 공을 주고받았다.",{pin:D("baseball"),set:{sport:1}}),
+ O("공터에서 공차기","h5 p3","넘어져도 공만 보면 일어났다.",{pin:D("soccer"),set:{sport:1}}),
+ O("유튜브 키즈에 빠진다","s-2 p3","노래 영상을 다 외웠다. 눈이 조금 나빠졌다."),
+ O("한글을 일찍 뗀다","s5","네 살에 간판을 읽기 시작했다. 동네 어른들이 신기해했다."),
+ O("레고와 코딩 장난감","s4","블록으로 움직이는 자동차를 만들었다.",{pin:D("coder"),set:{coder:1}}),
+ O("소꿉놀이 요리사","p4","플라스틱 프라이팬으로 매일 할머니 밥상을 차렸다.",{pin:D("chef"),set:{chef:1}}),
+ O("놀이터에서 크게 다친다","h-6 p-1","미끄럼틀에서 떨어져 이마를 꿰맸다. 흉터가 남았다."),
+ O("수영을 배운다","h5","염주체육관 수영장에서 물을 무서워하지 않게 됐다.")]},
+
+{id:"mud",age:5,title:"첫 무등산",text:"아버지가 '무등산 정상 보러 갈래?' 하고 묻는다. 원효사 주차장에서 올려다본 산이 끝도 없다.",pool:[
+ O("서석대까지 끝까지 오른다","h8 p3","울면서 올랐는데, 주상절리를 보고 울음을 그쳤다.",{set:{hiker:1}}),
+ O("증심사 계곡에서 물놀이만","p6 h3","발 담그고 수박 먹은 기억만 오래 남았다."),
+ O("집에서 태블릿을 본다","h-4 p2","아버지 혼자 다녀왔다. 사진 속 하늘이 예뻤다."),
+ O("원효사 앞 도토리묵","p5","산은 반도 못 갔지만 도토리묵은 두 그릇 먹었다."),
+ O("중머리재에서 길을 잃는다","","",{odds:[.75,["p-3 r1","30분 만에 등산객 아저씨가 손을 잡고 데려다줬다.",{}],["h-5 p-6","해가 질 무렵 구조대가 찾았다. 아버지가 처음 우는 걸 봤다.",{}]]}),
+ O("아빠 등에 업혀 정상까지","p6","아버지의 땀 냄새와 산바람이 섞여 있었다."),
+ O("다람쥐를 쫓다 넘어진다","h-3 p2","무릎이 까졌지만 다람쥐는 끝내 잡지 못했다."),
+ O("무등산 수박을 맛본다","p4","산 아래 농가에서 산 수박. 세상에서 제일 달았다."),
+ O("산 대신 패밀리랜드","p7","우치공원 패밀리랜드 바이킹에서 소리를 질렀다."),
+ O("국립광주박물관에 간다","s3","신안 앞바다에서 건진 도자기 앞에서 오래 서 있었다."),
+ O("비가 와서 집에서 그림을 그린다","p3","창밖 무등산을 크레파스로 그렸다.",{pin:D("art"),set:{art:1}})]},
+
+{id:"ele",age:7,title:"초등학교 입학",text:s=>`${HOME()}의 초등학교에 입학했다. 방과 후를 어떻게 보낼까.`,pool:[
+ O("영어·수학 학원","s8 p-4","받아쓰기 100점이 늘었다. 놀이터 친구는 줄었다.",{job:["student","초등학생"]}),
+ O("태권도장","h6 r2","노란띠를 매고 동네를 뛰어다녔다.",{job:["student","초등학생"]}),
+ O("골목에서 실컷 논다","p7 s-2","해 질 녘까지 술래잡기. 저녁마다 무릎이 까져 있었다.",{job:["student","초등학생"]}),
+ O("리틀야구 체험반","h6 p3","처음 친 공이 내야를 넘어갔다.",{pin:D("baseball"),set:{sport:1},job:["student","초등학생"]}),
+ O("유소년 축구교실","h6 p3","드리블로 세 명을 제쳤다. 코치가 이름을 물었다.",{pin:D("soccer"),set:{sport:1},job:["student","초등학생"]}),
+ O("피아노와 노래 교실","p5","학교 합창단에 뽑혔다.",{pin:D("music"),set:{music:1},job:["student","초등학생"]}),
+ O("미술 학원","p5","광주학생미술대회 입선.",{pin:D("art"),set:{art:1},job:["student","초등학생"]}),
+ O("코딩 교실","s6","스크래치로 첫 게임을 만들었다.",{pin:D("coder"),set:{coder:1},job:["student","초등학생"]}),
+ O("바둑 교실","s5","동네 할아버지들을 이기기 시작했다.",{job:["student","초등학생"]}),
+ O("지역아동센터","p3 r2","친구들과 저녁을 먹는 곳이 생겼다.",{req:s=>s.cls<=1,job:["student","초등학생"]}),
+ O("혼자 집에서 게임","p3 s-3 h-2","부모님이 퇴근할 때까지 게임기가 친구였다.",{job:["student","초등학생"]}),
+ O("교회 어린이 성경학교","p3 r2","여름성경학교 율동을 아직도 기억한다.",{job:["student","초등학생"]}),
+ O("부모님 가게를 돕는다","r3 p2",s=>`${FAMSHOP()} 계산대 옆에서 숙제를 했다. 단골들이 이름을 불러 줬다.`,{req:F("familyShop"),pin:true,job:["student","초등학생"]})]},
+
+{id:"dream9",age:9,title:"열 살의 꿈",text:"어른이 되면 뭐가 되고 싶냐는 질문을 자주 듣는 나이가 됐다.",pool:[
+ O("리틀야구단에 입단한다","h8 s-2","주말마다 그라운드에서 흙투성이가 됐다. 등번호는 1번.",{pin:D("baseball"),set:{sport:1}}),
+ O("광주FC 유소년 테스트","","",{pin:D("soccer"),odds:[.7,["h8 r4","합격. 광주FC 유소년 유니폼을 받았다.",{set:{sport:1}}],["p-6","떨어졌다. 그래도 공은 계속 찼다.",{set:{sport:1}}]]}),
+ O("교내 동요대회에 나간다","p6 r3","대상. 교장 선생님이 '광주의 아이유'라고 했다.",{pin:D("music"),set:{music:1}}),
+ O("광주학생미술대회","p6 r4","무등산 그림으로 금상을 받았다.",{pin:D("art"),set:{art:1}}),
+ O("과학 영재원에 간다","s8 r3","GIST 영재교육원 토요반에 다니게 됐다.",{req:s=>s.s>=50,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=50,set:{gifted:1}}),
+ O("챔피언스필드 직관","p8 r2","목이 쉬었다. 기아가 9회말에 이겼다.",{set:{tigers:1}}),
+ O("어린이 요리대회","p5","주먹밥으로 장려상. 할머니가 사진을 액자에 넣었다.",{pin:D("chef"),set:{chef:1}}),
+ O("모의재판 체험","s4 r2","광주지방법원 견학에서 판사 역할을 맡았다.",{pin:D("law"),set:{law:1}}),
+ O("문방구에서 몰래 훔친다","","",{odds:[.5,["p2","들키지 않았다. 그날 밤 이불 속에서 심장이 쿵쾅거렸다.",{set:{guilt:1}}],["r-6 p-5","주인 할머니에게 붙잡혔다. 어머니가 와서 고개를 숙였다.",{}]]}),
+ O("길고양이를 돌본다","p5 r2","아파트 화단 고양이에게 '무등이'라는 이름을 붙였다."),
+ O("전학 온 친구와 짝이 된다","p4 r2","서울에서 온 친구. 광주 사투리를 가르쳐 줬다."),
+ O("할아버지와 대인시장에 간다","p4","할아버지가 시장 사람들 이름을 다 알았다.")]},
+
+{id:"elec",age:11,title:"5학년 교실",text:"교실에서 이런저런 일이 생기는 나이가 됐다.",pool:[
+ O("반장 선거에 나간다","","",{odds:[s=>.45+s.r/200,["r9 p6","한 표 차이로 반장이 됐다. 연설에서 무등산 이야기를 한 게 먹혔다.",{}],["r3 p-4","두 표 차이로 떨어졌다. 그래도 연설은 잘했다는 말을 들었다.",{}]]}),
+ O("괴롭힘당하는 친구 편에 선다","r6 p-2 h-2","같이 놀림을 받았다. 그 친구와는 평생 친구가 됐다."),
+ O("같이 친구를 괴롭힌다","p2 r-6","그때는 장난이라고 생각했다.",{set:{bully:1}}),
+ O("선생님께 괴롭힘을 알린다","r4","담임 선생님이 반 전체와 이야기했다."),
+ O("수학경시대회에 나간다","s6 r3","광주 지역 은상.",{req:s=>s.s>=50}),
+ O("첫 휴대폰으로 밤새 게임","p4 s-4 h-2","눈 밑이 거뭇해졌다."),
+ O("학예회 주인공을 맡는다","r5 p5","강당이 박수로 가득 찼다.",{pin:D("music")}),
+ O("교내 미술상을 휩쓴다","r4 p5","복도에 그림이 걸렸다.",{pin:D("art")}),
+ O(s=>`${SPT().club} 주전이 된다`,"h6 r4","소년체전 광주 대표로 뽑혔다.",{req:F("sport"),pin:true,set:{sportStar:1}}),
+ O("운동회 계주 대표","h4 r4","마지막 주자로 역전승."),
+ O("부모님 다툼을 듣는다","p-6","방문을 닫고 이어폰 볼륨을 올렸다."),
+ O("가출을 시도한다","p-2 r-2","광주역까지 걸어갔다가 해 질 무렵 돌아왔다.")]},
+
+{id:"mid",age:13,title:"중학교 1학년",text:"교복을 입었다. 친구 준호가 자꾸 어딘가 가자고 한다.",pool:[
+ O("학원 빠지고 PC방에 간다","p6 s-5 r-2","상무지구 PC방. 학원에서 집으로 전화가 왔다. 그래도 준호와는 평생 친구가 됐다.",{set:{junho:1}}),
+ O("거절하고 학원에 간다","s6 p-3","준호는 다음 날 혼자 혼났다."),
+ O("광주천 자전거를 타자고 한다","h5 p3","둘이서 광주천을 따라 영산강 합류점까지 달렸다.",{set:{junho:1}}),
+ O("일진 무리에 낀다","r3 s-6 p4","복도에서 다들 길을 비켰다.",{set:{delinq:1}}),
+ O("몰래 담배를 배운다","h-5 r-2","화장실 뒤편. 기침이 멈추지 않았다.",{set:{smoke:1}}),
+ O("유튜브 채널을 연다","p4 s2","게임 영상 채널. 구독자 32명.",{set:{creatorSeed:1}}),
+ O("게임 대회에 나간다","","",{odds:[.3,["p8 r4","광주 지역 예선 우승. 상금 30만 원.",{set:{creatorSeed:1}}],["p-2","1라운드 탈락.",{}]]}),
+ O("봉사활동을 한다","r5","양림동 펭귄마을 벽화 그리기에 참여했다."),
+ O("부모님과 크게 싸운다","p-4","사춘기라는 말로 다 설명되진 않았다."),
+ O(s=>`중학교 ${SPT().club}`,"h6 s-2","새벽 훈련이 시작됐다.",{req:F("sport"),pin:true}),
+ O("밴드부에 들어간다","p6","베이스 기타를 처음 잡았다.",{pin:D("music"),set:{music:1}}),
+ O("웹툰을 그린다","p5","교실 친구들이 연재를 기다렸다.",{pin:D("art"),set:{art:1}}),
+ O("과학고 준비반","s7 p-4","주말도 없이 문제집을 풀었다.",{req:s=>s.s>=60})]},
+
+{id:"delinq",age:14,title:"일진의 세계",req:F("delinq"),text:"어울리는 무리가 점점 거칠어진다. 형들이 새로운 '일'을 시킨다.",pool:[
+ O("후배들 돈을 뺏는다","","",{odds:[.6,["m50 r-6 p2","주머니가 두둑해졌다. 후배들이 눈을 피했다.",{set:{bully:1}}],["r-10 p-4","학교폭력위원회가 열렸다. 출석정지 10일.",{set:{bully:1}}]]}),
+ O("충장로 패싸움에 끼어든다","","",{odds:[.5,["r3 h-4","이겼다. 이름이 학교에 퍼졌다.",{}],["h-6 r-6","경찰서에 끌려갔다. 어머니가 새벽에 데리러 왔다.",{set:{juvenile:1}}]]}),
+ O("무면허 오토바이 질주","","",{odds:[.7,["p6","무진대로를 달렸다. 무서운 게 없었다.",{}],["h-15 p-4","트럭과 부딪힐 뻔했다. 다리에 철심을 박았다.",{}]]}),
+ O("상무지구 형님들과 어울린다","r-4 p3","까만 차에서 내린 형이 '싹수 있네' 했다.",{set:{gang:1}}),
+ O("손을 씻고 공부를 시작한다","s6 p-3","무리에서 빠져나왔다. 한동안 혼자 밥을 먹었다.",{set:{delinq:0}}),
+ O("피해자에게 사과한다","r6 p2","고개를 숙였다. 그 친구가 한참 뒤에 고개를 끄덕였다.",{set:{delinq:0,reconciled:1}}),
+ O("처음 술을 마신다","h-3 p3","편의점 뒤에서 마신 소주가 썼다."),
+ O("문신을 한다","r-3 p3","팔뚝에 별 하나. 여름에도 긴팔을 입었다."),
+ O("편의점에서 물건을 훔친다","","",{odds:[.5,["p2","들키지 않았다.",{set:{guilt:1}}],["r-8","CCTV에 찍혀 보호관찰을 받았다.",{set:{juvenile:1}}]]}),
+ O("일진 대장 자리를 노린다","r2 h-4","싸워서 대장이 됐다. 그 자리는 생각보다 외로웠다."),
+ O("경찰 선도 프로그램에 간다","r3 p2","형사 아저씨가 무등산에 데려갔다. 정상에서 처음으로 울었다.",{set:{delinq:0}})]},
+
+{id:"may",age:15,title:"오월",text:"5월, 역사 수행평가로 5·18민주광장과 옛 전남도청을 찾았다. 분수대 앞에 사람들이 모여 있다.",pool:[
+ O("해설을 끝까지 듣고 기록한다","s5 r6","보고서가 교내 대회에서 상을 받았다.",{set:{history:1}}),
+ O("할아버지께 그때 이야기를 여쭙는다","p4 r4","할아버지는 한참 말이 없다가 금남로 이야기를 꺼내셨다.",{set:{history:1}}),
+ O("사진만 찍고 돌아간다","p2 r-3","과제는 냈지만 기억에 남는 건 별로 없다."),
+ O("주먹밥 나눔 자원봉사","r6 p3","주먹밥 백 개를 쥐었다. 손바닥이 따뜻했다.",{set:{history:1}}),
+ O("5·18 기념 백일장","","",{odds:[s=>s.flags.art||s.flags.dream==="study"?.5:.25,["r8 p6","대상. 시가 기념식장에서 낭독됐다.",{set:{history:1}}],["p2","입선. 그래도 쓰는 동안 많이 배웠다.",{set:{history:1}}]]}),
+ O("국립5·18민주묘지 참배","r4 s2","묘비마다 적힌 나이를 읽었다. 대부분 스무 살 남짓이었다.",{set:{history:1}}),
+ O("친구들과 수업을 빠진다","p3 r-4","그날 PC방은 이상하게 조용했다."),
+ O("민주광장 무대에서 노래한다","r4 p4","'님을 위한 행진곡'을 합창했다.",{pin:D("music"),set:{history:1}}),
+ O("금남로 전야제에 간다","p4 r3","촛불 사이를 걸었다.",{set:{history:1}}),
+ O("할머니가 우신다","p-2 r3 s2","할머니는 그해 오빠를 잃었다고 했다. 처음 듣는 이야기였다.",{set:{history:1}}),
+ O("다큐 영상을 만든다","s4 r4","학교 축제에서 상영했다.",{req:F("creatorSeed"),pin:true,set:{history:1}})]},
+
+{id:"hs",age:16,title:"고등학교 진학",text:"담임 선생님이 진학 상담을 하자고 한다.",pool:[
+ O("인문계 일반고","s5","야간 자율학습의 세계가 열렸다.",{edu:"일반고",job:["student","고등학생"]}),
+ O("과학고","s8 r4","광주과학고 기숙사에 들어갔다.",{req:s=>s.s>=75,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=75,edu:"과학고",job:["student","과학고 학생"]}),
+ O("자율형 사립고","s7 p-3","등록금 고지서를 보고 어머니가 한숨을 쉬었다.",{req:s=>s.s>=68&&s.cls>=2,edu:"자사고",job:["student","자사고 학생"]}),
+ O("자동차 특성화고","s3 p2","기아 오토랜드 광주 견학이 1학년 첫 행사였다.",{edu:"특성화고",set:{tech:1},job:["student","특성화고 학생"]}),
+ O("소프트웨어 마이스터고","s5","코딩 대회 상장이 쌓였다.",{pin:D("coder"),edu:"마이스터고",set:{coder:1},job:["student","마이스터고 학생"]}),
+ O("예술고 미술과","p6","양림동 골목을 스케치북에 담기 시작했다.",{pin:D("art"),edu:"예술고",set:{art:1},job:["student","예술고 학생"]}),
+ O("예술고 음악과","p6","연습실 불이 꺼지지 않았다.",{pin:D("music"),edu:"예술고",set:{music:1},job:["student","예술고 학생"]}),
+ O(s=>`${SPT().n} 명문고 ${SPT().club}`,"h6 s-3",s=>`${SPT().n} 명문 고등학교 ${SPT().club}에 들어갔다. 프로 스카우트가 경기를 보러 온다.`,{req:F("sport"),pin:true,edu:"체육 특기생",set:{sportHS:1},job:["student","고교 운동부"]}),
+ O("조리과학고","p5 s2","칼질 소리가 교실을 채웠다.",{pin:D("chef"),edu:"조리고",set:{chef:1},job:["student","조리고 학생"]}),
+ O("자퇴하고 검정고시","p4 s2 r-2","혼자 도서관에서 공부했다.",{edu:"검정고시",job:["student","검정고시 준비"]}),
+ O("자퇴하고 형님들 밑으로 들어간다","m100 r-10 p2","학교 대신 상무지구 사무실로 출근했다.",{req:s=>s.flags.gang||s.flags.delinq,pin:F("gang"),edu:"중졸",set:{gang:2},job:["gang","상무지구 조직 막내"]}),
+ O("대안학교","p5","시험 대신 텃밭과 토론이 있었다.",{edu:"대안학교",job:["student","대안학교 학생"]})]},
+
+{id:"love",age:17,title:"첫사랑",text:"마음이 자꾸 한 사람 쪽으로 기운다.",pool:[
+ O("충장로 버스킹에서 번호를 묻는다","","",{odds:[.55,["p10","번호를 받았다. 그날 밤 문자를 열 번 썼다 지웠다.",{set:{firstLove:"한소연"}}],["p-4 r1","웃으면서 거절당했다. 그래도 용기 낸 자신이 좀 좋았다.",{}]]}),
+ O("독서실 쪽지를 건넨다","","",{odds:[.5,["p9","다음 날 책상에 답장이 있었다. '나도.'",{set:{firstLove:"정유나"}}],["p-3","쪽지는 쓰레기통에 있었다.",{}]]}),
+ O("친구에게 대신 물어봐 달라고 한다","r-2 p2","친구가 받아 온 번호는 친구 번호였다."),
+ O("교회 수련회에서 고백한다","","",{odds:[.6,["p9","캠프파이어 앞에서 손을 잡았다.",{set:{firstLove:"김예슬"}}],["p-3","'오빠 같아.' 그 말이 오래 남았다.",{}]]}),
+ O("짝사랑만 한다","p-2 s3","졸업할 때까지 말 한마디 못 했다."),
+ O("SNS로 DM을 보낸다","","",{odds:[.4,["p8","답장이 왔다. 새벽 세 시까지 대화했다.",{set:{firstLove:"박하린"}}],["p-5","차단당했다.",{}]]}),
+ O("친구의 여자친구를 좋아한다","","",{odds:[.3,["p6 r-4","결국 사귀게 됐다. 친구는 잃었다.",{set:{firstLove:"이수아"}}],["r-4 p-4","들켰다. 반 전체가 알았다.",{}]]}),
+ O("공부에 집중한다","s4","모의고사 성적이 조금 올랐다."),
+ O("축제 무대에서 노래로 고백","","",{pin:D("music"),odds:[.7,["p12 r5","노래가 끝나자 객석에서 그 사람이 손을 흔들었다.",{set:{firstLove:"한소연"}}],["p-6 r2","음이탈. 그래도 박수는 받았다.",{}]]}),
+ O("초상화를 그려 선물한다","","",{pin:D("art"),odds:[.65,["p10","그림을 받은 날부터 사귀기 시작했다.",{set:{firstLove:"정유나"}}],["p-3","'고마워.' 그게 다였다.",{}]]}),
+ O("야구장 키스캠","","",{req:F("tigers"),odds:[.5,["p10 r2","전광판에 둘이 잡혔다. 그날부터 사귀었다.",{set:{firstLove:"윤가람"}}],["p-3","옆자리 아저씨와 잡혔다.",{}]]}),
+ O("졸업식 날 고백하기로 미룬다","p-2","결국 졸업식에서도 말하지 못했다.")]},
+
+{id:"sport18",age:18,title:s=>`마지막 전국대회`,req:F("sportHS"),text:s=>`고3, 마지막 전국대회. ${SPT().team} 스카우트가 관중석에 앉아 있다.`,pool:[
+ O("결승에서 에이스를 자청한다","","",{odds:[s=>.35+s.h/250,["r8 p8",s=>`${SPT().n==="야구"?"완투승":"결승골"}. 스카우트가 수첩에 이름을 적었다.`,{inc:{scout:2}}],["p-6","무너졌다. 벤치에서 고개를 숙였다.",{}]]}),
+ O("부상을 숨기고 출전한다","","",{odds:[.5,["r6",s=>"아픈 줄 아무도 몰랐다. 팀이 우승했다.",{inc:{scout:1}}],["h-20 p-8","경기 중 쓰러졌다. 수술대에 올랐다.",{set:{injured:1}}]]}),
+ O("금지약물 권유를 받아들인다","","",{odds:[.6,["h-5 r3","기록이 확 좋아졌다. 몸 어딘가가 이상했다.",{inc:{scout:2},set:{doping:1}}],["r-15 p-8","도핑 검사에 걸렸다. 출장 정지.",{set:{doping:1}}]]}),
+ O("감독과 충돌한다","r-4 p2","기용 문제로 대들었다. 벤치를 지켰다."),
+ O("팀을 위해 희생한다","r5 p3",s=>`${SPT().n==="야구"?"희생번트":"어시스트"}로 팀이 이겼다. 스카우트는 그것도 봤다.`,{inc:{scout:1}}),
+ O("공부도 병행한다","s6","원정 버스에서 단어장을 폈다."),
+ O("스카우트 앞에서 무리한 플레이","","",{odds:[.4,["r6",s=>"화려한 플레이가 하이라이트에 실렸다.",{inc:{scout:1}}],["h-8 r-3","실책. 관중석이 조용해졌다.",{}]]}),
+ O("부모님 반대로 운동을 그만둔다","s4 p-8","글러브를 창고에 넣었다.",{set:{sportHS:0}}),
+ O("야간 개인 훈련","h5","무등경기장 불이 꺼질 때까지 남았다.",{inc:{scout:1}}),
+ O("팬카페가 생긴다","p6 r4","광주 고교 스타로 지역 신문에 나왔다.",{inc:{scout:1}})]},
+
+{id:"college",age:19,title:"스무 살의 갈림길",text:s=>s.age>19?"다시 한번 갈림길 앞에 섰다.":"졸업이 다가온다. 앞으로 무엇을 할지 정해야 한다.",pool:[
+ O("서울대학교","s8 r8 p4","관악산 아래 캠퍼스. 광주송정역에서 KTX로 1시간 40분.",{req:s=>s.s>=85,pin:true,edu:"서울대",loc:"서울",job:["student","서울대 재학"],set:{outside:1}}),
+ O("연세대학교","s6 r6 p4","신촌에서 자취를 시작했다. 월세가 광주의 두 배다.",{req:s=>s.s>=78,edu:"연세대",loc:"서울",job:["student","연세대 재학"],set:{outside:1}}),
+ O("고려대학교","s6 r6 p4","안암동 막걸리 골목에서 첫 MT를 했다.",{req:s=>s.s>=78,edu:"고려대",loc:"서울",job:["student","고려대 재학"],set:{outside:1}}),
+ O("KAIST","s9 r6","대전 기숙사. 밤마다 과제가 쌓인다.",{req:s=>s.s>=82,pin:s=>["coder","study"].includes(s.flags.dream),edu:"KAIST",loc:"대전",job:["student","KAIST 재학"],set:{outside:1}}),
+ O("광주과학기술원(GIST)","s8 r5","오룡동 캠퍼스 기숙사에 들어갔다. 광주에 남았다.",{req:s=>s.s>=74,edu:"GIST",job:["student","GIST 재학"]}),
+ O("전남대 의대","s8 r10 p-2","6년짜리 공부가 시작됐다. 외할머니가 동네잔치를 열었다.",{req:s=>s.s>=88,pin:D("doctor"),edu:"전남대 의대",job:["student","전남대 의대 재학"],set:{doctorTrack:1}}),
+ O("전남대학교","s5 r3","용봉동 캠퍼스, 후문 밥집이 새 단골이 됐다.",{req:s=>s.s>=55,edu:"전남대",job:["student","전남대 재학"]}),
+ O("조선대학교","s3 p3","하얀 본관이 보이는 캠퍼스에서 새내기가 됐다.",{edu:"조선대",job:["student","조선대 재학"]}),
+ O("광주교육대학교","s4 r4","선생님이 되는 길에 들어섰다.",{req:s=>s.s>=65,edu:"광주교대",job:["student","광주교대 재학"],set:{teacherTrack:1}}),
+ O("홍익대 미대","p6 s3","홍대 앞 작업실에서 밤을 새웠다.",{req:s=>s.flags.art&&s.s>=45,pin:D("art"),edu:"홍익대 미대",loc:"서울",job:["student","홍익대 재학"],set:{outside:1}}),
+ O("서울예대 실용음악과","p7","합정동 연습실이 집보다 익숙해졌다.",{req:F("music"),pin:D("music"),edu:"서울예대",loc:"서울",job:["student","서울예대 재학"],set:{outside:1}}),
+ O("하버드 대학교","s10 r12 p3 m-500","합격 소식이 광주 지역 뉴스에 나왔다. 보스턴은 생각보다 추웠다.",{req:s=>s.s>=92&&s.cls>=2,pin:true,edu:"하버드",loc:"미국 보스턴",job:["student","하버드 재학"],set:{outside:1,abroad:1}}),
+ O("도쿄대학교","s8 r6 m-300","일본어로 수업을 듣는다. 혼고 캠퍼스 은행나무가 노랗다.",{req:s=>s.s>=80&&s.cls>=1,edu:"도쿄대",loc:"일본 도쿄",job:["student","도쿄대 재학"],set:{outside:1,abroad:1}}),
+ O("미국 커뮤니티칼리지","p4 m-1500","부모님 돈으로 캘리포니아에 갔다. 영어보다 외로움이 어려웠다.",{req:s=>s.cls>=3,edu:"미국 CC",loc:"미국 LA",job:["student","미국 유학"],set:{outside:1,abroad:1}}),
+ O(s=>`${SPT().team} 드래프트에 나간다`,"","",{req:F("sportHS"),pin:true,odds:[s=>.25+(s.flags.scout||0)*.12,["r12 p12 m500",s=>`${SPT().team}의 지명을 받았다. 돌잡이 이야기가 신문에 실렸다.`,{job:["athlete",""],f:s=>{s.work=`${SPT().team} 선수`;s.flags.pro=1}}],["p-10","이름이 끝내 불리지 않았다. 대학 체육학과로 방향을 틀었다.",{edu:"조선대 체육학과",job:["student","조선대 체육학과"]}]]}),
+ O("기아 오토랜드 광주 고졸 공채","","",{req:F("tech"),pin:true,odds:[s=>.5+s.s/250,["r5 p4","합격 문자를 받고 어머니가 울었다.",{job:["kia","기아 오토랜드 광주"]}],["p-6","아깝게 떨어졌다. 대인시장 가게에서 일을 시작했다.",{job:["part","대인시장 아르바이트"]}]]}),
+ O("요리 학교에 간다","p5 s3","칼질부터 다시 배웠다.",{req:F("chef"),pin:D("chef"),edu:"조리전문학교",job:["student","조리학교 재학"]}),
+ O("오디션 프로그램에 나간다","","",{req:F("music"),odds:[.2,["r15 p12 m800","3라운드 진출. 광주 출신 참가자로 이름이 알려졌다.",{job:["music","가수 지망생"],set:{famous:1}}],["p-8 r2","첫 라운드에서 떨어졌다. 그래도 노래를 그만두지 않았다.",{job:["part","카페 아르바이트"]}]]}),
+ O("조직에 남는다","m300 r-6","형님이 차 키를 던져 줬다. 어머니에게는 회사에 다닌다고 했다.",{req:s=>s.flags.gang>=2,pin:true,job:["gang","상무지구 조직원"]}),
+ O("재수 학원에 들어간다","s6 p-6","충장로 재수 학원. 1년만 더.",{q:["college",1],job:["student","재수생"]}),
+ O("호주 워킹홀리데이","p7 m300 h2","농장에서 1년을 보냈다. 돌아와 다시 진로를 고민한다.",{q:["college",1],set:{abroadExp:1}}),
+ O("대인시장 국밥집에서 일한다","m200 p-2","사장님이 손이 빠르다고 칭찬한다.",{job:["part","대인시장 국밥집"]}),
+ O("상무지구 클럽 웨이터","m400 r-3 h-2","밤에 일하고 낮에 잔다. 이상한 사람들을 많이 만났다.",{job:["part","상무지구 클럽 웨이터"],set:{night:1}})]}
+]);
+
+/* ===== 20~39세 ===== */
+addMain([
+{id:"gang1",age:20,title:"조직 생활",req:ILL,text:"상무지구 뒷골목. 형님이 새 일을 맡기려 한다.",pool:[
+ O("불법 도박장 관리를 맡는다","m900 r-6","하우스 도박장 열쇠를 받았다. 돈 세는 기계 소리가 밤새 났다.",{crime:"gambleBiz",q:["probe",2]}),
+ O("'물건' 운반을 맡는다","m1500 p-3","가방 안을 열어 보지 않는 게 규칙이었다.",{set:{drug:1},crime:"drug",q:["drugRing",2]}),
+ O("빚 수금을 맡는다","m500 h-3 r-6","문을 두드리는 일. 우는 사람들을 많이 봤다."),
+ O("형님의 운전기사가 된다","m300","까만 세단을 몰며 광주의 밤을 다 봤다."),
+ O("경찰 정보원이 된다","","",{odds:[.6,["r3 p-4","광주경찰청 형사와 몰래 만나기 시작했다. 들키면 끝이다.",{set:{informant:1}}],["h-30 p-10","정체가 들켰다. 영산강 둔치에서 정신을 잃은 채 발견됐다.",{job:["none","조직 이탈"],set:{gang:0}}]]}),
+ O("손을 씻고 나온다","","",{odds:[.5,["p6 r4","형님이 의외로 순순히 보내 줬다. '다시는 이 동네 오지 마라.'",{job:["part","택배 상하차"],set:{gang:0}}],["h-15 p-6","나오는 대가로 갈비뼈 세 대가 부러졌다.",{job:["part","택배 상하차"],set:{gang:0}}]]}),
+ O("유흥업소 지분을 받는다","m1100 r-4","상무지구 술집 간판 뒤에 이름이 올라갔다.",{crime:"gambleBiz",q:["probe",3]}),
+ O("라이벌 조직과 맞붙는다","","",{odds:[.5,["r2 h-6 m400","이겼다. 조직 안에서 이름이 불리기 시작했다.",{}],["h-20","칼에 찔려 응급실에 실려 갔다.",{crime:"assault",q:["probe",1]}]]}),
+ O("어머니께 생활비를 보낸다","p-2 r1 m-300","출처를 묻지 않는 어머니의 목소리가 더 아팠다."),
+ O("자수한다","r4 p3","경찰서 문을 직접 열고 들어갔다.",{jail:[1,"폭력행위"],set:{gang:0}}),
+ O("조직 돈을 몰래 빼돌린다","","",{odds:[.35,["m3000 p-4","아무도 눈치채지 못했다. 아직은.",{}],["h-25 m-500","들켰다. 다시는 그 사무실에 가지 못했다.",{job:["none","조직 이탈"],set:{gang:0}}]]})]},
+
+{id:"army",age:21,title:"입영 통지서",req:s=>!s.flags.served&&!s.flags.dodge,text:s=>`병무청에서 입영 통지서가 날아왔다.${s.job==="athlete"?" 구단도 대책을 고민 중이다.":""}`,pool:[
+ O("육군 현역으로 간다","h5 r3 p-4","광주 31사단 신병교육대에 입소했다.",{set:{served:1,unit:"31사단"},q:["army2",1]}),
+ O("해병대에 지원한다","","",{odds:[.7,["h10 r6 p-4","포항 해병대 교육훈련단. 빨간 명찰을 달았다.",{set:{served:1,marine:1,unit:"해병대"},q:["army2",1]}],["p-3","해병대는 떨어졌다. 결국 육군으로 갔다.",{set:{served:1,unit:"육군"},q:["army2",1]}]]}),
+ O("공군에 지원한다","s3 r3","광주 공군 제1전투비행단. 집이 가까워 부러움을 샀다.",{set:{served:1,unit:"공군 제1전투비행단"},q:["army2",1]}),
+ O("해군에 지원한다","h5 r3","진해에서 훈련받고 함정을 탔다. 뱃멀미가 석 달 갔다.",{set:{served:1,unit:"해군"},q:["army2",1]}),
+ O("특전사에 지원한다","h12 r5 p-6","검은 베레모를 썼다. 낙하산 강하만 스무 번.",{req:s=>s.h>=60,set:{served:1,unit:"특전사"},q:["army2",1]}),
+ O("카투사에 지원한다","","",{req:s=>s.s>=70,odds:[.3,["s6 r4","추첨에 붙었다. 미군 부대에서 영어가 늘었다.",{set:{served:1,unit:"카투사"},q:["army2",1]}],["p-2","추첨에서 떨어져 육군으로 갔다.",{set:{served:1,unit:"육군"},q:["army2",1]}]]}),
+ O("학군단(ROTC) 장교로 간다","r6 m200","소위 계급장을 달았다.",{req:s=>s.job==="student"&&s.s>=55,set:{served:1,unit:"장교"},q:["army2",1]}),
+ O("군악대에 지원한다","p5 r2","군악대에서 트럼펫을 불었다.",{req:F("music"),pin:D("music"),set:{served:1,unit:"군악대"},q:["army2",1]}),
+ O("상무(국군체육부대)에 간다","r4 h4","운동을 이어 가며 군 복무를 했다.",{req:s=>s.job==="athlete",pin:true,set:{served:1,unit:"상무"},q:["army2",1]}),
+ O("사회복무요원","p2","주민센터에서 복무했다.",{req:s=>s.h<55,set:{served:1,unit:"사회복무"}}),
+ O("입영을 거부하고 도망친다","","",{odds:[.15,["p-8 r-10","2년을 숨어 지냈다. 붙잡히진 않았지만 늘 뒤를 돌아봤다.",{set:{dodge:1,guilt:1}}],["r-20 p-10","도망 다니다 붙잡혔다.",{jail:[2,"병역법 위반"],set:{dodge:1}}]]}),
+ O("살을 찌워 면제를 노린다","","",{odds:[.35,["h-10","4급 판정을 받았다. 친구들 앞에선 운이 좋았다고 했다.",{set:{served:1,guilt:1}}],["h-10 r-15","병역 브로커가 잡히면서 같이 걸렸다.",{jail:[1,"병역법 위반"],set:{dodge:1}}]]}),
+ O("해외로 도피한다","r-25 p-5 m-500","아무에게도 말하지 않고 출국했다.",{req:s=>s.cls>=2,loc:"해외 도피 중",set:{dodge:1,fugitive:1},q:["fugitiveReturn",4]}),
+ O("대체복무를 신청한다","r-2 p3","교정시설에서 36개월을 복무했다. 신념은 지켰다.",{set:{served:1,unit:"대체복무"}})]},
+
+{id:"y23",age:23,title:"스물셋",text:s=>s.job==="student"?"학교생활이 반쯤 지났다. 남은 시간을 어디에 쓸지 고민이다.":`${s.work}에서 지낸 지 몇 해가 지났다.`,pool:[
+ O("창업 동아리","s4 r3","첨단 창업보육센터에서 밤을 새웠다.",{req:STU,set:{startup:1}}),
+ O("밴드 동아리","p8 s-2","양림동 작은 공연장에서 첫 공연. 관객은 열두 명.",{req:STU}),
+ O("학점 관리","s8 p-3","장학금을 받았다.",{req:STU}),
+ O("교환학생을 간다","s6 p6 m-400","네덜란드에서 한 학기. 자전거로 등교했다.",{req:s=>s.job==="student"&&(s.cls>=2||s.s>=75),set:{abroadExp:1}}),
+ O("학생회장에 출마한다","","",{req:STU,odds:[s=>.3+s.r/200,["r10 p5","당선. 축제 때 가수를 불렀다.",{}],["p-4","낙선. 그래도 친구가 많아졌다.",{}]]}),
+ O("스포츠토토에 빠진다","p3 m-300","주말마다 경기 결과에 돈을 걸었다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}),
+ O("야간 대학에 등록한다","s7 m-400 p-2","일 끝나고 수업을 듣는다.",{req:s=>s.job!=="student",f:s=>{if(!/대/.test(s.edu))s.edu="야간대"}}),
+ O("악착같이 저축한다","m500 p-3","통장 잔고가 처음으로 네 자리가 됐다.",{req:s=>s.job!=="student"}),
+ O("동료들과 즐겁게 산다","p7 r3 m-200","퇴근 후 송정역시장이 아지트가 됐다.",{req:s=>s.job!=="student"}),
+ O("유튜브 채널을 연다","p3 s2","광주 맛집 리뷰 채널. 구독자 87명.",{set:{creatorSeed:1}}),
+ O("아르바이트 두 탕","m400 h-5","편의점과 배달을 같이 했다. 잠이 늘 모자랐다."),
+ O("헬스장을 끊는다","h6 p2","거울 앞에서 사진 찍는 사람이 됐다.",{set:{exercise:1}}),
+ O("동남아 배낭여행","p6 m-300","라오스에서 만난 사람들과 아직 연락한다."),
+ O("자격증 공부","s6","정보처리기사를 땄다.")]},
+
+{id:"pro",ages:[24,28],title:s=>`${SPT().team} 그라운드`,req:s=>s.job==="athlete",text:s=>`${SPT().ground}에 관중이 가득하다. 감독이 이름을 부른다.`,pool:[
+ O("정면승부를 건다","","",{odds:[s=>.35+s.h/250,["r10 p8 m1200",s=>`${SPT().n==="야구"?"삼진 세 개로 이닝을 끝냈다":"결승골을 넣었다"}. 다음 날 지역 신문 1면에 실렸다.`,{set:{proStar:1}}],["p-6","실수 하나로 경기를 망쳤다. 2군으로 내려갔다.",{}]]}),
+ O("승부조작 제안을 받아들인다","","",{odds:[.5,["m3000 p-8","봉투를 받았다. 그날 밤 잠을 못 잤다.",{crime:"fix",q:["probe",2]}],["r-30 p-15","검찰 수사에서 바로 드러났다. 영구 제명.",{jail:[1,"국민체육진흥법 위반"]}]]}),
+ O("금지약물로 몸을 만든다","","",{odds:[.6,["h-5 r4 m800","기록이 확 좋아졌다. 몸 어딘가가 조금씩 이상했다.",{set:{doping:1}}],["r-20 m-500","도핑 검사에 걸렸다. 72경기 출장 정지.",{set:{doping:1}}]]}),
+ O("팬 서비스에 정성을 쏟는다","r7 p4","사인 요청을 한 번도 거절하지 않았다. 광주 아이들이 유니폼에 이름을 새겼다."),
+ O("2군에서 묵묵히 훈련한다","h4 s3 p-4","함평 2군 구장에서 한 시즌을 보냈다."),
+ O("연봉 협상에서 강하게 나간다","","",{odds:[.5,["m1500","구단이 물러섰다.",{}],["r-5 p-3","팬들 사이에서 욕을 먹었다.",{}]]}),
+ O("부상을 참고 뛴다","h-12 r6","시즌은 지켰지만 몸에 흉터가 남았다."),
+ O("해외 진출에 도전한다","","",{req:F("proStar"),pin:true,odds:[.3,["m6000 r15 p8",s=>`${SPT().n==="야구"?"메이저리그":"유럽 리그"}와 계약했다. 광주 출신 해외파가 됐다.`,{loc:"해외 리그",set:{abroadPro:1,outside:1}}],["p-5","테스트에서 떨어졌다. 다시 광주로.",{}]]}),
+ O("음주운전을 한다","","",{odds:[.5,["r-25 m-2000","벌금과 출장정지. 팬들이 등을 돌렸다.",{}],["r-30 h-10","사람을 다치게 했다.",{jail:[2,"음주운전 치상"]}]]}),
+ O("은퇴 후를 위해 공부한다","s6","원정 버스에서 지도자 자격증 책을 폈다."),
+ O("구단 레전드에게 개인 지도를 받는다","h3 s4 p3","레전드가 '니는 될 놈이다' 했다.")]},
+
+{id:"proEnd",age:34,title:"은퇴",req:s=>s.job==="athlete",text:"몸이 예전 같지 않다. 구단이 은퇴 이야기를 꺼냈다.",pool:[
+ O("구단 코치로 남는다","r6 p4","코치 유니폼을 받았다.",{job:["coach",""],f:s=>s.work=`${SPT().team} 코치`}),
+ O("해설위원이 된다","r8 m500","광주 사투리 해설이 화제가 됐다.",{job:["creator","스포츠 해설위원"]}),
+ O("모교 감독으로 간다","r6 p6","고등학교 시절 그 운동장으로 돌아갔다.",{job:["coach","모교 감독"]}),
+ O("고깃집을 차린다","m-2000 p3","가게 벽에 선수 시절 유니폼을 걸었다.",{job:["shop","선수 출신 고깃집 사장"]}),
+ O("유소년 아카데미를 연다","m-1500 r5","광주 아이들 서른 명이 첫 수강생이었다.",{job:["startup","유소년 아카데미 대표"]}),
+ O("예능 프로그램에 나간다","","",{odds:[.4,["r10 m2000 p6","예능 고정 출연. 전국구 얼굴이 됐다.",{job:["creator","방송인"],set:{famous:1}}],["p-4","편집으로 한 장면 나왔다.",{job:["none","은퇴 선수"]}]]}),
+ O("현역 연장에 매달린다","","",{odds:[.35,["r8 m800","2년을 더 뛰었다.",{}],["h-10 p-6","재활에 실패했다. 결국 은퇴했다.",{job:["none","은퇴 선수"]}]]}),
+ O("은퇴금으로 도박에 빠진다","m-3000 p3","허전함을 카지노에서 채웠다.",{job:["none","은퇴 선수"],inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",1]}),
+ O("지도자 연수로 해외에 간다","s6 m-500","1년 연수 후 돌아왔다.",{job:["coach","프로 2군 코치"]}),
+ O("경기장 앞에 카페를 연다","m-1500 p4",s=>`${SPT().ground} 앞 카페. 경기 날이면 줄을 선다.`,{job:["cafe","경기장 앞 카페 사장"]})]},
+
+{id:"temptation",age:25,title:"솔깃한 제안",text:s=>`${FR()}가 술자리에서 목소리를 낮춘다. '쉽게 버는 방법이 있다.'`,pool:[
+ O("불법 도박사이트 운영을 돕는다","","",{odds:[.6,["m900","한 달에 월급의 세 배가 들어왔다.",{crime:"gambleBiz",q:["probe",2]}],["r-15","사이트가 털리면서 같이 붙잡혔다.",{jail:[2,"도박장 개설 방조"]}]]}),
+ O("클럽에서 '물건'을 옮긴다","m1200 p-2","가방 하나에 백만 원. 묻지 않았다.",{set:{drug:1},crime:"drug",q:["drugRing",2]}),
+ O("보이스피싱 현금 수거를 한다","","",{odds:[.45,["m500 p-5","할머니 한 분의 돈봉투를 받았다. 그 얼굴이 오래 남았다.",{crime:"fraud",set:{guilt:1},q:["probe",2]}],["r-20","잠복 중이던 형사에게 붙잡혔다.",{jail:[3,"사기 방조"]}]]}),
+ O("다단계에 가입한다","m-800 r-4","정수기 세 대를 친척들에게 팔고 연락이 끊겼다."),
+ O("코인 리딩방에 들어간다","m-1000 p-3","리딩방 방장은 한 달 뒤 사라졌다."),
+ O("거절하고 연락을 끊는다","p2 r3","그 친구는 몇 년 뒤 뉴스에 나왔다."),
+ O("경찰에 신고한다","r6 p-2","조직이 통째로 붙잡혔다. 한동안 밤길이 무서웠다."),
+ O("친구 사업에 동업한다","","",{odds:[.4,["m2000 p5","첨단에 차린 배달 대행 사무실이 잘 됐다.",{}],["m-1500 p-5","1년 만에 폐업. 친구와도 멀어졌다.",{}]]}),
+ O("상무지구 하우스 도박판에 앉는다","","",{odds:[.4,["m700 p4","첫판에 땄다. 그게 시작이었다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}],["m-900 p-4","한 판에 석 달 월급을 잃었다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}]]}),
+ O("강원랜드 원정을 간다","","",{pin:s=>s.flags.dream==="gamble"||s.flags.gambleAdd>0,odds:[.25,["m2500 p6","잭팟. 돌잡이 화투패가 떠올랐다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}],["m-1500 p-6","KTX 표 살 돈만 남았다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}]]}),
+ O("파티에서 약에 손을 댄다","","",{odds:[.6,["h-8 p4","몇 시간 동안 아무것도 무섭지 않았다. 깨고 나니 더 무서웠다.",{set:{drugUse:1,drug:1},crime:"drug",q:["drugRing",2]}],["h-8 r-15","파티 현장이 단속에 걸렸다.",{jail:[1,"마약류관리법 위반"],set:{drugUse:1}}]]}),
+ O("그냥 술만 마시고 집에 간다","h-1 p1","다음 날 아침 해장국이 맛있었다.")]},
+
+{id:"job",age:26,title:"첫 직장",req:s=>["student","part","none"].includes(s.job),text:s=>s.loc!=="광주"?`${s.loc}에서 공부를 마쳤다. 광주로 돌아갈지, 남을지.`:"이제 진짜 일을 구해야 한다.",pool:[
+ O("삼성전자 광주사업장","","",{req:s=>s.s>=60,odds:[s=>.45+s.s/300,["r6 p5","하남산단으로 출근한다. 첫 월급으로 부모님 내복을 샀다.",{job:["samsung","삼성전자 광주사업장"],loc:"광주"}],["p-6","최종 면접에서 떨어졌다. 편의점 야간 일로 버틴다.",{job:["part","편의점 야간"],loc:"광주"}]]}),
+ O("광주광역시청 공무원 시험","","",{odds:[s=>.25+s.s/220-(s.flags.exCon?.2:0),["r5 p3","합격. 상무지구 시청으로 출근한다.",{job:["gov","광주광역시청"],loc:"광주"}],["p-8 m-300","두 점 차이로 떨어졌다. 독서실 총무를 하며 다시 준비한다.",{job:["part","독서실 총무"],q:["job",2],loc:"광주"}]]}),
+ O("첨단 AI 스타트업","s6 p4","직원 일곱 명. 직함이 세 개다.",{req:s=>s.flags.startup||s.s>=55,job:["startup","첨단 AI 스타트업"],loc:"광주"}),
+ O("GIST 연구원","s8 r6","연구실 창밖으로 무등산이 보인다.",{req:s=>["GIST","KAIST","도쿄대","하버드","서울대"].includes(s.edu),pin:true,job:["research","GIST 연구원"],loc:"광주"}),
+ O("동명동 카페 창업 (대출 3천)","m-3000 p6","동명동 골목 2층에 카페를 열었다. 간판은 직접 칠했다.",{job:["cafe","동명동 카페 사장"],loc:"광주"}),
+ O("광주비엔날레재단","p7 r4","전시장 벽에 작품을 거는 일부터 시작했다.",{req:F("art"),pin:D("art"),job:["art","광주비엔날레재단"],loc:"광주"}),
+ O("서울 대기업에 입사한다","r8 p3","여의도로 출근한다. 광주는 명절에만 간다.",{req:s=>["서울대","연세대","고려대","KAIST","하버드"].includes(s.edu),job:["seoulcorp","서울 대기업 본사"],loc:"서울"}),
+ O("실리콘밸리 빅테크","","",{req:s=>["KAIST","하버드","서울대"].includes(s.edu)&&s.s>=80,odds:[.4,["m3000 r12 p5","캘리포니아 빅테크에 합격했다. 연봉 앞자리가 달라졌다.",{job:["dev","실리콘밸리 엔지니어"],loc:"미국 실리콘밸리",set:{outside:1}}],["p-5","최종에서 떨어졌다. 광주로 돌아와 개발자가 됐다.",{job:["dev","광주 IT 기업"],loc:"광주"}]]}),
+ O("전남대병원 레지던트","h-6 r8","당직 서는 밤이 일주일에 네 번.",{req:F("doctorTrack"),pin:true,job:["doctor","전남대병원 의사"],loc:"광주"}),
+ O("초등교사 임용시험","","",{req:F("teacherTrack"),pin:true,odds:[.7,["r6 p6","광주 초등학교로 발령. 첫 담임 반 아이들이 스물두 명.",{job:["teacher","광주 초등교사"],loc:"광주"}],["p-6","떨어졌다. 기간제 교사로 1년을 보낸다.",{job:["part","기간제 교사"],q:["job",1],loc:"광주"}]]}),
+ O("로스쿨에 진학한다","s6 m-1500","전남대 로스쿨. 3년 뒤 변호사 시험이다.",{req:s=>s.s>=75||(s.flags.dream==="law"&&s.s>=60),pin:D("law"),job:["student","전남대 로스쿨"],q:["barExam",3],loc:"광주"}),
+ O("광주 IT 기업 개발자","s5 p3","첨단 소프트웨어 회사. 무등산이 보이는 자리.",{req:s=>s.flags.coder||s.s>=60,pin:D("coder"),job:["dev","광주 IT 기업"],loc:"광주"}),
+ O("호텔 주방에 들어간다","h-3 s4","상무지구 호텔 주방 막내. 손에 화상 자국이 늘었다.",{req:F("chef"),pin:D("chef"),job:["chef","호텔 주방"],loc:"광주"}),
+ O("인디 밴드를 결성한다","p8","양림동 지하 공연장이 무대다.",{req:F("music"),pin:D("music"),job:["music","인디 밴드"],loc:"광주"}),
+ O("웹툰 작가에 도전한다","","",{req:F("art"),odds:[.35,["r8 m800 p6","연재가 시작됐다. 광주 배경 학원물.",{job:["art","웹툰 작가"],loc:"광주"}],["p-5","공모전에서 떨어졌다. 그림은 계속 그린다.",{job:["part","카페 아르바이트"],loc:"광주"}]]}),
+ O("유튜버로 전업한다","","",{req:F("creatorSeed"),odds:[.3,["m1000 r8 p6","광주 맛집 영상 하나가 터졌다. 구독자 30만.",{job:["creator","광주 맛집 유튜버"],set:{famous:1}}],["p-5 m-300","조회수 200. 다시 아르바이트를 구했다.",{job:["part","편의점 야간"]}]]}),
+ O("기아 오토랜드 광주","r4 p3","하남산단 공장 라인에 섰다.",{req:F("tech"),job:["kia","기아 오토랜드 광주"],loc:"광주"}),
+ O("광주글로벌모터스","","",{odds:[.6,["r3 p3","빛그린산단 공장에 입사했다.",{job:["kia","광주글로벌모터스"],loc:"광주"}],["p-4","서류에서 떨어졌다.",{job:["part","택배 상하차"],loc:"광주"}]]}),
+ O(s=>`가업 '${FAMSHOP()}'을 잇는다`,"p3 r3","부모님이 앞치마를 건네줬다.",{req:F("familyShop"),pin:true,job:["shop",""],f:s=>s.work=FAMSHOP()+" 사장",loc:"광주"}),
+ O("편의점 야간 아르바이트","m100 h-3","밤새 계산대를 지킨다.",{job:["part","편의점 야간"]}),
+ O("공무원 시험 장수생이 된다","p-5 s3","충장로 독서실이 집이 됐다.",{job:["part","공시생"],q:["job",2]}),
+ O("조직 일을 계속한다","m500 r-5","명함 없는 직업.",{req:s=>s.flags.gang>=1,job:["gang","상무지구 조직원"]})]},
+
+{id:"dating",ages:[27,29,31,34,41,46,53],title:s=>s.age<30?"인연":s.age<40?"아직 혼자":"다시, 누군가",req:SINGLE,text:s=>s.marry==="이혼"?"이혼 후 몇 해가 지났다. 다시 누군가를 만날 수 있을까.":s.marry==="사별"?`${JS(s.late,"을","를")} 보낸 뒤 처음으로 누군가가 궁금해졌다.`:"주변에서 하나둘 결혼 소식이 들린다. 어머니의 잔소리도 늘었다.",pool:[
+ O("헌팅포차에서 말을 건다","p-4 r-1","'저희 일행 있어요.' 일행은 끝내 오지 않았다. 친구들이 밤새 놀렸다."),
+ O("상무지구 클럽에서 들이댄다","p-6 r-3 h-1","세 마디 만에 뺨을 맞았다. 볼이 얼얼한 채로 택시를 탔다."),
+ O("소개팅 앱을 깐다","","",{odds:[.4,["p8",s=>`앱에서 만난 ${SPN()}. 첫 만남은 동명동 파스타집이었다.`,{marry:"연애중",partner:true}],["m-500 p-6","두 달 동안 다정했던 상대가 급한 병원비를 빌려 가고 사라졌다. 로맨스 스캠이었다.",{}]]}),
+ O("친구 소개팅에 나간다","","",{odds:[.6,["p9",s=>`소개팅에서 만난 ${SPN()}. 광주천 산책길에서 손을 잡았다.`,{marry:"연애중",partner:true}],["p-3","대화가 끊기지 않게 하느라 파스타 맛을 기억 못 한다.",{}]]}),
+ O("직장 동료에게 고백한다","","",{req:s=>!["none","student","prisoner"].includes(s.job),odds:[.45,["p10",s=>`동료 ${JS(SPN(),"과","와")} 몰래 사내 연애를 시작했다.`,{marry:"연애중",partner:true}],["r-4 p-5","거절당했다. 다음 날 회사 단톡방이 조용했다.",{}]]}),
+ O("무등산 산악회에 가입한다","","",{odds:[.5,["h5 p8",s=>`산악회에서 만난 ${JS(SPN(),"과","와")} 중머리재에서 김밥을 나눠 먹었다.`,{marry:"연애중",partner:true}],["h6 p2","인연은 없었지만 다리가 튼튼해졌다.",{}]]}),
+ O("광주천 러닝크루","","",{odds:[.5,["h4 p8",s=>`러닝크루 ${JS(SPN(),"과","와")} 매주 목요일 밤 광주천을 달린다.`,{marry:"연애중",partner:true}],["h5","10km 기록만 좋아졌다.",{}]]}),
+ O("결혼정보회사에 가입한다","m-300","",{odds:[.5,["p7",s=>`매니저가 소개한 ${SPN()}. 조건보다 웃음소리가 좋았다.`,{marry:"연애중",partner:true}],["p-4","가입비만 냈다. 매니저 전화가 끊겼다.",{}]]}),
+ O("첫사랑에게 연락한다","","",{req:F("firstLove"),pin:true,odds:[.45,["p12",s=>`충장로에서 ${JS(s.flags.firstLove,"을","를")} 다시 만났다. 둘 다 웃었다.`,{marry:"연애중",partner:s=>s.flags.firstLove}],["p-5","읽음 표시만 남았다.",{}]]}),
+ O("전 연인에게 연락한다","","",{req:s=>!!s.ex,odds:[.3,["p6",s=>`${JS(SPN(),"과","와")} 다시 만나기로 했다. 이번엔 다를 거라고.`,{marry:"연애중",partner:s=>s.ex}],["p-6","'번호 바꿨어요.' 모르는 사람이 받았다.",{}]]}),
+ O("야구장 키스캠을 노린다","","",{req:F("tigers"),odds:[.35,["p10 r2",s=>`전광판에 옆자리 ${JS(SPN(),"과","와")} 함께 잡혔다. 그날 번호를 교환했다.`,{marry:"연애중",partner:true}],["p-3","전광판에 혼자 잡혔다. 관중석이 웃었다.",{}]]}),
+ O("교회 청년부에 나간다","","",{odds:[.5,["p8",s=>`청년부 찬양팀의 ${SPN()}. 양림동 교회 계단에서 고백했다.`,{marry:"연애중",partner:true}],["p2","찬양 실력만 늘었다.",{}]]}),
+ O("소개팅에서 휴대폰만 본다","p-3 r-2","'바쁘신가 봐요.' 상대는 커피도 다 마시지 않고 일어났다."),
+ O("혼자가 편하다","p4 m300","주말엔 국립아시아문화전당 공연을 혼자 본다."),
+ O("동창 모임에서 다시 만난 친구","","",{odds:[.4,["p9",s=>`동창 ${SPN()}. 오랜만에 만났는데 어제 본 것 같았다.`,{marry:"연애중",partner:true}],["p-1","술값만 냈다.",{}]]}),
+ O("와인 동호회에 나간다","m-200","",{odds:[.45,["p7",s=>`와인 동호회 ${JS(SPN(),"과","와")} 둘이 남아 마지막 병을 땄다.`,{marry:"연애중",partner:true}],["h-2","와인 맛만 알게 됐다.",{}]]}),
+ O("노래방 번개에서 열창한다","","",{odds:[.25,["p8",s=>`발라드 한 곡에 ${JS(SPN(),"이","가")} 번호를 물어 왔다.`,{marry:"연애중",partner:true}],["p2 r-1","음이탈 영상이 단톡방에 돌았다.",{}]]})]},
+
+{id:"propose",ages:[30,33,36,39,44,49,57],title:"프러포즈",req:s=>s.marry==="연애중",text:s=>`${JS(SPN(),"과","와")} 만난 지 꽤 됐다. 반지를 샀다. 어디서 말할까.`,pool:[
+ O("무등산 서석대 일출 앞에서","","",{odds:[.85,["p14 m-2000 r3",s=>`해가 뜨는 순간 ${JS(SPN(),"이","가")} 고개를 끄덕였다. 결혼식은 김대중컨벤션센터에서 했다.`,{marry:"기혼"}],["p-10","새벽 산행에 지친 상대가 '생각해 볼게'라고 했다. 몇 달 뒤 헤어졌다.",{marry:"미혼"}]]}),
+ O("광주호 호수생태원 피크닉","","",{odds:[.8,["p12 m-1800","버드나무 아래에서 반지를 꺼냈다. 결혼식은 양림동 작은 교회에서 했다.",{marry:"기혼"}],["p-10","'아직은 아닌 것 같아.' 그 말이 오래 남았다.",{marry:"미혼"}]]}),
+ O("챔피언스필드 전광판 이벤트","","",{odds:[.6,["p14 r5 m-2200","만 명의 관중 앞에서 '예스'를 받았다. 중계 화면에도 나왔다.",{marry:"기혼"}],["p-15 r-5","관중 만 명 앞에서 거절당했다. 영상이 퍼졌다.",{marry:"미혼"}]]}),
+ O("양림동 카페를 통째로 빌린다","","",{odds:[.8,["p12 m-2300","촛불 백 개. 상대가 울었다.",{marry:"기혼"}],["p-8 m-300","촛불 백 개가 다 타도록 대답이 없었다.",{marry:"미혼"}]]}),
+ O("반지 없이 담백하게 말한다","","",{odds:[.7,["p10 m-1200","'그래, 하자.' 짧은 대답이 더 좋았다.",{marry:"기혼"}],["p-6","'최소한 성의는 보여야지.' 다툼으로 끝났다.",{}]]}),
+ O("아이가 먼저 생겼다","p8 m-1500","급하게 날을 잡았다. 양가 부모님 표정이 복잡했다.",{marry:"기혼",kids:1}),
+ O("아직은 아니다","","",{odds:[.5,["p-8","기다리다 지친 상대가 먼저 이별을 말했다.",{marry:"미혼"}],["m300","1년을 더 미뤘다. 상대는 아직 기다려 준다.",{}]]}),
+ O("동거부터 시작한다","p5 m200","운암동 투룸에서 같이 살기 시작했다. 결혼은 천천히.",{set:{cohab:1}}),
+ O("상대 부모님의 반대를 설득한다","","",{odds:[.5,["p12 r3 m-1500","세 번째 인사에 장인어른이 술잔을 건넸다. 결혼했다.",{marry:"기혼"}],["p-12","끝내 허락을 받지 못했다. 헤어졌다.",{marry:"미혼"}]]}),
+ O("바람을 피우다 걸린다","p-10 r-6",s=>`${JS(SPN(),"이","가")} 휴대폰을 봤다. 그날로 끝났다.`,{marry:"미혼"}),
+ O("해외에서 프러포즈","","",{odds:[.85,["p12 m-1500","파리 에펠탑 앞. 광주 사투리로 청혼했다.",{marry:"기혼"}],["p-10 m-800","비행기 값만 날렸다.",{marry:"미혼"}]]})]},
+
+{id:"house",age:32,title:"내 집",text:"전세 계약이 끝나 간다. 집을 어떻게 할지 정해야 한다.",pool:[
+ O("수완지구 아파트 매수 (대출)","m-600 p4","30년 대출. 그래도 내 이름 문패가 생겼다.",{set:{house:1},home:"광산구 수완지구"}),
+ O("봉선동 전세","m-300 p2","학군 좋다는 봉선동.",{home:"남구 봉선동"}),
+ O("부모님 집으로 들어간다","m500 p-3 r-2","돈은 모였다. 저녁 반찬 결정권은 없다."),
+ O("첨단 신축 청약에 넣는다","","",{odds:[.2,["m2500 p6","당첨! 분양가보다 시세가 훨씬 올랐다.",{set:{house:1},home:"북구 첨단지구"}],["p-2","떨어졌다. 경쟁률 87대 1.",{}]]}),
+ O("학동 재개발 빌라를 산다","m-500 p1","녹슨 대문 집. 언젠가 재개발되면.",{set:{redevStake:1},q:["redev",6]}),
+ O("상무지구 오피스텔","p2","역세권 원룸. 혼자 살기엔 딱이다.",{home:"서구 상무지구"}),
+ O("무등산 자락 전원주택","m-2000 h5 p5","방림동 끝자락. 아침마다 새소리에 깬다.",{req:s=>s.m>=4000,set:{house:1},home:"남구 방림동"}),
+ O("영끌해서 갭투자 세 채","","",{odds:[.4,["m4000 p5","집값이 올랐다. 주변에서 투자 고수라 부른다.",{set:{house:1}}],["m-4000 p-10","역전세가 터졌다. 세입자들에게 줄 돈이 없다.",{set:{debt:1}}]]}),
+ O("월세 살며 투자금을 모은다","m300","집 대신 통장을 키운다."),
+ O("반지하로 옮겨 악착같이 모은다","m700 h-4 p-4","비 오는 날마다 창문을 확인한다."),
+ O("서울에 전세를 구한다","m-1000 p-2","방 두 칸에 광주 아파트 값.",{req:s=>s.loc==="서울"}),
+ O("시세보다 싼 전세를 덥석 잡는다","","",{odds:[.5,["m300","운이 좋았다.",{}],["m-2500 p-10","전세사기였다. 집주인이 잠적했다.",{}]]})]},
+
+{id:"baby",age:33,title:"아이",req:MARRIED,text:s=>`${JS(SPN(),"과","와")} 아이 이야기를 했다.`,pool:[
+ O("하나 낳자","p12 h-2",s=>`전남대병원에서 ${K(-1)}${hasJong(K(-1))?"이":"가"} 태어났다.`,{kids:1}),
+ O("둘 낳자","p14 h-4 m-500",s=>`${K(-2)}, 그리고 2년 뒤 ${K(-1)}. 집이 시끄러워졌다.`,{kids:2}),
+ O("셋을 낳는다","p15 h-6 m-1200",s=>`${s.kids.map(k=>callName(k.name)).join(", ")}. 다둥이 가족으로 구청에서 상을 받았다.`,{kids:3}),
+ O("둘이서 행복하게 살자","p4 m600","주말마다 광주 곳곳을 둘이서 걸었다."),
+ O("난임 치료를 받는다","","",{odds:[.5,["p14 m-1000",s=>`3년 만에 ${K(-1)}${hasJong(K(-1))?"이":"가"} 왔다. 둘 다 펑펑 울었다.`,{kids:1}],["p-8 m-1200","시술을 몇 번 더 했지만 아이는 오지 않았다.",{}]]}),
+ O("아이를 입양한다","p10 r6",s=>`${K(-1)}${hasJong(K(-1))?"이":"가"} 가족이 됐다. 피보다 진한 게 있었다.`,{kids:1}),
+ O("쌍둥이를 낳는다","p14 h-5 m-800",s=>`쌍둥이 ${K(-2)}와 ${K(-1)}. 잠이 사라졌다.`,{kids:2}),
+ O("아직은 미룬다","m300","경제적으로 준비가 되면.",{q:["baby",3]}),
+ O("반려견부터 키운다","p6 m-100","풍암호수공원 산책이 일상이 됐다. 이름은 '무등이'."),
+ O("육아휴직을 하고 낳는다","p12 m-800 r3",s=>`${K(-1)}${hasJong(K(-1))?"이":"가"} 태어났다. 아빠 육아휴직 1호로 회사 소식지에 실렸다.`,{kids:1})]},
+
+{id:"homecoming",age:35,title:"고향",req:s=>s.loc!=="광주",text:s=>`${s.loc}에서 지낸 지 오래다. 어머니 목소리가 전화기 너머로 자꾸 작아진다.`,pool:[
+ O("광주 지사 발령을 신청한다","p5 r2","상무지구 지사로 내려왔다.",{req:s=>["seoulcorp","dev","samsung"].includes(s.job),loc:"광주"}),
+ O("모든 걸 정리하고 귀향한다","p6 m-500","광주송정역에 내리자 공기가 달랐다.",{loc:"광주",job:["none","귀향 후 구직 중"]}),
+ O("고향에서 창업한다","m-2500 p6","첨단에 작은 사무실을 얻었다.",{loc:"광주",job:["startup","광주 창업 기업 대표"]}),
+ O("원격 근무로 광주에 산다","p6","양림동 집에서 노트북을 켠다.",{req:s=>["dev","seoulcorp","creator"].includes(s.job),loc:"광주"}),
+ O("남는다","m400 p-4","명절에만 내려간다. 어머니가 서운해했다.",{q:["homecoming",8]}),
+ O("부모님을 모셔 온다","m-800 p2 r4","부모님이 낯선 도시에서 적적해했다.",{q:["homecoming",10]}),
+ O("광주 공공기관 경력직","","",{odds:[.6,["p5 r4","혁신도시 공기업에 붙었다. 주말엔 광주 본가에 간다.",{loc:"광주",job:["gov","공공기관 경력직"]}],["p-3","떨어졌다. 다시 타지 생활.",{q:["homecoming",5]}]]}),
+ O("고향 대학 교수로 지원한다","","",{req:s=>s.s>=80,odds:[.4,["r10 p6","모교 교수로 임용됐다.",{loc:"광주",job:["research","광주 대학 교수"]}],["p-3","최종에서 떨어졌다.",{q:["homecoming",5]}]]}),
+ O("어머니만 자주 찾아뵌다","p3 m-300","한 달에 두 번 KTX를 탔다.",{q:["homecoming",6]}),
+ O("도피를 끝내고 돌아온다","r-5","입국장에서 바로 조사를 받았다.",{req:F("fugitive"),pin:true,loc:"광주",set:{fugitive:0},jail:[1,"병역법 위반"]}),
+ O("해외 영주권을 신청한다","p2 m500","돌아갈 이유가 점점 줄었다.",{req:s=>/미국|일본|해외/.test(s.loc)&&!s.flags.fugitive,q:["homecoming",10]})]},
+
+{id:"marriage",age:36,title:"결혼 생활",req:MARRIED,text:s=>`결혼 ${Math.max(1,s.age-(s.flags.marriedAt||s.age))}년째. ${JS(SPN(),"과","와")}의 대화가 예전 같지 않다.`,pool:[
+ O("직장 동료와 선을 넘는다","p5 r-2","야근 후 둘만 남은 사무실. 그날 이후 비밀이 생겼다.",{req:s=>!["none","prisoner","retired"].includes(s.job),set:{affair:1},q:["affairOut",2]}),
+ O("첫사랑과 연락을 이어 간다","p4",s=>`${s.flags.firstLove}의 메시지 알림을 무음으로 해 두었다.`,{req:s=>s.flags.firstLove&&s.flags.firstLove!==s.partner,set:{affair:1},q:["affairOut",2]}),
+ O("둘만의 여행을 간다","p7 m-300","무등산 원효사 템플스테이. 오랜만에 손을 잡고 걸었다."),
+ O("각방을 쓴다","p-5","편하긴 했다. 그게 문제였다."),
+ O("육아와 집안일을 반반 나눈다","p6 r2",s=>s.kids.length?`${K(0)}${hasJong(K(0))?"이":"가"} '아빠 요리가 더 맛있어'라고 했다.`:"주말 청소 당번표를 냉장고에 붙였다."),
+ O("처가와 크게 다툰다","p-6 r-2","명절마다 분위기가 얼어붙었다."),
+ O("배우자 몰래 대출을 받는다","","",{odds:[.5,["m1500","아직 들키지 않았다.",{set:{guilt:1}}],["p-12 m1500",s=>`${JS(SPN(),"이","가")} 대출 문자를 봤다. 한 달 동안 말을 하지 않았다.`,{}]]}),
+ O("부부 상담을 받는다","p5 m-100","서로 몰랐던 이야기가 많았다."),
+ O("술로 스트레스를 푼다","h-6 p-2","대인시장 포장마차에 매일 들렀다."),
+ O("깜짝 선물을 준비한다","p6 m-300",s=>`${JS(SPN(),"이","가")} 오랜만에 크게 웃었다.`),
+ O("이혼 이야기를 꺼낸다","","",{odds:[.5,["p-10 m-3000 r-3","서로 지쳐 있었다. 도장을 찍었다.",{marry:"이혼"}],["p-4","말을 꺼내고 둘 다 울었다. 다시 해 보기로 했다.",{}]]}),
+ O("주말마다 가족과 무등산에 간다","h5 p6","정상에서 먹는 컵라면이 가족의 의식이 됐다.")]},
+
+{id:"career",age:37,title:"직장의 바람",req:s=>!["none","part","student","retired","prisoner","athlete"].includes(s.job),text:s=>`${s.work}에 변화의 바람이 분다.`,pool:[
+ O("희망퇴직, 위로금을 받는다","m3500 p-4","큰돈이 들어왔지만 아침에 갈 곳이 없어졌다.",{req:EMP,job:["none","퇴직 후 구직 중"]}),
+ O("남아서 버틴다","h-6 m300 r2","주말 출근이 늘었다. 그래도 자리를 지켰다.",{req:EMP}),
+ O("승진 경쟁에 뛰어든다","","",{req:EMP,odds:[.5,["r8 m600 p4","팀장이 됐다. 책임이 월급보다 빨리 늘었다.",{}],["p-6","동기가 먼저 올라갔다.",{}]]}),
+ O("회삿돈을 횡령한다","m6000 p-4","장부의 숫자를 조금씩 바꿨다. 처음엔 손이 떨렸다.",{req:s=>EMP(s)||s.job==="council",crime:"embezzle",set:{embezzle:1},q:["probe",2]}),
+ O("내부 비리를 고발한다","","",{req:EMP,odds:[.5,["r14 p2","언론에 보도됐다. 회사는 바뀌었고, 동료 몇은 등을 돌렸다.",{}],["r6 p-10","해고됐다. 소송이 2년 걸렸다.",{job:["none","해고 후 소송 중"]}]]}),
+ O("상사의 갑질을 참는다","p-7 h-3","화장실에서 몇 번 울었다.",{req:EMP}),
+ O("상사를 들이받는다","","",{req:EMP,odds:[.4,["r5 p6","상사가 다른 지점으로 갔다. 동료들이 커피를 샀다.",{}],["r-8 p-4","책상이 창가 구석으로 옮겨졌다.",{}]]}),
+ O("2호점을 낸다","","",{req:BIZ,odds:[.45,["m2500 r5 p5","상무지구 2호점이 대박 났다.",{}],["m-3000 h-4 p-6","2호점은 1년 만에 문을 닫았다.",{}]]}),
+ O("매출을 숨겨 세금을 줄인다","m1800","현금 결제만 받기 시작했다.",{req:BIZ,crime:"tax",q:["probe",3]}),
+ O("가게를 정리한다","m600 p-6","마지막 영업일에 단골들이 꽃을 들고 왔다.",{req:BIZ,job:["none","폐업 후 구직 중"]}),
+ O("배달 전문으로 바꾼다","m500 h-2","홀을 접고 주방만 남겼다.",{req:BIZ}),
+ O("큰 기회에 승부를 건다","","",{req:ART,odds:[.3,["m3000 r12 p8","작품이 전국적으로 알려졌다. 광주 출신이라는 소개가 따라붙었다.",{set:{famous:1}}],["p-6 m-800","기대만큼 반응이 없었다.",{}]]}),
+ O("남의 작품을 베낀다","","",{req:ART,odds:[.5,["m1500 r4","아무도 눈치채지 못했다.",{set:{guilt:1}}],["r-25 p-10","표절 의혹이 터졌다. 모든 활동이 중단됐다.",{}]]}),
+ O("배신자를 처리하라는 지시를 받는다","","",{req:ILL,odds:[.4,["p-15 m2000","그날 밤 이후 거울을 보지 못했다. 사건은 미제로 남았다.",{set:{murder:1,guilt:1}}],["r-40 p-20","수사는 오래 걸리지 않았다.",{set:{murder:1},jail:[18,"살인"]}]]}),
+ O("지시를 거부하고 조직을 떠난다","","",{req:ILL,odds:[.5,["p8 r5","광주를 떠났다가 몇 해 뒤 조용히 돌아왔다.",{job:["part","택배 기사"],set:{gang:0}}],["h-35","거부한 대가는 컸다.",{job:["none","요양 중"],set:{gang:0}}]]}),
+ O("조직의 2인자가 된다","m2500 r-6","차가 바뀌었다. 잠은 더 얕아졌다.",{req:ILL,crime:"gambleBiz",q:["probe",3]}),
+ O("이직한다","s4 p3","더 작은 회사, 더 나은 저녁.",{req:EMP}),
+ O("창업에 뛰어든다","m-3000 p5","모은 돈을 털어 첨단에 사무실을 냈다.",{job:["startup","창업 기업 대표"]}),
+ O("리베이트를 받는다","m3000","제약 회사 영업사원의 봉투를 거절하지 않았다.",{req:s=>s.job==="doctor",crime:"bribe",q:["probe",2]}),
+ O("수술 실력으로 이름을 얻는다","r12 m1500","광주 최고의 집도의로 방송에 나왔다.",{req:s=>s.job==="doctor",pin:true}),
+ O("담임 반 아이의 위기를 돕는다","r10 p6","가정폭력에 시달리던 아이를 지켰다. 그 아이가 훗날 편지를 보냈다.",{req:s=>s.job==="teacher",pin:true}),
+ O("억울한 사건을 맡는다","r12 m-300","돈 안 되는 사건이었다. 무죄 판결이 나왔다.",{req:s=>s.job==="lawyer",pin:true})]},
+
+{id:"againJob",age:39,title:"다시 일자리",req:s=>["none","part"].includes(s.job),text:s=>s.flags.exCon?"전과 기록이 이력서보다 먼저 도착한다.":"쉬는 시간이 길어지고 있다. 통장이 줄어드는 게 보인다.",pool:[
+ O("광주글로벌모터스 생산직","","",{odds:[s=>s.flags.exCon?.25:.6,["r3 p4","빛그린산단 공장으로 출근하게 됐다.",{job:["kia","광주글로벌모터스"]}],["p-5","면접에서 떨어졌다.",{}]]}),
+ O("송정역 앞 떡갈비집을 차린다","m-2500 p5","KTX 손님이 줄을 섰다. 가끔은.",{job:["shop","송정역 떡갈비집 사장"]}),
+ O("자격증을 따서 재취업","s6 p-2","공인중개사로 봉선동 부동산에 들어갔다.",{job:["shop","공인중개사"]}),
+ O("개인택시를 몬다","m-1500 p2","광주 택시 기사. 손님들이 들려주는 이야기가 재미있다.",{job:["stall","개인택시 기사"]}),
+ O("배달 라이더","m100 h-4","광주 골목을 다 외웠다.",{job:["part","배달 라이더"]}),
+ O("공사 현장 일용직","m200 h-6","새벽 다섯 시 인력사무소. 허리가 먼저 늙었다.",{job:["part","공사장 일용직"]}),
+ O("대리운전","m100 p-2","상무지구 술집 앞에서 콜을 기다린다.",{job:["part","대리운전 기사"]}),
+ O("불법 하우스 도박장 일을 한다","m800 r-6","출소한 친구의 소개였다.",{job:["gang","하우스 도박장 관리"],crime:"gambleBiz",q:["probe",2]}),
+ O("유튜브에 인생 이야기를 올린다","","",{odds:[.25,["m800 r8 p6","인생 이야기가 조회수 백만을 넘었다.",{job:["creator","인생 썰 유튜버"],set:{famous:1}}],["p-3","조회수 34.",{}]]}),
+ O("평동에서 농사를 시작한다","h4 p4","광산구 평동 비닐하우스. 손에 흙이 묻었다.",{job:["stall","평동 농부"]}),
+ O("사회적기업에 들어간다","r5 p3","출소자와 노숙인을 돕는 광주 사회적기업.",{job:["gov","사회적기업 직원"]}),
+ O("부모님 가게를 돕는다","p2 r2",s=>`${FAMSHOP()} 카운터에 섰다.`,{req:F("familyShop"),pin:true,job:["shop",""],f:s=>s.work=FAMSHOP()})]}
+]);
+
+addPath([
+{id:"army2",title:s=>s.flags.marine?"빨간 명찰":"군 생활",text:s=>`${s.flags.unit||"부대"}에서 1년이 지났다.`,pool:[
+ O("선임의 괴롭힘을 참는다","p-6 h-3","전역까지 참았다. 그 이름은 평생 잊히지 않았다."),
+ O("마음의 편지로 신고한다","r4 p2","선임은 다른 부대로 갔다. 후임들이 고맙다고 했다."),
+ O("선임에게 주먹을 날린다","","",{odds:[.4,["r3 p3","맞은 선임이 오히려 조용해졌다.",{}],["r-6 p-6","군기교육대를 다녀왔다. 진급이 밀렸다.",{}]]}),
+ O("부대를 이탈한다","","",{odds:[.1,["p-12","사흘 만에 스스로 돌아왔다. 운 좋게 징계로 끝났다.",{}],["r-20 p-12","군무이탈로 붙잡혔다.",{jail:[2,"군무이탈"],set:{deserter:1}}]]}),
+ O("포상휴가를 노린다","p6 r2","사격 만발로 포상휴가를 받았다. 광주 집 밥이 꿀맛이었다."),
+ O("말년에 사고를 친다","","",{odds:[.5,["p3","아무도 몰랐다.",{}],["r-4 p-4","휴가 복귀가 늦어 징계를 받았다.",{}]]}),
+ O("군대에서 자격증을 딴다","s5","지게차와 컴퓨터 자격증을 땄다."),
+ O("몰래 휴대폰 도박을 한다","p3 m-300","불법 스포츠 도박에 손을 댔다. 월급이 하루에 사라졌다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}),
+ O("후임을 챙긴다","r5 p2","전역할 때 후임들이 롤링페이퍼를 써 줬다."),
+ O("혹한기 훈련을 버틴다","h4 p-3","영하 20도의 밤. 그날 이후로 추위를 덜 탄다."),
+ O("고향 친구에게 편지를 쓴다","p3",s=>`${FR()}에게서 답장이 왔다. '광주 오면 송정 떡갈비 쏜다.'`),
+ O("해병대 기수 문화에 적응한다","h4 r3 p-4","한 번 해병은 영원한 해병. 그 말을 몸으로 배웠다.",{req:F("marine"),pin:true})]},
+
+{id:"barExam",title:"변호사 시험",text:"로스쿨 3년이 끝났다. 시험장 앞에서 손이 떨린다.",pool:[
+ O("하루 열네 시간 공부","","",{odds:[s=>.4+s.s/250,["r10 p8","합격. 광주지방법원 앞 로펌에 들어갔다.",{job:["lawyer","광주 로펌 변호사"]}],["p-8 h-4","떨어졌다. 한 번 더.",{q:["barExam",1]}]]}),
+ O("스터디 그룹","","",{odds:[s=>.35+s.s/250,["r8 p6","합격. 스터디원 다섯 명 중 셋이 붙었다.",{job:["lawyer","광주 변호사"]}],["p-6","떨어졌다. 법률사무소에 취직했다.",{job:["part","법률사무소 직원"]}]]}),
+ O("시험을 포기하고 취업","p2","로스쿨 학위로 공기업 법무팀에 들어갔다.",{job:["gov","공기업 법무팀"]}),
+ O("부정행위를 시도한다","","",{odds:[.15,["r6","합격했다. 아무도 모른다. 아직은.",{job:["lawyer","광주 변호사"],set:{guilt:1}}],["r-25","적발됐다. 응시 자격이 5년 정지됐다.",{job:["part","법률사무소 직원"]}]]}),
+ O("검사를 목표로 한다","","",{req:s=>s.s>=80,odds:[.35,["r12 p6","광주지검 검사로 임용됐다.",{job:["lawyer","광주지방검찰청 검사"]}],["p-3","변호사로 시작한다.",{job:["lawyer","광주 변호사"]}]]}),
+ O("공익 변호사의 길","r10 m-300","광주 인권센터 상근 변호사가 됐다.",{job:["lawyer","공익 변호사"]}),
+ O("시험 직전 연애를 시작한다","p6 s-4","…시험은 다음으로.",{q:["barExam",1]}),
+ O("부모님 기대 때문에 버틴다","p-6","간신히 붙었다.",{job:["lawyer","광주 변호사"]}),
+ O("재판연구원에 지원한다","s5 r6","광주고등법원 재판연구원이 됐다.",{req:s=>s.s>=75,job:["lawyer","재판연구원"]}),
+ O("법무사로 방향을 튼다","p3","법무사 사무소를 냈다.",{job:["shop","법무사 사무소"]})]}
+]);
+
+/* ===== 40세 이후 ===== */
+addMain([
+{id:"health",age:40,title:"건강검진",text:"전남대병원 건강검진 결과지에 빨간 글씨가 세 줄이다.",pool:[
+ O("광주천 자전거로 출퇴근","h8 p2","비 오는 날이 더 많았지만 뱃살이 줄었다.",{set:{exercise:1}}),
+ O("술과 담배를 끊는다","h7 p-3 m200","대인시장 막걸리 모임에서 사이다만 마셨다.",{set:{smoke:0}}),
+ O("바쁘니까 다음에","h-6","결과지는 서랍 속으로 들어갔다.",{set:{neglect:1}}),
+ O("정밀검사를 받는다","","",{odds:[.7,["h3 m-300","별일 아니었다. 마음이 놓였다.",{}],["h-5 m-1500","초기 암이 발견됐다. 일찍 찾아서 다행이라고 했다.",{set:{survivor:1}}]]}),
+ O("PT를 끊는다","h6 m-400","트레이너가 무서웠다. 효과는 있었다.",{set:{exercise:1}}),
+ O("주말마다 무등산에 오른다","h7 p3","증심사 코스는 이제 눈 감고도 간다.",{set:{exercise:1,hiker:1}}),
+ O("건강식품만 잔뜩 산다","m-400 h1","홈쇼핑에서 산 영양제가 찬장을 채웠다."),
+ O("다이어트 약에 의존한다","h-5 p2","살은 빠졌다. 심장이 자주 두근거렸다."),
+ O("금연에 실패한다","h-3 p1","사흘을 못 갔다."),
+ O("마라톤 풀코스에 도전한다","h8 r2","완주했다. 결승선에서 아이처럼 울었다.",{set:{exercise:1}}),
+ O("정신건강의학과 상담을 받는다","p7","오래 묵은 피로의 이름을 알게 됐다."),
+ O("술자리를 더 늘린다","h-7 p2","간 수치가 두 배가 됐다.")]},
+
+{id:"invest",age:42,title:"솔깃한 투자",text:s=>`${FR()}가 술자리에서 투자 이야기를 꺼낸다.`,pool:[
+ O("코인에 3천만 원 넣는다","","",{odds:[s=>s.flags.luck?.4:.28,["m6000 p6","세 배가 됐다. 돌잡이 때 돈을 잡은 덕일까.",{}],["m-2500 p-9",s=>MARRIED(s)?`반의 반 토막. ${SPN()}에게 말하지 못했다.`:"반의 반 토막. 누구에게도 말하지 못했다.",{}]]}),
+ O("송정역 근처 상가에 투자","","",{odds:[.55,["m2000","KTX 역세권 상가 월세가 꼬박꼬박 들어온다.",{}],["m-1200 p-4","공실이 1년째다.",{}]]}),
+ O("정중히 거절하고 적금","m300 p1","재미는 없지만 마음은 편하다."),
+ O("미국 주식에 묻어 둔다","","",{odds:[.55,["m1500","10년 뒤 계좌를 열어 보고 놀랐다.",{}],["m-800","하필 고점에 샀다.",{}]]}),
+ O("친구 사업에 보증을 선다","","",{odds:[.45,["p4 r3","사업이 잘 됐다. 친구가 평생 고마워했다.",{}],["m-4000 p-10","친구가 잠적했다. 빚이 남았다.",{set:{debt:1}}]]}),
+ O("강원랜드에 간다","","",{pin:s=>s.flags.dream==="gamble"||s.flags.gambleAdd>0,odds:[.2,["m3000 p6","잭팟이 터졌다. 돌아오는 차 안에서 웃음이 멈추지 않았다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}],["m-2500 p-8","휴게소에서 라면 한 그릇 살 돈만 남았다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}]]}),
+ O("불법 선물 옵션에 손댄다","","",{odds:[.3,["m5000","한 달 만에 다섯 배.",{crime:"fraud",q:["probe",3]}],["m-5000 p-12","증거금이 하루에 날아갔다.",{set:{debt:1}}]]}),
+ O("금을 산다","m400","장롱 속 금이 조용히 늘었다."),
+ O("매주 로또를 산다","","",{odds:[.01,["m150000 p15","1등. 광주 북구의 한 복권방에서 나왔다.",{set:{lotto:1}}],["m-60","오천 원짜리 꿈을 매주 샀다.",{}]]}),
+ O("확실하다는 땅에 투자한다","m-2000 p-6","기획부동산이었다. 산비탈 지분 2평."),
+ O("사채업에 손댄다","m2500 r-10","빌려준 돈에 이자가 붙는 속도가 무서웠다.",{crime:"loanShark",q:["probe",3]}),
+ O("투자 대신 나에게 투자한다","s6 m-300","야간 대학원에 등록했다.")]},
+
+{id:"parents",age:45,title:"부모님",text:"어머니가 쓰러지셨다는 전화를 받았다. 뇌경색 초기라고 한다.",pool:[
+ O("직접 모시고 간병한다","p-6 h-5 r8 m-800","2년 동안 어머니 곁을 지켰다. 어머니는 웃으며 고맙다고 하셨다.",{set:{filial:1}}),
+ O("요양병원에 모시고 주말마다 간다","m-1500 p-2 r2","일요일 오후는 늘 요양병원에서 보냈다."),
+ O("형제에게 맡긴다","m-300 r-6 p-3","마음 한구석이 오래 무거웠다."),
+ O("간병인을 고용한다","m-2000 p1","전문 간병인이 와서 마음이 놓였다."),
+ O("재산 이야기부터 꺼낸다","r-8 p-4","형제들 앞에서 한 그 말을 평생 후회했다."),
+ O("회사를 휴직한다","m-1200 r6 p-1","1년을 쉬고 어머니 재활을 도왔다.",{req:s=>!["none","part","retired"].includes(s.job)}),
+ O("고향집으로 이사한다","p3 r3",s=>`${s.distName}의 그 집으로 돌아갔다.`,{f:s=>s.home=s.distName}),
+ O("매일 새벽 기도에 나간다","p2","무릎이 닳도록 빌었다."),
+ O("서울 큰 병원으로 옮긴다","","",{odds:[.6,["m-2500 p5","치료가 잘 됐다. 어머니가 다시 걸으셨다.",{}],["m-3000 p-6","결과는 같았다.",{}]]}),
+ O("가족 회의를 피한다","r-6 p-2","전화를 계속 받지 않았다."),
+ O("어머니와 매일 영상통화","p4 r3","10분짜리 통화가 하루의 끝이 됐다.")]},
+
+{id:"community",age:47,title:"동네 일",text:s=>`${s.home} 주민들이 동네 일을 맡아 달라고 한다.`,pool:[
+ O("주민자치회를 맡는다","r10 p3 h-2","마을 축제를 다시 살렸다."),
+ O("구의원에 출마한다","","",{odds:[s=>s.r/110-(s.flags.exCon?.3:0),["r15 m-1500","당선. 현수막에 이름이 걸렸다.",{job:["council","구의회 의원"]}],["r-3 m-3000 p-8","낙선. 선거 빚이 남았다.",{}]]}),
+ O("정중히 거절한다","p2","저녁 시간은 지켰다."),
+ O("마을 축제를 기획한다","r6 p4","골목 축제에 3천 명이 왔다."),
+ O("재개발 반대위원장이 된다","r8 h-4","구청 앞 천막에서 겨울을 났다."),
+ O("재개발 조합 돈을 빼돌린다","m4000 r-2","조합 도장을 맡았다. 숫자가 조금씩 사라졌다.",{crime:"embezzle",q:["probe",2]}),
+ O("동네 유소년 팀 감독","h4 p6","주말마다 아이들과 무등경기장에서 공을 찼다.",{req:F("sport"),pin:true}),
+ O("무료 급식소 봉사","r8 p4","대인시장 앞 무료 급식소에서 매주 수요일 밥을 펐다."),
+ O("주차 시비 끝에 주먹을 휘두른다","","",{odds:[.5,["r-4 m-300","합의금으로 끝났다.",{}],["r-10","상대가 크게 다쳤다.",{jail:[1,"상해"]}]]}),
+ O("동네 단톡방 빌런이 된다","r-6 p2","모든 공지에 반대 댓글을 달았다."),
+ O("골목 CCTV 설치 운동","r5","골목 범죄가 줄었다."),
+ O("동네 아이들 공부방을 연다","r9 p5 m-300","교회 지하에서 아이들 숙제를 봐 줬다.")]},
+
+{id:"midlife",age:50,title:"쉰",text:"쉰 번째 생일. 거울 속 얼굴이 아버지를 닮았다.",pool:[
+ O("일을 그만두고 동명동 책방을 연다","m-2000 p12 r3","손님은 적지만 하루가 짧다.",{job:["shop","동명동 책방 주인"]}),
+ O("지금 자리에서 버틴다","m800 p-5","꿈은 은퇴 후로 미뤘다."),
+ O("빛고을 둘레길을 완주한다","h6 p7 m-200","광주를 한 바퀴 걸었다. 몰랐던 골목이 많았다."),
+ O("대형 오토바이를 산다","p6 h-2 m-1500","주말마다 무등산 순환도로를 달린다."),
+ O("늦깎이 대학원","s8 m-1000","전남대 대학원. 동기들이 아들뻘이다."),
+ O("젊은 사람과 바람이 난다","p6 r-3","충장로 와인바에서 시작됐다.",{req:MARRIED,set:{affair:1},q:["affairOut",1]}),
+ O("무등산 산장에서 한 달 산다","p7 h4","휴대폰을 끄고 장작을 팼다."),
+ O("모발이식을 받는다","p5 m-600","거울 보는 시간이 늘었다."),
+ O("모아 둔 돈으로 주식 몰빵","","",{odds:[.4,["m4000 p6","은퇴 자금이 두 배가 됐다.",{}],["m-4000 p-10","반 토막.",{}]]}),
+ O("전국노래자랑 광주 편에 나간다","","",{odds:[s=>s.flags.music?.6:.2,["r8 p10","인기상. 동네에서 알아본다.",{f:s=>{if(s.flags.dream==="music")s.flags.dreamLate=1}}],["p3 r2","땡! 그래도 TV에 나왔다.",{}]]}),
+ O("화해하지 못한 사람에게 전화한다","p6 r4","20년 만의 전화. 짧았지만 충분했다."),
+ O("아버지와 낚시를 간다","p7","광주호에서 아버지와 하루 종일 말없이 앉아 있었다. 그게 마지막 낚시였다.")]},
+
+{id:"kidsSchool",age:52,title:"아이의 진로",req:s=>s.kids.length>0,text:s=>`${K(0)}가 고3이 됐다. 진로 이야기로 저녁 식탁이 조용하다.`,pool:[
+ O("봉선동 학원가에 집중 투자","m-3000 p-2",s=>`${K(0)}는 서울의 대학에 붙었다. 광주송정역에서 배웅했다.`),
+ O("하고 싶은 걸 하게 둔다","p6 r2",s=>`${K(0)}는 조선대 간호학과에 갔다. 광주에 남았다.`),
+ O("해외 유학을 보낸다","m-6000 p2","공항 가는 길이 길었다."),
+ O("아이가 운동을 하겠다고 한다","p5",s=>`${K(0)}가 ${SPT().n} 선수가 되겠다고 했다. 대를 이은 꿈이었다.`,{req:F("sport"),pin:true}),
+ O("의대에 가라고 강요한다","p-8 r-2",s=>`${K(0)}와 1년 동안 말을 하지 않았다.`),
+ O("아이의 자퇴를 받아들인다","p3 r-2",s=>`${K(0)}는 검정고시를 보고 유튜버가 됐다. 생각보다 잘했다.`),
+ O("입시 비리를 청탁한다","","",{odds:[.5,["m-3000 p-3","아이는 붙었다. 그 사실을 아이는 몰랐다.",{set:{guilt:1}}],["m-3000 r-25","청탁이 드러났다. 아이의 입학이 취소됐다.",{crime:"bribe",jail:[1,"업무방해"]}]]}),
+ O("서석대에서 아이와 대화한다","p7 h2",s=>`무등산 정상에서 ${K(0)}가 처음으로 속마음을 말했다.`),
+ O("아이가 광주에 남겠다고 한다","p6",s=>`${K(0)}가 전남대에 갔다. 주말마다 같이 밥을 먹는다.`),
+ O("아이가 연예인을 하겠다고 한다","p2 m-1000",s=>`${K(0)}가 서울 기획사 연습생이 됐다.`),
+ O("아이 입시에 무관심하다","r-4 p-2","원서 마감일도 몰랐다.")]},
+
+{id:"inherit",age:54,title:"아버지의 마지막",text:"아버지가 돌아가셨다. 장례가 끝나고 형제들이 모였다.",pool:[
+ O("형제와 공평하게 나눈다","r4 p2",s=>INH(s)<0?"아버지의 빚을 형제들과 나눠 갚기로 했다.":`${won(Math.round(INH(s)*.5))}을 물려받았다. 형제들과 사이가 좋다.`,{f:s=>s.m+=Math.round(INH(s)*.5)}),
+ O("내 몫을 더 주장한다","r-6 p-4",s=>INH(s)<0?"빚은 형들에게 떠넘겼다. 그 뒤로 명절에 부르지 않았다.":`${won(Math.round(INH(s)*.8))}을 챙겼다. 형제들이 등을 돌렸다.`,{f:s=>s.m+=Math.max(0,Math.round(INH(s)*.8))}),
+ O("상속 소송을 건다","","",{req:s=>s.cls>=2,odds:[.5,["r-8",s=>`이겼다. ${won(INH(s))}을 받았다. 형제는 잃었다.`,{f:s=>s.m+=INH(s)}],["m-1000 r-10","졌다. 소송비만 남았다.",{}]]}),
+ O("전부 어머니께 드린다","r6 p4","어머니가 조용히 손을 잡으셨다."),
+ O("상속을 포기한다","p2","빚까지 물려받지 않았다.",{req:s=>s.cls===0,pin:true}),
+ O("부모님 집을 지킨다","p5 r2",s=>`${s.distName}의 그 집. 아버지의 공구함을 그대로 두었다.`,{f:s=>s.m+=Math.round(Math.max(0,INH(s))*.3)}),
+ O("유언장을 고친다","","",{req:s=>s.cls>=1,odds:[.5,["p-4",s=>`${won(INH(s))}을 혼자 차지했다. 형제들과 연락이 끊겼다.`,{f:s=>s.m+=INH(s),set:{guilt:1}}],["r-20 p-10","필적 감정에서 들통났다.",{jail:[2,"사문서위조"]}]]}),
+ O("장례를 성대하게 치른다","m-800 r5","화환이 장례식장 복도를 채웠다."),
+ O("막내에게 양보한다","p5 r6","막내에게 다 줬다. 막내가 울었다."),
+ O("유품에서 편지를 발견한다","p6","'유성아, 니가 내 자랑이다.' 평생 처음 듣는 말이었다."),
+ O("아버지의 숨겨진 빚을 갚는다","m-1500 r6","아무에게도 말하지 않고 갚았다.")]},
+
+{id:"reunion",age:56,title:"충장로 동창회",text:"30년 만의 고등학교 동창회가 충장로에서 열렸다.",pool:[
+ O("2차, 3차까지 간다","p7 h-3","새벽 세 시, 금남로를 걸으며 교가를 불렀다."),
+ O("동창 사업을 돕는다","r6 m-500","친구 가게 개업식 화환을 보냈다."),
+ O("1차만 하고 귀가","p2 h1","집에 오니 마음이 편했다."),
+ O("첫사랑을 다시 본다","p3",s=>`${s.flags.firstLove}도 왔다. 둘 다 많이 늙었다. 그게 좋았다.`,{req:s=>s.flags.firstLove&&s.flags.firstLove!==s.partner,pin:true}),
+ O("동창의 투자 권유에 넘어간다","m-2000 p-6","그 동창은 다음 모임부터 나오지 않았다."),
+ O("학창 시절 괴롭힌 친구에게 사과한다","r6 p5","'그땐 다 어렸제.' 그 친구가 먼저 잔을 채웠다.",{req:s=>s.flags.bully||s.flags.delinq,pin:true,set:{reconciled:1}}),
+ O("준호를 다시 만난다","p7","둘이 PC방 얘기로 한 시간을 웃었다.",{req:F("junho"),pin:true}),
+ O("동창회장을 맡는다","r6 m-200","단톡방 공지 담당이 됐다."),
+ O("술에 취해 싸운다","r-5 h-3","30년 묵은 감정이 터졌다."),
+ O("노래방에서 교가를 부른다","p4","다들 가사를 다 기억하고 있었다."),
+ O("세상을 떠난 친구 소식을 듣는다","p-5","그 친구 몫까지 잔을 채웠다."),
+ O("성공한 척 허세를 부린다","r-2 p-2 m-300","2차 계산은 결국 카드 할부였다.")]},
+
+{id:"spouseCrisis",age:59,title:"식탁의 침묵",req:MARRIED,text:s=>`${JS(SPN(),"이","가")} 요즘 둘이 대화가 줄었다고 말한다.`,pool:[
+ O("원효사 템플스테이를 함께 간다","p8 m-200","새벽 예불 소리에 둘 다 오래 앉아 있었다."),
+ O("부부 상담을 받는다","p5 m-150","서로 몰랐던 이야기가 많았다."),
+ O("바빠서 넘긴다","","",{odds:[.35,["p-15 m-4000 r-4","이듬해 이혼 서류에 도장을 찍었다.",{marry:"이혼"}],["p-4","불편한 침묵이 이어졌다.",{}]]}),
+ O("황혼 여행을 떠난다","p8 m-600","제주에서 한 달을 살았다. 신혼여행보다 좋았다."),
+ O("함께 운동을 시작한다","h5 p5","풍암호수공원을 매일 저녁 같이 걸었다."),
+ O("배우자의 투병을 간병한다","p-6 r6 h-3",s=>`${SPN()}의 항암 치료 1년. 손을 놓지 않았다.`),
+ O("각자의 취미를 존중한다","p4","서로의 시간을 지켜 주니 대화가 늘었다."),
+ O("졸혼을 선언한다","p3 r-2","같은 집, 다른 방, 각자의 인생.",{set:{jolhon:1}}),
+ O("황혼 이혼을 한다","p-6 r-3","재산을 반으로 나눴다.",{marry:"이혼",f:s=>{if(s.m>0)s.m=Math.round(s.m*.55)}}),
+ O("다시 연애하듯 데이트한다","p9 m-300","첫 데이트 장소였던 충장로 빵집에 다시 갔다."),
+ O("손편지를 쓴다","p7",s=>`${JS(SPN(),"이","가")} 편지를 지갑에 넣고 다녔다.`)]},
+
+{id:"retire",age:62,title:"은퇴",req:s=>!["none","retired","prisoner","part","student"].includes(s.job),text:s=>`${s.work}에서 은퇴 이야기가 나온다.`,pool:[
+ O("연장 근무를 신청한다","m1500 h-4","3년을 더 일했다."),
+ O("은퇴하고 연금 생활","p6 h2","송별회에서 꽃다발을 받았다.",{job:["retired","은퇴"]}),
+ O("대인시장에 작은 가게를 연다","m-1000 p5 r4","야시장 날이면 손님이 꽤 온다.",{job:["stall","대인시장 상인"]}),
+ O("아파트 경비원이 된다","m200 p-2","같은 아파트 사람들의 하루를 지켜본다.",{job:["part","아파트 경비원"]}),
+ O("손주 육아를 맡는다","p6 h-3","유모차 밀며 걷는 게 일과가 됐다.",{req:s=>s.kids.length>0,job:["retired","은퇴"]}),
+ O("평동에서 귀농한다","h4 p5","작은 밭에 고추와 상추를 심었다.",{job:["stall","평동 농부"]}),
+ O("후배들 멘토로 강의","r6 p4","광주 청년센터에서 강의를 시작했다.",{job:["retired","은퇴 · 강사"]}),
+ O("퇴직금으로 치킨집","","",{odds:[.35,["m1500 p4","의외로 장사가 됐다.",{job:["shop","치킨집 사장"]}],["m-3000 p-8","1년 만에 문을 닫았다.",{job:["retired","은퇴"]}]]}),
+ O("세계 여행을 떠난다","p10 m-2000","42개국. 그래도 광주가 제일 좋았다.",{job:["retired","은퇴"]}),
+ O("은퇴를 거부하고 버틴다","h-5 m800 r-2","후배들의 눈치가 따가웠다."),
+ O("해외 봉사를 간다","r8 p6","캄보디아 학교 짓기에 1년을 보냈다.",{job:["retired","은퇴"]})]},
+
+{id:"noJob",age:62,title:"예순둘",req:s=>["none","part"].includes(s.job),text:"번듯한 일자리 없이 예순을 넘겼다.",pool:[
+ O("노인 일자리 사업","p3 m100","광주천 쓰레기 줍는 일. 생각보다 좋다.",{job:["retired","광주천 환경지킴이"]}),
+ O("그냥 쉰다","p2","오후엔 사직공원 벤치에 앉는다.",{job:["retired","은퇴"]}),
+ O("폐지를 줍는다","m50 h-4 p-3","리어카가 무거웠다.",{job:["retired","폐지 수집"]}),
+ O("건물 경비를 구한다","m200","야간 경비를 시작했다.",{job:["part","건물 경비"]}),
+ O("자녀에게 기댄다","p-2",s=>`${K(0)}가 매달 용돈을 보낸다. 고맙고 미안하다.`,{req:s=>s.kids.length>0,job:["retired","은퇴"]}),
+ O("기초연금을 신청한다","m100 p1","작지만 꼬박꼬박 들어온다.",{job:["retired","은퇴"]}),
+ O("동네 분식집을 연다","m-1000 p3","떡볶이 맛집 소리를 들었다.",{job:["stall","분식집 사장"]}),
+ O("화투판을 전전한다","m-300 p2","경로당 화투판의 큰손이 됐다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2],job:["retired","무직"]}),
+ O("자원봉사를 시작한다","r6 p4","무료 급식소의 단골 봉사자가 됐다.",{job:["retired","은퇴 · 자원봉사"]}),
+ O("요양보호사 자격증을 딴다","s3 m200 r3","요양원에서 나보다 나이 많은 어르신들을 돌봤다.",{job:["part","요양보호사"]})]},
+
+{id:"grandkid",age:65,title:"손주",req:s=>s.kids.length>0,text:s=>`${K(0)}가 아이를 낳았다. 할아버지가 됐다.`,pool:[
+ O("손주를 돌봐 준다","p10 h-3","유모차를 밀고 펭귄마을을 매일 걸었다."),
+ O("용돈과 선물로 챙긴다","m-500 p3","영상통화로 자주 얼굴을 본다."),
+ O("내 시간이 우선이다","p2 r-3","서운하다는 말을 들었다."),
+ O("손주와 공놀이를 한다","p9 h2","손주가 처음 공을 받았을 때 눈물이 났다.",{req:F("sport"),pin:true,set:{dreamLate:1}}),
+ O("손주에게 그림을 가르친다","p8","손주가 그린 할아버지 얼굴을 냉장고에 붙였다.",{req:F("art"),pin:true}),
+ O("손주 이름을 직접 짓는다","p6 r2","작명소 대신 옥편을 펼쳤다."),
+ O("손주 돌잡이를 준비한다","p8","손주는 할아버지 안경을 잡았다. 다들 웃었다."),
+ O("육아 방식으로 자녀와 다툰다","p-5","'요즘은 그렇게 안 해요, 아버지.'"),
+ O("손주에게 오월 이야기를 들려준다","p6 r3","손주가 끝까지 들었다.",{req:F("history"),pin:true}),
+ O("손주 교육비를 대 준다","m-2000 p5 r3","할아버지 장학금이라고 불렀다."),
+ O("손주와 챔피언스필드에 간다","p8","손주가 기아 모자를 쓰고 응원가를 따라 불렀다.",{req:F("tigers")})]},
+
+{id:"hobby",age:66,title:"예순여섯",text:"매일 아침이 길어졌다. 무엇으로 하루를 채울까.",pool:[
+ O("5·18 기념공원 해설 자원봉사",s=>s.flags.history?"r14 p6":"r8 p6",s=>s.flags.history?"열다섯 살 때 들은 해설이 이제 유성이의 입에서 나온다.":"공부해서 해설사가 됐다. 학생들이 귀를 기울인다."),
+ O("무등산 산악회","h6 p4","한 달에 한 번 무등산을 오른다."),
+ O("경로당 바둑","p4 h-1","동네 최강자가 됐다."),
+ O("사진 동호회","p5 m-300","양림동 골목 사진으로 작은 전시를 열었다."),
+ O("스마트폰을 배운다","s4 p2","손주에게 이모티콘을 보냈다."),
+ O("노인대학에 다닌다","s5 p4","노인대학 반장이 됐다."),
+ O("실버 유튜버가 된다","","",{odds:[.25,["r10 p8 m500","'광주 할배' 채널이 구독자 20만을 넘었다.",{set:{famous:1}}],["p2","구독자는 손주 친구들뿐.",{}]]}),
+ O("텃밭을 가꾼다","h4 p4","상추를 이웃에게 나눴다."),
+ O("노래교실에 다닌다","p6",s=>s.flags.dream==="music"?"마이크를 잡자 돌잡이 이야기가 다시 나왔다.":"트로트 열 곡을 외웠다.",{f:s=>{if(s.flags.dream==="music")s.flags.dreamLate=1}}),
+ O("시니어 모델에 도전한다","","",{odds:[.2,["r8 p10","광주 패션 행사 런웨이에 섰다.",{}],["p2","서류에서 떨어졌다. 그래도 옷을 잘 입기 시작했다.",{}]]}),
+ O("경로당 화투판","p3 m-200","점 백 원짜리 화투가 점점 커졌다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}),
+ O("붓을 다시 잡는다","p7","수채화 교실에 다닌다. 첫 그림은 무등산이었다.",{f:s=>{if(s.flags.dream==="art")s.flags.dreamLate=1}})]},
+
+{id:"old70",age:70,title:"일흔",text:"몸이 예전 같지 않다. 계단 하나에도 숨이 찬다. 진짜 노년이 시작됐다.",pool:[
+ O("매일 광주천을 걷는다","h5 p2","하루 만 보. 비가 와도 우산 쓰고 걸었다.",{set:{exercise:1}}),
+ O("병원을 순례한다","m-500 h4","내과, 정형외과, 안과. 요일마다 갈 병원이 있다."),
+ O("술을 못 끊는다","h-7 p2","의사가 혀를 찼다."),
+ O("보청기와 돋보기를 맞춘다","m-300 p4","손주 목소리가 다시 또렷해졌다."),
+ O("장기요양 등급을 신청한다","p-2 m200","방문 요양보호사가 일주일에 세 번 온다."),
+ O("운전면허를 반납한다","r3 p-2","버스 노선을 외우기 시작했다."),
+ O("운전을 계속한다","","",{odds:[.7,["p2","아직은 괜찮다.",{}],["h-15 r-5","교차로에서 사고를 냈다.",{}]]}),
+ O("무릎 수술을 받는다","m-800 h6","다시 계단을 오를 수 있게 됐다."),
+ O("건강 걱정에 잠을 못 잔다","p-5 h-2","인터넷 건강 정보를 밤새 찾아봤다."),
+ O("치매 예방 교실","s3 p3","숫자 퍼즐과 손 운동."),
+ O("마지막으로 무등산 정상에 오른다","","",{odds:[s=>s.h/100,["p10 h2","서석대에 다시 섰다. 다섯 살 때 울던 그 길이었다.",{}],["h-8 p-3","중머리재에서 돌아섰다. 정상은 마음속에만.",{}]]}),
+ O("요양원을 미리 알아본다","p-2 r2","자식들에게 짐이 되기 싫었다.")]},
+
+{id:"senior",age:72,title:"경로당",text:s=>`${s.home} 경로당. 오늘도 사람들이 모였다.`,pool:[
+ O("경로당에서 불륜을 저지른다","p8 r-4","옆 동네 할머니와 몰래 손을 잡았다. 소문은 빨랐다.",{req:MARRIED,set:{affair:1},q:["affairOut",1]}),
+ O("경로당 로맨스","","",{req:SINGLE,odds:[.5,["p12",s=>`${SPN()} 할머니와 매일 같이 점심을 먹는다. 자식들이 놀랐다.`,{marry:"연애중",partner:true}],["p-3","고백했다가 거절당했다. 경로당에 소문이 났다.",{}]]}),
+ O("바둑 최강자가 된다","p4 s2","경로당 바둑판의 왕."),
+ O("화투 도박판에 빠진다","m-500 p3","점 천 원짜리 화투가 판이 커졌다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",1]}),
+ O("경로당 회장 선거에 나간다","","",{odds:[s=>s.r/100,["r8 p5","회장이 됐다. 경로당 에어컨을 새로 달았다.",{}],["p-3","한 표 차이로 떨어졌다.",{}]]}),
+ O("노래교실 아이돌","p7","트로트 한 곡에 박수가 쏟아졌다."),
+ O("텃밭 자리로 이웃과 싸운다","p-4 r-3","상추 두 고랑 때문에 1년을 말을 안 했다."),
+ O("친구 장례식에 다녀온다","p-6","장례식장에서 동창 셋을 만났다. 다음은 누구일까."),
+ O("건강식품 떴다방에 넘어간다","m-1000 p-3","공짜 휴지를 받다가 3백만 원짜리 장판을 샀다."),
+ O("경로당에 안마의자를 기부한다","r6 m-200","다들 고맙다고 했다."),
+ O("경로당 운영비를 슬쩍한다","","",{odds:[.5,["m100","아무도 몰랐다.",{set:{guilt:1}}],["r-15 p-6","장부가 맞지 않았다. 경로당에 발길을 끊었다.",{}]]}),
+ O("젊은 날 이야기를 들려준다","r4 p4",s=>s.served?`담장 안의 ${s.served}년 이야기를 처음으로 꺼냈다. 다들 조용히 들었다.`:"오월과 무등산 이야기를 했다. 다들 고개를 끄덕였다.")]},
+
+{id:"surgery",age:74,title:"큰 수술",text:"전남대병원 의사가 큰 수술을 권했다. 회복이 길 거라고 한다.",pool:[
+ O("수술을 받는다","","",{odds:[.72,["h15 m-1200","수술은 잘 끝났다. 창밖 무등산이 반가웠다.",{}],["h-22 m-1200","합병증이 왔다. 회복이 더디다.",{}]]}),
+ O("약물 치료로 지켜본다","h-8 m-300","조금씩 숨이 찬다."),
+ O("민간요법에 기댄다","h-12 m-500","효과는 잘 모르겠다."),
+ O("서울 큰 병원으로 간다","","",{odds:[.8,["h14 m-2500","KTX로 오가며 치료받았다.",{}],["h-15 m-2500","서울까지 갔지만 결과는 같았다.",{}]]}),
+ O("치료를 거부한다","h-15 p3","남은 시간을 병원이 아닌 집에서 보내기로 했다."),
+ O("가족과 상의한다","p5",s=>s.kids.length?`${K(0)}가 휴가를 내고 내려왔다. 같이 결정했다.`:"동생이 같이 병원에 다녀 줬다."),
+ O("종교에 의지한다","p5","새벽 기도에서 마음이 편해졌다."),
+ O("임상시험에 참여한다","","",{odds:[.5,["h18","신약이 잘 들었다. 의사도 놀랐다.",{}],["h-10","부작용이 심했다.",{}]]}),
+ O("호스피스를 알아본다","p2 r2","마지막을 어떻게 보낼지 미리 정했다."),
+ O("수술 전 목소리를 녹음해 둔다","p3","휴대폰에 3분짜리 목소리를 남겼다.")]},
+
+{id:"legacy",age:76,title:"남길 것",text:"통장과 집 문서를 정리할 때가 됐다.",pool:[
+ O("자녀에게 미리 증여한다","p4 r2","아이들이 고맙다고 했다. 홀가분하다.",{req:s=>s.kids.length>0&&s.m>0,f:s=>s.m=Math.round(s.m*.5)}),
+ O("모교에 장학금을 기부한다","r15 p5","'박유성 장학금'이 생겼다. 첫 장학생이 편지를 보내왔다.",{req:s=>s.m>0,f:s=>s.m=Math.round(s.m*.7)}),
+ O("남은 인생 내가 쓴다","p8 m-2000","좋은 옷을 사고, 좋은 걸 먹었다."),
+ O("빚을 정리한다","p4 r2","남은 빚을 정리했다. 자식들에게 넘기지 않았다.",{req:s=>s.m<0,pin:true,f:s=>s.m=Math.round(s.m*.3)}),
+ O("5·18 기념재단에 기부한다","r10 p4","이름 없이 기부했다.",{req:s=>s.m>1000,f:s=>s.m-=1000}),
+ O("유언장을 쓴다","p3 r2","변호사 사무실에서 도장을 찍었다."),
+ O("재산을 두고 자식들이 다툰다","p-8 r-4","생전에 정리하지 않은 걸 후회했다.",{req:s=>s.kids.length>1}),
+ O("시신 기증을 서약한다","r8 p3","전남대 의대에 서약서를 냈다."),
+ O("숨겨 둔 이야기를 털어놓는다","p5",s=>s.flags.guilt?"평생 숨긴 일들을 자식들 앞에서 털어놓았다.":"장롱 속 금을 꺼냈다. 다들 놀랐다.",{f:s=>{if(s.flags.guilt)s.flags.reconciled=1}}),
+ O("골목 어귀에 정자를 짓는다","r8 m-800",s=>`${s.home} 골목 어귀에 작은 정자를 지었다.`),
+ O("아무것도 정리하지 않는다","p2","될 대로 되겠지.")]},
+
+{id:"regret",age:78,title:"지나온 길",text:"양림동 펭귄마을 골목을 천천히 걷는다. 지나온 일들이 하나씩 떠오른다.",pool:[
+ O("피해자 가족을 찾아가 사과한다","p6 r8","무릎을 꿇었다. 용서는 받지 못했어도, 그날 이후 잠은 조금 편해졌다.",{req:s=>s.served>0||s.flags.guilt||s.flags.murder,pin:true,set:{reconciled:1}}),
+ O("헤어진 사람을 찾아간다","p6",s=>`${s.ex}에게 미안했다고 말했다. 둘 다 웃었다.`,{req:s=>!!s.ex,pin:true}),
+ O("자녀와 깊은 이야기를 나눈다","p8",s=>`${K(0)}에게 처음으로 미안하다고, 사랑한다고 말했다.`,{req:s=>s.kids.length>0}),
+ O("준호를 찾아간다","p8","둘이서 광주천 벤치에 앉아 해가 질 때까지 이야기했다.",{req:F("junho")}),
+ O("어릴 적 꿈을 작게나마 이룬다","p10",s=>({baseball:"노인 야구단에서 마운드에 섰다.",soccer:"동네 조기축구회에서 골을 넣었다.",art:"양림동 작은 갤러리에서 첫 전시를 열었다.",music:"동네 공연장에서 노래를 불렀다.",chef:"경로당 잔치 음식을 혼자 다 차렸다.",doctor:"의료봉사 단체에서 접수 일을 도왔다.",law:"마을 분쟁 조정위원이 됐다.",coder:"노인 코딩 교실에서 첫 앱을 만들었다.",study:"방송대에 입학했다.",money:"작은 장학 재단을 만들었다.",health:"노인 걷기 대회를 완주했다.",gamble:"남은 화투패를 전부 태웠다."})[s.flags.dream]||"오래 미뤄 둔 일을 해냈다.",{req:s=>!dreamDone(),pin:true,set:{dreamLate:1}}),
+ O("자서전을 쓴다","r4 p6","제목은 '광주에서 한 평생'. 동네 책방에 열 권을 놓았다."),
+ O("국립아시아문화전당 공연을 본다","p6","처음 보는 나라의 음악이었다. 아직 처음인 게 남아 있다."),
+ O("첫사랑에게 편지를 쓴다","p5",s=>`${s.flags.firstLove}에게 부치지 못할 편지를 썼다.`,{req:s=>s.flags.firstLove&&s.flags.firstLove!==s.partner}),
+ O("부모님 산소에 술 한 잔 올린다","p5","'아버지, 저도 이제 아버지 나이를 넘었습니다.'"),
+ O("모교를 찾아간다","p4","운동장이 이렇게 작았나."),
+ O("아무도 찾아가지 않는다","p-4","후회는 혼자 삼켰다."),
+ O("청소년들 앞에서 실수를 고백한다","r8 p5",s=>s.served?"교도소 이야기로 청소년들 앞에 섰다. 한 아이가 끝나고 손을 잡았다.":"내 인생의 실수 세 가지를 이야기했다. 박수가 길었다.")]},
+
+{id:"last80",age:81,title:"여든",text:"여든을 넘겼다. 남은 날을 셀 수 있을 것 같다.",pool:[
+ O("가족에게 손편지를 쓴다","p6",s=>s.kids.length?`${s.kids.map(k=>callName(k.name)).join(", ")}에게 한 장씩 편지를 썼다.`:"조카들에게 한 장씩 편지를 썼다."),
+ O("가족사진을 찍는다","p8","충장로 사진관에서 모두 모였다. 사진사가 웃으라고 하기 전부터 웃고 있었다.",{req:s=>s.kids.length>0||MARRIED(s)}),
+ O("무등산 원효사까지만 가 본다","","",{odds:[s=>s.h/90,["p8","지팡이를 짚고 원효사 마당까지 갔다. 그걸로 충분했다.",{}],["h-6","버스에서 내리지 못했다. 창밖으로 산을 오래 봤다.",{}]]}),
+ O("장기기증을 서약한다","r8 p3","마지막까지 쓸모 있는 몸이고 싶었다."),
+ O("송정 떡갈비를 먹으러 간다","p6","40년 단골집. 사장님도 같이 늙었다."),
+ O("기아 우승을 직관한다","p10","챔피언스필드에서 마지막 우승을 봤다. 돌잡이 야구공 이야기가 또 나왔다.",{req:F("tigers")}),
+ O("요양원에 들어간다","p-3 h3","창가 침대를 받았다. 무등산이 보였다."),
+ O("혼자 집을 지킨다","p2 h-3","익숙한 냄새가 나는 곳에서 끝까지."),
+ O("버킷리스트 해외여행","p8 m-800 h-3","오로라를 봤다. 생각보다 조용했다."),
+ O("자원봉사를 마무리한다","r5 p4","20년 봉사의 마지막 날, 감사패를 받았다.",{req:s=>s.r>=55}),
+ O("생일 잔치를 연다","p7","케이크 초는 여덟 개만 꽂았다."),
+ O("마당에 감나무를 심는다","p6","내가 못 먹어도 누군가는 먹겠지.")]},
+
+{id:"late",ages:[85,88,91,94,97,100],title:"어느 날",text:"햇볕이 좋은 날이다.",pool:[
+ O("창가에서 무등산을 본다","p4","산은 그대로였다."),
+ O("오래된 앨범을 넘긴다","p5","돌잔치 사진 속 아기가 나라니."),
+ O("손주의 손을 잡는다","p6","따뜻했다.",{req:s=>s.kids.length>0}),
+ O("라디오에서 옛 노래를 듣는다","p4","따라 부르다 가사가 기억나지 않았다."),
+ O("요양보호사에게 옛날이야기를 한다","p4 r2","오월 이야기를 했다. 그녀가 눈물을 닦았다."),
+ O("낮잠을 길게 잔다","h1","꿈에 어머니가 나왔다."),
+ O("기아 경기를 라디오로 듣는다","p4","9회말 역전. 소리를 지르다 간호사가 왔다.",{req:F("tigers")}),
+ O("휠체어로 광주천에 나간다","h-2 p6","휠체어를 밀어 준 손이 고마웠다."),
+ O("먼저 간 사람들을 떠올린다","p-2",s=>s.late?`${s.late}의 웃음소리가 들리는 것 같았다.`:"부모님, 친구들. 다들 어디쯤 있을까."),
+ O("유언을 다시 고친다","p2","한 줄을 더 썼다. '고마웠다.'"),
+ O("병문안 온 이웃에게 귤을 준다","r2 p3","줄 수 있는 게 아직 있었다.")]}
+]);
+
+/* ===== 후속 사건 · 수감 · 돌발 · 일상 ===== */
+const J_=(add,min)=>s=>sendJail(Math.max(min||1,sev(s)+add),crimeName(s));
+addPath([
+{id:"probe",title:"수사망",text:s=>`${crimeName(s)} 건으로 수사가 시작됐다. 형사가 집 앞에 찾아왔다.`,pool:[
+ O("자수한다","r4 p2",s=>`자수해서 형이 줄었다.`,{f:J_(-2)}),
+ O("증거를 인멸한다","","",{odds:[.4,["p-4","수사가 흐지부지 끝났다. 하지만 마음은 끝나지 않았다.",{set:{guilt:1}}],["r-15","증거인멸까지 더해졌다.",{f:J_(2)}]]}),
+ O("해외로 도피한다","","",{req:s=>s.m>500,odds:[.3,["m-2000 p-12","동남아에서 숨어 산다. 광주 꿈을 매일 꾼다.",{loc:"해외 도피 중",set:{fugitive:1},q:["fugitiveReturn",5]}],["r-20","공항에서 붙잡혔다.",{f:J_(1)}]]}),
+ O("비싼 변호사를 선임한다","","",{req:s=>s.m>1000,odds:[.5,["m-3000","집행유예로 풀려났다.",{set:{exCon:1}}],["m-3000","변호사비만 날렸다.",{f:J_(0)}]]}),
+ O("동료에게 덮어씌운다","","",{odds:[.35,["r-4 p-8","동료가 대신 들어갔다. 그 얼굴을 평생 피했다.",{set:{guilt:1}}],["r-25","거짓말이 드러났다.",{f:J_(2)}]]}),
+ O("끝까지 침묵한다","","",{odds:[.35,["p-5","증거 불충분으로 풀려났다.",{}],["r-15","실형이 선고됐다.",{f:J_(0)}]]}),
+ O("피해를 모두 변제한다","","",{req:s=>s.m>2000,odds:[.6,["m-3000 r2","합의 끝에 집행유예.",{set:{exCon:1}}],["m-3000","변제했지만 실형을 피하지 못했다.",{f:J_(-1)}]]}),
+ O("가족에게 먼저 고백한다","p3","가족 앞에서 울었다. 다음 날 함께 경찰서에 갔다.",{f:J_(-2)}),
+ O("수사관을 매수하려 한다","","",{req:s=>s.m>1500,odds:[.25,["m-1500","수사관이 눈을 감았다. 둘 다 공범이 됐다.",{set:{guilt:1}}],["r-20","뇌물공여까지 추가됐다.",{f:J_(3)}]]}),
+ O("잠적한다","","",{odds:[.3,["p-10 h-5","3년을 숨어 살았다. 공소시효는 아직 남았다.",{set:{guilt:1}}],["r-15","석 달 만에 붙잡혔다.",{f:J_(1)}]]})]},
+
+{id:"drugRing",title:"판이 커지다",req:F("drug"),text:"물건을 옮기던 일이 점점 커졌다. 이제는 직접 팔아 보라는 제안이 왔다.",pool:[
+ O("판을 키운다","m4000 r-6","광주 밤거리의 공급책이 됐다.",{crime:"drug",q:["probe",2],set:{dealer:1}}),
+ O("발을 뺀다","","",{odds:[.55,["p6","연락처를 지우고 휴대폰을 바꿨다.",{set:{drug:0}}],["h-20","'그만두는 건 니가 정하는 게 아니다.' 크게 다쳤다.",{set:{drug:0}}]]}),
+ O("자수한다","r3 p3","경찰서에 가서 다 털어놓았다.",{jail:[3,"마약류관리법 위반"],set:{drug:0}}),
+ O("직접 투약한다","h-12 p3","팔 것을 스스로 쓰기 시작했다.",{set:{drugUse:1},crime:"drug",q:["probe",1]}),
+ O("경찰 정보원이 된다","","",{odds:[.5,["r2 p-4","조직을 넘기고 감형을 약속받았다.",{set:{drug:0},jail:[1,"마약류관리법 위반"]}],["h-30","정체가 들켰다.",{set:{drug:0}}]]}),
+ O("해외 공급책과 손잡는다","","",{odds:[.3,["m9000 r-10","큰돈이 들어왔다. 밤에 잠을 잘 수 없었다.",{crime:"drug",q:["probe",2]}],["r-30","국제 공조 수사에 걸렸다.",{jail:[10,"마약 밀수"]}]]}),
+ O("번 돈으로 가게를 차려 세탁한다","m2000 r-2","상무지구 카페 간판을 달았다.",{job:["cafe","상무지구 카페 사장"],crime:"drug",q:["probe",3]}),
+ O("친구에게 넘기고 빠진다","p-6","친구는 1년 뒤 붙잡혔다. 내 이름은 말하지 않았다.",{set:{drug:0,guilt:1}}),
+ O("가족에게 들킨다","p-10","어머니가 가방을 열어 봤다. 그날 처음으로 어머니가 우는 걸 봤다.",{set:{drug:0}}),
+ O("단속 정보를 듣고 잠적한다","p-6 m1000","석 달을 숨어 지냈다.",{q:["probe",2]})]},
+
+{id:"gambleDebt",title:"도박 빚",req:s=>s.flags.gambleAdd>0,text:s=>`잃은 돈을 찾으려다 빚이 ${won(Math.max(1000,(s.flags.gambleAdd||1)*1500))}이 됐다.`,pool:[
+ O("사채를 쓴다","m1500 p-6","이자가 원금을 매달 넘었다.",{inc:{gambleAdd:1},q:["gambleDebt",2]}),
+ O("가족에게 털어놓는다","p-4 r-2","가족이 빚을 갚아 줬다. 대신 다시는 안 하겠다고 약속했다.",{set:{gambleAdd:0}}),
+ O("한탕으로 만회한다","","",{odds:[.25,["m3000 p6","만회했다. 그리고 다시 앉았다.",{inc:{gambleAdd:1},q:["gambleDebt",3]}],["m-3000 p-10","전부 잃었다.",{inc:{gambleAdd:1},q:["gambleDebt",2]}]]}),
+ O("단도박 모임에 나간다","p4 r3","처음으로 '저는 도박 중독자입니다'라고 말했다.",{set:{gambleAdd:0}}),
+ O("빚을 피해 도망친다","p-8 r-8","휴대폰을 끄고 여관을 전전했다.",{q:["gambleDebt",2]}),
+ O("회사 돈에 손을 댄다","m3000","빚은 막았다. 대신 다른 구멍이 생겼다.",{req:s=>!["none","part","retired","student"].includes(s.job),crime:"embezzle",q:["probe",2]}),
+ O("개인회생을 신청한다","p-2 r-3","빚의 일부를 탕감받았다.",{f:s=>{if(s.m<0)s.m=Math.round(s.m*.4)},set:{gambleAdd:0}}),
+ O("중독 치료를 받는다","p5 m-300","도박도 병이라는 걸 받아들였다.",{set:{gambleAdd:0}}),
+ O("도박장 일을 해서 갚는다","m1500 r-6","빚을 갚는 대신 도박장 문지기가 됐다.",{crime:"gambleBiz",q:["probe",2]}),
+ O("빚쟁이와 몸싸움을 벌인다","","",{odds:[.5,["h-10","얻어맞고 끝났다.",{}],["r-15","상대가 크게 다쳤다.",{jail:[2,"상해"]}]]})]},
+
+{id:"affairOut",title:"들킨 비밀",req:s=>MARRIED(s)&&s.flags.affair,text:s=>`${JS(SPN(),"이","가")} 휴대폰을 봤다.`,pool:[
+ O("무릎 꿇고 용서를 빈다","","",{odds:[.45,["p-6 r-3","몇 달을 각방에서 지냈다. 천천히 다시 밥을 같이 먹게 됐다.",{set:{affair:0}}],["p-14 m-4000 r-5","용서는 없었다. 이혼.",{marry:"이혼",set:{affair:0}}]]}),
+ O("이혼한다","p-10 m-4000 r-5","재산을 나누고 각자의 길로 갔다.",{marry:"이혼",set:{affair:0}}),
+ O("상대를 선택한다","p4 m-4000 r-10","이혼 후 새 사람과 살기 시작했다.",{marry:"이혼",set:{affair:0},f:s=>{s.partner=pick(NAMES_F.filter(n=>n!==s.ex));s.marry="연애중"}}),
+ O("끝까지 잡아뗀다","","",{odds:[.3,["p-5","의심은 남았지만 넘어갔다.",{set:{affair:0}}],["p-15 r-8 m-5000","증거가 더 나왔다. 위자료까지 물었다.",{marry:"이혼",set:{affair:0}}]]}),
+ O("부부 상담을 제안한다","p-3 m-200","상담실에서 처음으로 서로의 외로움을 들었다.",{set:{affair:0}}),
+ O("상대와 정리하고 다시 시작한다","p-4",s=>`정리했다. ${JS(SPN(),"은","는")} 1년 뒤에야 웃어 줬다.`,{set:{affair:0}}),
+ O("이성을 잃고 상대를 해친다","r-40 p-20","돌이킬 수 없는 선을 넘었다.",{set:{murder:1,affair:0},jail:[15,"살인"]}),
+ O("자녀들 때문에 참고 산다","p-8","한집에서 남처럼 살았다.",{req:s=>s.kids.length>0,set:{affair:0}}),
+ O("집을 나간다","p-6 r-4","모텔을 전전하다 일주일 만에 돌아왔다.",{set:{affair:0}}),
+ O("상간 소송을 당한다","m-3000 r-8","법원에 불려 다녔다.",{set:{affair:0}})]},
+
+{id:"redev",title:"재개발",req:F("redevStake"),text:"학동 재개발 사업이 드디어 확정됐다.",pool:[
+ O("보상금을 받고 나간다","m4000 p3","오래된 집이 돈이 됐다."),
+ O("새 아파트 입주권을 받는다","m6000 p5","분담금을 내고 새 아파트에 들어갔다.",{set:{house:1}}),
+ O("끝까지 버틴다","","",{odds:[.4,["m8000","마지막까지 버텨 보상금이 두 배가 됐다.",{}],["m1500 r-5 p-6","강제 철거. 보상금이 줄었다.",{}]]}),
+ O("조합장이 된다","r6 m500","조합 일을 떠맡았다."),
+ O("조합 비리에 가담한다","m5000","시공사 돈봉투를 받았다.",{crime:"bribe",q:["probe",2]}),
+ O("세입자들을 돕는다","r10 m2000","내 몫을 줄여 세입자 이주비를 보탰다."),
+ O("입주권을 팔아 차익을 남긴다","m7000 p2","웃돈을 받고 팔았다."),
+ O("철거 현장 안전을 고발한다","r10 p-2","부실한 철거 현장을 구청에 신고했다. 큰 사고를 막았다."),
+ O("보상금으로 자식 집을 산다","p6 m1000 r2","아이들에게 작은 집을 마련해 줬다.",{req:s=>s.kids.length>0}),
+ O("보상금을 도박으로 날린다","m-1000 p-6","석 달 만에 바닥났다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",1]})]},
+
+{id:"fugitiveReturn",title:"도피 생활",req:F("fugitive"),text:s=>`${s.loc}. 숨어 지낸 지 몇 해. 광주가 너무 그립다.`,pool:[
+ O("귀국해서 자수한다","r3 p5","인천공항에서 체포됐다.",{loc:"광주",set:{fugitive:0},jail:[1,"도피 · 수배"]}),
+ O("계속 숨어 산다","p-8 h-4","가짜 이름으로 식당 주방에서 일한다.",{q:["fugitiveReturn",5]}),
+ O("현지에서 새 인생을 꾸린다","p4","작은 가게를 차렸다.",{q:["fugitiveReturn",10],job:["stall","해외 식당 주인"]}),
+ O("어머니 장례식에 몰래 온다","","",{odds:[.4,["p-6","멀리서 장례식장을 바라봤다. 들어가지 못했다.",{q:["fugitiveReturn",4]}],["r-10","장례식장 앞에서 체포됐다.",{loc:"광주",set:{fugitive:0},jail:[2,"도피"]}]]}),
+ O("가짜 여권으로 귀국한다","","",{odds:[.3,["p4","광주에 몰래 들어왔다.",{loc:"광주",set:{fugitive:0,guilt:1}}],["r-15","입국 심사에서 걸렸다.",{loc:"광주",set:{fugitive:0},jail:[3,"여권법 위반"]}]]}),
+ O("현지 범죄 조직에 들어간다","m2000 r-10","돈은 벌었다. 사람은 잃었다.",{q:["fugitiveReturn",4]}),
+ O("가족에게 편지를 쓴다","p3","'살아 있다. 미안하다.' 답장은 오지 않았다.",{q:["fugitiveReturn",3]}),
+ O("변호사를 통해 협상한다","m-2000","",{odds:[.5,["p5","불구속 수사로 귀국했다.",{loc:"광주",set:{fugitive:0,exCon:1}}],["p-4","협상이 결렬됐다.",{q:["fugitiveReturn",3]}]]}),
+ O("현지 경찰에 붙잡힌다","r-10","강제 송환됐다.",{loc:"광주",set:{fugitive:0},jail:[2,"도피"]}),
+ O("광주 뉴스를 매일 본다","p-3","기아가 우승했다. 혼자 울었다.",{q:["fugitiveReturn",4]})]},
+
+{id:"prison",jailOK:true,title:"담장 안",text:s=>`광주교도소. 남은 형기 ${s.jail}년.`,pool:[
+ O("검정고시를 준비한다","s6 p3","교도소 안에서 고졸 학력을 땄다.",{f:s=>{if(!/대|고/.test(s.edu))s.edu="고졸(교도소 검정고시)"}}),
+ O("성실하게 수형 생활을 한다","r3 p2","모범수로 가석방 심사를 받았다.",{f:s=>{s.jail-=Math.ceil(s.jail*.3);if(s.jail<=0)releaseNow()}}),
+ O("교도소 안에서 싸운다","","",{odds:[.5,["r1 h-6","서열이 정리됐다.",{}],["h-12","독방에 갇혔다. 형기가 늘었다.",{f:s=>s.jail+=1}]]}),
+ O("탈옥을 시도한다","","",{odds:[.05,["p6","믿기지 않게 담을 넘었다. 사흘 뒤 무등산 기슭에서 붙잡혔다.",{f:s=>s.jail+=3}],["h-10","계획이 새어 나갔다. 형기가 늘었다.",{f:s=>s.jail+=2}]]}),
+ O("종교에 귀의한다","p6 r2","교도소 교회에서 세례를 받았다."),
+ O("가족에게 편지를 쓴다","p4",s=>s.kids.length?`${K(0)}에게서 답장이 왔다. 삐뚤빼뚤한 글씨였다.`:"어머니에게서 답장이 왔다. '밥은 잘 먹냐.'"),
+ O("독서에 빠진다","s6 p3","교도소 도서관 책을 거의 다 읽었다."),
+ O("교도소 안 조직에 들어간다","r-4 p2","출소 후 갈 곳이 생겼다. 좋은 곳은 아니었다.",{set:{gang:1}}),
+ O("제빵 직업훈련을 받는다","s4 p4","빵 굽는 냄새가 처음으로 위로가 됐다.",{set:{bakerSkill:1}}),
+ O("피해자에게 사과 편지를 쓴다","p3 r4","답장은 없었다. 그래도 계속 썼다.",{set:{reconciled:1}}),
+ O("면회 오는 사람이 없다","p-6","명절에도 아무도 오지 않았다."),
+ O("젊은 수감자들을 상담한다","r5 p4","젊은 수감자들의 이야기를 들어 줬다.")]},
+
+{id:"release",title:"출소",text:s=>`${s.flags.jailReason||"죄"}로 들어간 지 몇 해. 교도소 문이 열렸다.`,pool:[
+ O("어머니가 두부를 들고 기다린다","p8","어머니가 아무 말 없이 두부를 내밀었다."),
+ O("아무도 마중 나오지 않았다","p-6","버스 정류장까지 혼자 걸었다."),
+ O("출소자 지원센터로 간다","r3 p3","갱생보호공단에서 방과 일을 구해 줬다.",{job:["part","갱생보호 사업장"]}),
+ O("옛 조직이 마중 나와 있다","m500 r-6","검은 차 문이 열렸다.",{job:["gang","상무지구 조직원"],set:{gang:2}}),
+ O("제빵 기술로 빵집에 취업한다","p6 r3","교도소에서 배운 기술. 사장님이 기회를 줬다.",{req:F("bakerSkill"),pin:true,job:["chef","동네 빵집 제빵사"]}),
+ O("가족을 찾아간다","p5",s=>MARRIED(s)?`${JS(SPN(),"이","가")} 문을 열었다. 한참을 서 있다가 들어오라고 했다.`:`${K(0)}가 문을 열었다. 키가 많이 컸다.`,{req:s=>MARRIED(s)||s.kids.length>0}),
+ O("다시 범죄로 돌아간다","m1000 r-8","아는 게 이것뿐이었다.",{crime:"fraud",q:["probe",2]}),
+ O("이름을 바꾸고 새 출발한다","p4 r-2","개명 신청을 했다. 새 이름이 낯설었다."),
+ O("교도소 이야기를 책으로 쓴다","","",{odds:[.3,["r8 m500 p6","책이 나왔다. 강연 요청이 왔다.",{}],["p2","출판사 열두 곳에서 거절당했다.",{}]]}),
+ O("피해자를 찾아가 사과한다","p4 r6","문 앞에서 돌아섰다가, 다음 날 다시 갔다.",{set:{reconciled:1}}),
+ O("무등산부터 오른다","h3 p6","몇 년 만에 보는 서석대. 숨이 찼다.")]}
+]);
+
+addSudden([
+{id:"robbery",min:20,max:95,title:"강도",text:"새벽 2시. 현관 쪽에서 소리가 났다. 복면을 쓴 남자가 집 안에 들어와 있다.",pool:[
+ O("맞서 싸운다","","",{odds:[s=>s.h/130,["r8 h-5","강도를 제압했다. 동네 뉴스에 나왔다.",{}],["h-25","흉기에 다쳤다. 응급실에 실려 갔다.",{}]]}),
+ O("숨어서 112에 신고한다","r2","경찰이 7분 만에 왔다. 강도는 도망쳤다."),
+ O("돈을 건넨다","m-300 p-4","지갑과 금반지를 줬다. 다친 사람은 없었다."),
+ O("흉기를 들고 맞선다","","",{odds:[.5,["r3 h-3","정당방위가 인정됐다.",{}],["r-20 p-15","강도가 숨졌다. 과잉방위로 재판을 받았다.",{jail:[3,"과실치사"]}]]}),
+ O("가족을 먼저 대피시킨다","r6 h-6",s=>MARRIED(s)||s.kids.length?"가족을 베란다로 내보내고 문을 막았다. 다 무사했다.":"혼자였다. 창문으로 빠져나왔다."),
+ O("비명을 질러 이웃을 깨운다","r3","옆집 아저씨가 야구방망이를 들고 나왔다."),
+ O("강도와 대화를 시도한다","","",{odds:[.4,["p5 r5","생활고에 시달리던 청년이었다. 밥을 차려 주고 자수를 권했다.",{}],["m-500 h-8","소용없었다.",{}]]}),
+ O("자는 척한다","m-500 p-6","아침에 일어나니 TV가 없었다."),
+ O("홈캠 영상을 경찰에 넘긴다","m-200","영상 덕분에 사흘 만에 범인이 잡혔다."),
+ O("이사를 결심한다","m-800 p-3","그 집에서는 더 이상 잘 수 없었다.")]},
+
+{id:"carCrash",min:19,max:95,title:"교통사고",text:"무진대로 교차로. 신호를 무시한 차가 달려들었다.",pool:[
+ O("핸들을 꺾는다","","",{odds:[.6,["h-5 m-300","가드레일을 들이받았지만 크게 다치지 않았다.",{}],["h-30 m-800","크게 다쳤다. 석 달을 입원했다.",{}]]}),
+ O("급브레이크를 밟는다","h-8 m-200","목을 다쳤다. 한동안 고생했다."),
+ O("상대 운전자를 먼저 챙긴다","r6 h-4","상대도 다쳤다. 둘 다 무사했다."),
+ O("보험 사기를 시도한다","","",{odds:[.5,["m800 r-2","합의금이 꽤 나왔다.",{set:{guilt:1}}],["r-15 m-500","보험사 조사에 걸렸다.",{jail:[1,"보험사기"]}]]}),
+ O("블랙박스로 시비를 가린다","m300","과실 0%. 보험금을 받았다."),
+ O("뺑소니 차량을 쫓는다","","",{odds:[.5,["r10","번호판을 외워 범인을 잡았다.",{}],["h-10","쫓다가 넘어졌다.",{}]]}),
+ O("쓰러진 사람에게 심폐소생술","r10 p4","한 사람을 살렸다. 표창장을 받았다."),
+ O("다친 걸 숨기고 일하러 간다","h-10","후유증이 오래갔다."),
+ O("이후 운전대를 놓는다","p-3 r2","대중교통으로만 다닌다."),
+ O("한의원 치료로 버틴다","h3 m-200","침을 맞으며 회복했다.")]},
+
+{id:"kidCrash",min:6,max:18,title:"등굣길 사고",text:"등굣길 횡단보도. 오토바이 한 대가 신호를 무시하고 달려왔다.",pool:[
+ O("뒤로 물러선다","p-2","간발의 차이로 피했다. 다리가 후들거렸다."),
+ O("친구를 잡아당긴다","r8 h-3","친구는 무사했다. 내 팔에 멍이 들었다."),
+ O("그대로 얼어붙는다","h-12","부딪혔다. 한 달 동안 깁스를 했다."),
+ O("오토바이 번호를 외운다","r5","경찰 아저씨가 칭찬했다."),
+ O("울면서 엄마에게 전화한다","p-2","엄마가 맨발로 뛰어왔다."),
+ O("녹색어머니회 아주머니가 막아 준다","p3","아주머니가 대신 넘어지셨다. 평생 인사드렸다."),
+ O("이후 길을 건널 때마다 손을 든다","h2","좌우를 세 번 보는 버릇이 생겼다."),
+ O("넘어져 무릎이 까진다","h-3","무릎에 흉터가 남았다.")]},
+
+{id:"fire",min:13,max:95,title:"화재",text:"새벽, 화재경보가 울렸다. 복도에 연기가 차오른다.",pool:[
+ O("젖은 수건으로 입을 막고 탈출","h-4","계단으로 빠져나왔다."),
+ O("이웃집 문을 두드린다","r10 h-8","옆집 할머니를 업고 나왔다. 구청에서 표창을 받았다."),
+ O("귀중품을 챙기러 들어간다","","",{odds:[.6,["h-6","가족 앨범을 건졌다.",{}],["h-30","연기를 너무 마셨다.",{}]]}),
+ O("소화기로 불을 끈다","","",{odds:[.5,["r8","초기 진화에 성공했다.",{}],["h-12 m-1000","불길이 번졌다.",{}]]}),
+ O("완강기로 내려간다","h-3","훈련 때 배운 대로 했다."),
+ O("모든 걸 잃는다","m-2500 p-10","집이 다 탔다. 임시 숙소에서 한 달을 보냈다.",{req:s=>s.age>=19}),
+ O("119에 신고하고 기다린다","h-2","소방관이 10분 만에 왔다."),
+ O("반려동물을 구하러 간다","h-10 p6","고양이를 안고 나왔다."),
+ O("화재 보험 덕을 본다","m-200","보험 덕분에 다시 시작했다.",{req:s=>s.age>=19}),
+ O("방화범을 목격한다","r6","경찰에 진술했다. 범인이 잡혔다.")]},
+
+{id:"lotto",min:19,max:95,title:"복권",text:"편의점에서 거스름돈으로 산 복권을 쥐고 있다.",pool:[
+ O("번호를 맞춰 본다","","",{odds:[.03,["m20000 p12","2등. 손이 떨렸다.",{}],["m-1","꽝.",{}]]}),
+ O("즉석복권을 더 산다","","",{odds:[.2,["m100 p3","5만 원 당첨.",{}],["m-10","꽝.",{}]]}),
+ O("복권을 끊는다","m50","그 돈으로 붕어빵을 샀다."),
+ O("1등 꿈을 꾼다","","",{odds:[.005,["m200000 p20","1등. 광주 1등 명당이 하나 늘었다.",{set:{lotto:1}}],["p1","꿈은 꿈이었다.",{}]]}),
+ O("5등 당첨금으로 효도한다","m-200 p5","보태서 어머니께 내복을 사 드렸다."),
+ O("연금복권을 산다","m-20","매달 조금씩 산다."),
+ O("로또 명당 원정을 간다","m-30 p2","줄을 한 시간 섰다."),
+ O("친구와 반반 산다","","",{odds:[.05,["m5000 p8 r2","3등! 약속대로 반반 나눴다.",{}],["p1","꽝. 같이 웃었다.",{}]]}),
+ O("주운 복권을 긁는다","","",{odds:[.1,["m300","만 원짜리가 됐다.",{}],["p1","꽝.",{}]]}),
+ O("복권 대신 적금","m200","확률은 낮아도 이자는 확실하다.")]},
+
+{id:"phishing",min:25,max:95,title:"수상한 전화",text:s=>s.kids.length?`'아빠, 나 ${K(0)}인데 폰이 고장 나서…' 낯선 번호로 문자가 왔다.`:"'서울중앙지검 수사관입니다.' 낯선 번호로 전화가 왔다.",pool:[
+ O("시키는 대로 송금한다","m-2000 p-10","보이스피싱이었다. 은행 창구에서 다리가 풀렸다."),
+ O("바로 끊는다","p1","다음 날 같은 수법 뉴스를 봤다."),
+ O("되레 사기꾼을 놀린다","p5","20분 동안 시간을 끌었다. 사기꾼이 먼저 끊었다."),
+ O("경찰에 신고한다","r4","계좌가 정지됐다."),
+ O("가족에게 직접 전화한다","p2","가족은 멀쩡했다."),
+ O("보내온 링크를 누른다","m-1000 p-6","휴대폰이 털렸다."),
+ O("은행에 확인한다","p1","은행원이 막아 줬다."),
+ O("반쯤 넘어가다 멈춘다","m-300 p-3","이체 직전에 이상함을 느꼈다. 일부만 잃었다."),
+ O("동네 어르신들께 알린다","r5","경로당에 주의 문구를 붙였다."),
+ O("녹음해서 유튜브에 올린다","r3 p3","조회수가 꽤 나왔다.")]},
+
+{id:"flood",min:6,max:95,title:"물난리",text:"태풍이 광주를 지나갔다. 광주천이 넘치기 직전이다.",pool:[
+ O("이웃과 모래주머니를 쌓는다","r6 h-3","골목이 지켜졌다."),
+ O("짐을 챙겨 대피한다","p-2","체육관에서 하룻밤을 보냈다."),
+ O("광주천 구경을 간다","","",{odds:[.7,["p1","무섭게 불어난 물을 봤다.",{}],["h-20","발을 헛디뎠다.",{}]]}),
+ O("반지하 이웃을 돕는다","r8 h-4","물이 차오르는 집에서 노인을 업고 나왔다.",{req:s=>s.age>=15}),
+ O("집이 잠긴다","m-1500 p-6","가구를 전부 버렸다.",{req:s=>s.age>=19}),
+ O("복구 자원봉사를 한다","r6 h-2","진흙을 퍼내는 데 일주일이 걸렸다."),
+ O("막힌 배수구를 뚫는다","h-2 r3","골목 배수구를 맨손으로 뚫었다."),
+ O("정전 속에서 촛불을 켠다","p3","가족끼리 오랜만에 이야기를 나눴다."),
+ O("피해 보상을 신청한다","m300","구청 재난지원금이 나왔다.",{req:s=>s.age>=19}),
+ O("우산을 쓰고 학교에 간다","p-1","휴교령이 내려진 줄 몰랐다.",{req:s=>s.age<19})]},
+
+{id:"bag",min:15,max:90,title:"돈가방",text:"충장로 골목에 검은 가방이 떨어져 있다. 열어 보니 현금 다발이다.",pool:[
+ O("경찰서에 가져간다","r8 m200","주인이 사례금을 줬다."),
+ O("몰래 챙긴다","","",{odds:[.6,["m1500 p3","아무도 찾지 않았다. 대신 마음이 무거웠다.",{set:{guilt:1}}],["r-15","CCTV에 찍혔다.",{jail:[1,"점유이탈물횡령"]}]]}),
+ O("반만 챙기고 신고한다","","",{odds:[.4,["m700","들키지 않았다.",{set:{guilt:1}}],["r-12","액수가 맞지 않았다.",{jail:[1,"횡령"]}]]}),
+ O("그냥 지나친다","p-1","뒤돌아보지 않았다."),
+ O("주인을 직접 찾아 준다","r10 p5","가방 속 영수증으로 시장 상인을 찾았다. 평생 단골이 됐다."),
+ O("조직 돈인 걸 알아챈다","p-3","조용히 내려놓고 떠났다."),
+ O("SNS에 올려 주인을 찾는다","r4","주인을 찾았다. 뉴스에도 나왔다."),
+ O("사례금을 기부한다","r6 p4","현금은 경찰에, 사례금은 기부했다."),
+ O("가방만 챙긴다","p1","돈은 신고하고 가방은 버려진 걸로 쳤다."),
+ O("함정이 아닐까 의심한다","p-1","결국 경찰을 불렀다.")]},
+
+{id:"assault",min:15,max:75,title:"골목의 비명",text:"밤늦게 골목에서 누군가 맞고 있다.",pool:[
+ O("뛰어들어 말린다","","",{odds:[s=>s.h/120,["r12","가해자들이 도망쳤다. 피해자가 고맙다고 울었다.",{}],["h-20 r6","같이 맞았다. 그래도 피해자는 살았다.",{}]]}),
+ O("112에 신고한다","r5","경찰이 금방 왔다."),
+ O("못 본 척 지나간다","p-5 r-2","다음 날 뉴스에 나왔다. 오래 잠을 설쳤다."),
+ O("영상을 찍는다","r3","영상이 결정적 증거가 됐다."),
+ O("주변 사람들을 모은다","r8","여럿이 소리치자 가해자들이 흩어졌다."),
+ O("가해자를 쫓아간다","","",{odds:[.5,["r10","경찰과 함께 붙잡았다.",{}],["h-12","놓쳤다. 넘어져 다쳤다.",{}]]}),
+ O("피해자를 병원에 데려간다","r8 m-100","응급실까지 같이 갔다."),
+ O("과하게 응징한다","","",{odds:[.5,["r4","가해자가 도망쳤다.",{}],["r-10","과잉 대응으로 오히려 입건됐다.",{jail:[1,"폭행"]}]]}),
+ O("호루라기를 분다","r3","소리에 놀라 다들 흩어졌다."),
+ O("집으로 뛰어간다","p-3","무서웠다.")]},
+
+{id:"tv",min:10,max:85,title:"방송국 카메라",text:"광주 지역 방송 길거리 인터뷰 카메라가 다가온다.",pool:[
+ O("광주 사투리로 신나게 인터뷰한다","r6 p5","저녁 뉴스에 나왔다. 사투리가 화제가 됐다."),
+ O("도망간다","p-1","뒷모습만 나왔다."),
+ O("노래를 부른다","","",{odds:[s=>s.flags.music?.6:.2,["r10 p8","영상이 퍼졌다. 섭외 전화가 왔다.",{set:{famous:1}}],["r-2 p3","음이탈 장면만 나왔다.",{}]]}),
+ O("정치 이야기를 한다","r-3","댓글이 반으로 갈렸다.",{req:s=>s.age>=19}),
+ O("가게 홍보를 한다","m300 r3","손님이 늘었다.",{req:s=>["cafe","shop","stall","chef"].includes(s.job)}),
+ O("카메라 앞에서 고백한다","p8",s=>`${JS(SPN(),"이","가")} 화면 속에서 웃었다.`,{req:s=>s.marry==="연애중"}),
+ O("엄마에게 인사한다","p4","어머니가 그 영상을 백 번 봤다."),
+ O("기아 응원가를 부른다","p5 r3","야구 커뮤니티에서 짤이 됐다.",{req:F("tigers")}),
+ O("욕을 한다","r-8","삐 처리됐다. 동네에서 알아봤다."),
+ O("무등산 자랑을 한다","r4 p3","광주 홍보 영상에 쓰였다.")]},
+
+{id:"collapse",min:45,max:95,title:"쓰러짐",text:s=>s.age>=65?"광주천 산책길에서 가슴을 움켜쥐고 쓰러졌다.":"출근길 계단에서 가슴을 움켜쥐고 쓰러졌다.",pool:[
+ O("지나가던 시민이 심폐소생술을 한다","h-10 p4","모르는 사람의 손이 나를 살렸다."),
+ O("버티다 혼자 병원에 간다","h-15","심근경색이었다. 조금만 늦었어도."),
+ O("119를 부른다","h-8","전남대병원에서 스텐트 시술을 받았다."),
+ O("괜찮다며 집에 간다","h-25","그날 밤 다시 쓰러졌다."),
+ O("가족에게 전화한다","h-10 p3",s=>MARRIED(s)?`${JS(SPN(),"이","가")} 맨발로 뛰어왔다.`:"동생이 뛰어왔다."),
+ O("생활을 완전히 바꾼다","h5 p2","술, 담배, 야식을 끊었다.",{set:{exercise:1,smoke:0}}),
+ O("병원비 걱정부터 한다","h-12 p-4","치료를 미뤘다."),
+ O("살려 준 사람을 찾아가 인사한다","p6 r4","그 사람과 매년 연락한다."),
+ O("기적처럼 회복한다","h-4 p5","의사가 운이 좋았다고 했다."),
+ O("병상에서 유언을 생각한다","p-2 h-8","처음으로 죽음을 생각했다.")]},
+
+{id:"lostKid",min:3,max:8,title:"길을 잃다",text:"대인시장 인파 속에서 어머니 손을 놓쳤다.",pool:[
+ O("그 자리에서 기다린다","p2","어머니가 10분 만에 돌아왔다."),
+ O("울면서 엄마를 부른다","p-2 r1","상인 아주머니가 방송을 해 줬다."),
+ O("경찰 아저씨를 찾는다","s2","지구대에서 아이스크림을 먹으며 기다렸다."),
+ O("혼자 집을 찾아간다","","",{odds:[.5,["s3 r2","정말로 집까지 걸어갔다. 다들 놀랐다.",{}],["h-5 p-4","더 멀리 가 버렸다.",{}]]}),
+ O("떡볶이 냄새를 따라간다","p4","떡볶이집 할머니가 데리고 있어 줬다."),
+ O("모르는 어른을 따라간다","","",{odds:[.8,["p-2","좋은 분이었다. 지구대에 데려다줬다.",{}],["h-5 p-8","무서운 일이 생길 뻔했다. 어머니가 뛰어와 잡았다.",{}]]}),
+ O("미아 방송 부스로 간다","s3","이름과 전화번호를 또박또박 말했다."),
+ O("숨바꼭질인 척 숨는다","p2 r-1","한 시간 동안 시장이 발칵 뒤집혔다."),
+ O("다른 길 잃은 아이를 달래 준다","r4 p3","같이 손잡고 기다렸다."),
+ O("목걸이 이름표를 보여 준다","p2","어머니가 걸어 준 이름표 덕분이었다.")]}
+]);
+
+AMBIENT=[
+ [0,6,"할머니 댁 김장 날, 수육을 얻어먹었다.","p2"],
+ [0,12,"충장축제 퍼레이드를 아버지 목말을 타고 봤다.","p2"],
+ [2,12,"감기에 걸려 일주일을 앓았다.","h-2"],
+ [3,12,"동네 놀이터에서 해가 질 때까지 놀았다.","p2 h1"],
+ [6,18,"사직공원 전망대에서 광주 야경을 봤다.","p2"],
+ [7,18,"광주천에서 자전거를 배웠다.","h2"],
+ [13,18,"시험 기간, 밤새 공부했다.","s2 h-1"],
+ [13,18,"친구들과 충장로에서 떡볶이를 먹었다.","p2"],
+ [0,99,"기아 타이거즈가 한국시리즈에서 우승했다.","p3"],
+ [0,99,"광주FC가 1부 리그에 잔류했다.","p1"],
+ [19,99,"대인시장 야시장에서 막걸리를 마셨다.","p2 h-1"],
+ [8,99,"광주비엔날레가 열렸다. 주말에 들러 봤다.","p2 s1"],
+ [0,99,"폭염 경보. 광주는 역시 덥다.","h-1"],
+ [5,99,"1913송정역시장에서 떡갈비를 먹었다.","p2"],
+ [0,99,"무등산에 첫눈이 내렸다.","p1"],
+ [19,99,"금남로 차 없는 거리 행사를 걸었다.","p1"],
+ [19,64,"야근이 이어진 한 해였다.","h-2 m100"],
+ [19,64,"보너스가 조금 나왔다.","m200 p1",s=>!["none","part","student"].includes(s.job)],
+ [19,64,"물가가 올랐다. 장바구니가 가벼워졌다.","m-150"],
+ [19,99,"전세 계약 갱신. 보증금이 올랐다.","m-200",s=>!s.flags.house],
+ [19,99,"재산세 고지서가 날아왔다.","m-120",s=>s.flags.house],
+ [19,60,"카드값이 생각보다 많이 나왔다.","m-200 p-1"],
+ [25,70,"차가 고장 나서 수리비가 들었다.","m-150"],
+ [30,70,s=>`${K(0)}의 학원비가 또 올랐다.`,"m-200",s=>s.kids.some(k=>s.age-k.born>=7&&s.age-k.born<=18)],
+ [30,99,s=>`${K(0)}가 학교에서 상을 받아 왔다.`,"p3",s=>s.kids.some(k=>s.age-k.born>=7&&s.age-k.born<=18)],
+ [30,99,s=>`${JS(s.partner||"배우자","과","와")} 풍암호수공원을 걸었다.`,"p2",s=>s.marry==="기혼"],
+ [45,99,"무릎이 시큰거린다.","h-2"],
+ [55,99,"동창의 부고 문자가 왔다.","p-2"],
+ [60,99,"사직공원 벤치에서 오후를 보냈다.","p1"],
+ [65,99,"양동시장 옛 단골집 사장님과 인사를 나눴다.","p2 r1"],
+ [70,99,"병원 대기실에서 반나절을 보냈다.","h1 m-100"],
+ [70,99,s=>s.kids.length?`${K(0)}가 주말에 반찬을 싸 들고 왔다.`:"이웃이 반찬을 나눠 줬다.","p3"]
+];
+JAIL_AMB=[
+ ["교도소 운동장에서 무등산 능선을 바라봤다.","p1"],
+ ["면회 날, 아무도 오지 않았다.","p-2"],
+ ["작업장에서 하루 종일 봉투를 접었다.",""],
+ ["명절 특식으로 떡국이 나왔다.","p1"],
+ ["같은 방 사람이 출소했다.","p-1"],
+ ["어머니 편지가 왔다. '밥 꼭 챙겨 먹어라.'","p2"],
+ ["감방 창문으로 첫눈이 들어왔다.","p1"]
+];
+
+/* ===== 화면 ===== */
+const $=id=>document.getElementById(id);
+let mode="setup",paused=false,speed=1,timer=null,curEv=null,curOpts=null,pickD=null,pickH=null;
+const STATDEF=[["h","건강"],["p","행복"],["r","평판"],["s","역량"]];
 
 function render(){
-  $("age").textContent=S.age; $("year").textContent=BIRTH+S.age;
-  const st=stageOf(S.age);
-  $("stageName").textContent=st[0]; $("stageRange").textContent=st[2]>=100?"65세 이상":`${st[1]}–${st[2]}세`;
-  $("stages").innerHTML=STAGES.map(x=>{const w=Math.min(x[2],90)-x[1]+1;const cls=S.age>x[2]?"on":(S.age>=x[1]?"now":"");return `<div class="${cls}" style="flex:${w}" title="${x[0]}"></div>`}).join("");
-  $("stats").innerHTML=STATDEF.map(([k,n])=>`<div class="stat"><span>${n}</span><div class="bar"><i class="${S[k]<25?"low":""}" style="width:${S[k]}%"></i></div><span class="v">${Math.round(S[k])}</span></div>`).join("");
-  const mEl=$("money");
-  if(S.age<19&&S.m===0){mEl.textContent="부모님 품";mEl.className=""}
-  else{mEl.textContent=won(S.m);mEl.className=S.m<0?"neg":""}
-  $("sub").textContent=`광주광역시 ${S.home} · ${BIRTH}년생`;
-  const jobName={none:"없음",student:"학생",part:"아르바이트",kia:"생산직",samsung:"회사원",gov:"공공기관",research:"연구원",art:"예술가",council:"정치인",retired:"은퇴",startup:"스타트업",cafe:"자영업",shop:"자영업",stall:"상인"}[S.job]||"—";
-  $("facts").innerHTML=[["직업",S.age<7?"—":jobName],["직장",S.work],["학력",S.edu],["결혼",S.marry+(S.partner&&S.marry!=="이혼"?` · ${S.partner}`:"")],["자녀",S.kids?`${S.kids}명`:"없음"]].map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join("");
+ $("age").textContent=S.age;$("year").textContent=BIRTH+S.age;
+ const st=stageOf(S.age);
+ $("stageName").textContent=st[0];$("stageRange").textContent=st[1]>=70?"70세 이상":`${st[1]}–${st[2]}세`;
+ $("stages").innerHTML=STAGES.map(x=>{const w=Math.min(x[2],90)-x[1]+1;const c=S.age>x[2]?"on":S.age>=x[1]?"now":"";return `<div class="${c}" style="flex:${w}" title="${x[0]}"></div>`}).join("");
+ $("stats").innerHTML=STATDEF.map(([k,n])=>`<div class="stat"><span>${n}</span><div class="bar"><i class="${S[k]<25?"low":""}" style="width:${S[k]}%"></i></div><span class="v">${Math.round(S[k])}</span></div>`).join("");
+ const mEl=$("money");
+ if(S.age<19&&S.m===0){mEl.textContent="부모님 품";mEl.className=""}else{mEl.textContent=won(S.m);mEl.className=S.m<0?"neg":""}
+ $("sub").textContent=`광주광역시 · ${BIRTH}년생`;
+ const facts=[["집안",CLS[S.cls]],["사는 곳",S.loc==="광주"?S.home:S.loc],["직업",S.age<7?"—":JOBS[S.job][0]],["직장",S.work],["학력",S.edu],
+  ["결혼",S.marry+(S.partner&&(S.marry==="기혼"||S.marry==="연애중")?` · ${S.partner}`:"")],["자녀",S.kids.length?`${S.kids.length}명 (${S.kids.map(k=>k.name).join(", ")})`:"없음"]];
+ if(S.jail>0)facts.push(["상태",`수감 중 · 출소까지 ${S.jail}년`,1]);else if(S.served>0)facts.push(["전과",`복역 ${S.served}년`,1]);
+ $("facts").innerHTML=facts.map(([a,b,w])=>`<dt>${a}</dt><dd${w?' class="warn"':""}>${b}</dd>`).join("");
 }
-function renderLog(){
-  $("log").innerHTML=S.log.slice(0,120).map(l=>`<li class="${l.key?"key":""}"><em>${String(l.a).padStart(2," ")}세</em>${l.t}</li>`).join("");
+function renderLog(){$("log").innerHTML=S?S.log.slice(0,150).map(l=>`<li class="${l.key?"key":""}"><em>${String(l.a).padStart(2," ")}세</em>${l.t}</li>`).join(""):""}
+function setCard(h){$("card").innerHTML=h}
+
+/* 시작 */
+function lifeCount(){try{return JSON.parse(localStorage.getItem("yuseong-lives")||"[]").length}catch(e){return 0}}
+function showDistricts(){
+ mode="setup";clearTimeout(timer);
+ const n=lifeCount();
+ setCard(`<div class="eyebrow">새 인생 · 1/2${n?` · 지금까지 ${n}번의 인생`:""}</div>
+ <h2>어느 동네에서 태어날까요?</h2>
+ <p class="story">박유성은 광주에서 태어난다. 동네마다 자라는 환경이 조금씩 다르다.</p>
+ <div class="pickgrid">${DISTRICTS.map((d,i)=>`<button class="pick" data-d="${i}"><em>${d.gu}</em><b>${d.dong}</b><span>${d.desc}</span></button>`).join("")}</div>
+ <div class="btns"><button class="ghost" id="randBtn">아무 곳에서나 태어나기</button></div>`);
+ document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{pickD=DISTRICTS[+b.dataset.d];showHouses()});
+ $("randBtn").onclick=()=>{pickD=pick(DISTRICTS);pickH=pick(HOUSES);showBirth()};
+}
+function showHouses(){
+ setCard(`<div class="eyebrow">새 인생 · 2/2 · ${pickD.gu} ${pickD.dong}</div>
+ <h2>어떤 집에서 태어날까요?</h2>
+ <p class="story">집은 집안 형편을 정한다. 형편은 학비, 유학, 물려받을 재산에 영향을 준다.</p>
+ <div class="pickgrid">${HOUSES.map((h,i)=>`<button class="pick" data-h="${i}"><b>${h.name}</b><span class="cls">${CLS[h.cls]}</span><span>${h.desc}</span></button>`).join("")}</div>
+ <div class="btns"><button class="ghost" id="backBtn">동네 다시 고르기</button></div>`);
+ document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{pickH=HOUSES[+b.dataset.h];showBirth()});
+ $("backBtn").onclick=showDistricts;
+}
+function showBirth(){
+ newLife(pickD,pickH);render();renderLog();
+ setCard(`<div class="eyebrow">${BIRTH}년 · ${S.home}</div>
+ <h2>박유성이 태어났다</h2>
+ <p class="story">${S.home}의 ${S.houseName}. 3.2kg, 울음소리가 컸다. 아버지 박태수와 어머니 김정희의 첫아이. 창밖으로 무등산 능선이 보인다.</p>
+ <p class="story">시간이 흐르다 갈림길이 오면 멈춘다. 선택지는 매번 열 가지가 넘는 가능성 중 세 개만 보인다.</p>
+ <div class="btns"><button class="primary" id="startBtn">인생 시작하기</button><button class="ghost" id="reBtn">다시 고르기</button></div>`);
+ $("startBtn").onclick=()=>{mode="run";tickerCard("응애. 세상에 나왔다.");schedule()};
+ $("reBtn").onclick=showDistricts;
+ $("startBtn").focus();
 }
 
-function setCard(html){$("card").innerHTML=html}
-
-function intro(){
-  mode="intro";
-  setCard(`<div class="eyebrow">2026년 · 광주광역시 남구 양림동</div>
-  <h2>박유성이 태어났다</h2>
-  <p class="story">3.2kg, 울음소리가 컸다. 아버지 박태수와 어머니 김정희의 첫아이. 창밖으로 무등산 능선이 보인다.<br>이 아이의 한평생을 광주에서 함께 지켜본다. 시간이 흐르다 갈림길이 오면 멈추고, 당신이 고른다.</p>
-  <button class="primary" id="startBtn">인생 시작하기</button>`);
-  $("startBtn").onclick=start;
+/* 진행 */
+function tickerCard(line){setCard(`<div class="eyebrow">${stageOf(S.age)[0]} · ${BIRTH+S.age}년${S.jail>0?" · 수감 중":""}</div><p class="ticker"><b>${S.age}세</b>${line}</p>`)}
+function schedule(){clearTimeout(timer);if(paused||mode!=="run")return;timer=setTimeout(step,1150/speed)}
+function step(){
+ const r=yearTick();render();renderLog();
+ if(r.type==="end")return showEnd();
+ if(r.type==="event")return showEvent(r.ev);
+ tickerCard(r.line);schedule();
 }
-function start(){
-  S=fresh(); renderLog(); addLog("광주 양림동에서 태어났다.",true); render();
-  mode="run"; tickerCard("응애. 세상에 나왔다."); schedule();
+function showEvent(ev){
+ mode="event";curEv=ev;curOpts=drawOptions(ev);
+ setCard(`<div class="eyebrow">${S.age}세 · ${BIRTH+S.age}년 · ${stageOf(S.age)[0]}</div>
+ <h2>${val(ev.title,S)}</h2><p class="story">${val(ev.text,S)}</p>
+ <div class="choices">${curOpts.map((o,i)=>`<button class="choice" data-i="${i}"><span class="k">${i+1}</span><span>${val(o.t,S)}${o.pin&&val(o.pin,S)?"<small>앞선 선택에서 이어짐</small>":""}</span></button>`).join("")}</div>`);
+ document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(+b.dataset.i));
 }
-function tickerCard(line){
-  setCard(`<div class="eyebrow">${stageOf(S.age)[0]} · ${BIRTH+S.age}년</div><p class="ticker"><b>${S.age}세</b>${line}</p>`);
-}
-function schedule(){
-  clearTimeout(timer);
-  if(paused||mode!=="run")return;
-  timer=setTimeout(year,1100/speed);
-}
-function year(){
-  S.age++;
-  // 수입과 흐름
-  if(S.age>=19){
-    let inc=val(INCOME[S.job]??0); S.m+=inc;
-    if(S.kids&&S.age<S.flags.kidAge+24) S.m-=350*S.kids;
-    if(S.flags.house) S.m+=280;
-    if(S.age>=75) S.m-=250;
-  }
-  if(S.age>=7&&S.age<=18) S.s=clamp(S.s+1);
-  let dh=0; if(S.age>=40)dh-=1; if(S.age>=60)dh-=1.5; if(S.age>=75)dh-=1;
-  if(S.flags.exercise)dh+=1; if(S.flags.neglect)dh-=1; if(S.p>75)dh+=.5;
-  S.h=clamp(S.h+dh);
-  S.p=clamp(S.p+(S.p>55?-1:S.p<45?1:0));
-  if(S.age>=72&&S.marry==="기혼"&&chance(.04)){S.marry="사별";S.p=clamp(S.p-15);addLog(`${S.partner}가 먼저 세상을 떠났다.`,true)}
-  if(checkDeath())return;
-  // 이벤트
-  const ev=EVENTS.find(e=>e.age===S.age&&(!e.req||e.req(S)));
-  render();
-  if(ev){openEvent(ev);return}
-  const pool=AMBIENT.filter(a=>S.age>=a[0]&&S.age<=a[1]);
-  let line="조용히 한 해가 지나갔다.";
-  if(pool.length&&chance(.65)){const a=pool[Math.floor(Math.random()*pool.length)];apply(a[3]);line=a[2];addLog(line)}
-  render(); tickerCard(line); schedule();
-}
-function checkDeath(){
-  let die=S.h<=0||S.age>=100;
-  if(!die&&S.age>=62){const p=Math.max(0,S.age-68)*.012+Math.max(0,40-S.h)*.005;die=chance(p)}
-  if(die){end();return true}
-  return false;
-}
-function openEvent(ev){
-  mode="event"; current=ev;
-  const list=val(ev.ch,S);
-  setCard(`<div class="eyebrow">${S.age}세 · ${BIRTH+S.age}년 · ${stageOf(S.age)[0]}</div>
-  <h2>${ev.title}</h2><p class="story">${val(ev.text,S)}</p>
-  <div class="choices">${list.map((c,i)=>{const ok=!c.req||c.req(S);return `<button class="choice${ok?"":" locked"}" data-i="${i}" ${ok?"":"aria-disabled=\"true\""}><span class="k">${i+1}</span><span>${val(c.t,S)}${ok?"":`<small>조건: ${c.lock||"충족 안 됨"}</small>`}</span></button>`}).join("")}</div>`);
-  current.list=list;
-  document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{if(!b.classList.contains("locked"))choose(+b.dataset.i)});
-}
+const NAMES={m:"자산",h:"건강",p:"행복",r:"평판",s:"역량"};
 function choose(i){
-  const c=current.list[i];
-  const before={m:S.m,h:S.h,p:S.p,r:S.r,s:S.s};
-  let out=c.x?c.x(S):{e:c.e,f:c.f,r:c.r};
-  apply(out.e); if(out.f)out.f(S);
-  const res=val(out.r,S)||"";
-  addLog(`${current.title} — ${val(c.t,S)}. ${res}`,true);
-  render();
-  const names={m:"자산",h:"건강",p:"행복",r:"평판",s:"역량"};
-  const ds=Object.keys(before).map(k=>{const d=Math.round((S[k]-before[k]));if(!d)return"";const up=d>0;return `<span class="${up?"up":"dn"}">${names[k]} ${up?"+":"−"}${k==="m"?won(Math.abs(d)):Math.abs(d)}</span>`}).join("");
-  mode="result";
-  setCard(`<div class="eyebrow">${S.age}세 · ${current.title}</div>
-  <h2>${val(c.t,S)}</h2><p class="story">${res}</p>
-  ${ds?`<div class="deltas">${ds}</div>`:""}
-  <button class="primary" id="contBtn">시간 흘려보내기</button>`);
-  $("contBtn").onclick=()=>{if(checkDeath())return;mode="run";tickerCard("시간이 흐른다.");schedule()};
-  $("contBtn").focus();
+ const o=curOpts[i];const res=resolve(curEv,o);render();renderLog();
+ const ds=Object.entries(res.d).map(([k,v])=>`<span class="${v>0?"up":"dn"}">${NAMES[k]} ${v>0?"+":"−"}${k==="m"?won(Math.abs(v)):Math.abs(v)}</span>`).join("");
+ mode="result";
+ setCard(`<div class="eyebrow">${S.age}세 · ${val(curEv.title,S)}</div>
+ <h2>${res.t}</h2><p class="story">${res.text}</p>
+ ${ds?`<div class="deltas">${ds}</div>`:""}
+ <div class="btns"><button class="primary" id="contBtn">${S.h<=0?"마지막 장으로":"계속"}</button></div>`);
+ $("contBtn").onclick=cont;$("contBtn").focus();
 }
-function end(){
-  mode="end"; clearTimeout(timer); S.dead=true;
-  const cause=S.h<=5?"오랜 투병 끝에":S.age>=90?"가족들 곁에서 잠든 채로 평온하게":"어느 봄날 아침, 조용히";
-  addLog(`${cause} 눈을 감았다.`,true); render();
-  const top=[["r","광주가 오래 기억할 사람"],["p","웃음이 많았던 사람"],["h","무등산처럼 단단했던 사람"],["s","끝까지 배우던 사람"]].sort((a,b)=>S[b[0]]-S[a[0]])[0];
-  const epi=S.m>=30000?"알뜰하게 일군 것을 나누고 간 사람":top[1];
-  const score=Math.round(S.p*.35+S.h*.15+S.r*.25+S.s*.1+Math.min(15,Math.max(0,S.m/2000)));
-  const grade=score>=70?"빛나는 삶":score>=55?"단단한 삶":score>=40?"평범하고 고운 삶":"고단했던 삶";
-  setCard(`<div class="eyebrow">${BIRTH}–${BIRTH+S.age} · 향년 ${S.age}세</div>
-  <h2>박유성, ${cause} 눈을 감다</h2>
-  <p class="story">광주에서 태어나 광주에서 ${S.age}년을 살았다. ${S.marry==="미혼"?"평생 혼자였지만 외롭지만은 않았다.":S.marry==="이혼"?"한 번의 이별이 있었다.":`${S.partner||"배우자"}와 함께한 세월이 길었다.`} ${S.kids?`자녀 ${S.kids}명이 장례식장을 지켰다.`:""} 마지막 직장은 ${S.work}.</p>
-  <p class="epitaph">“${epi}”</p>
-  <div class="end-grid">
-   <div><span>평가</span><b style="font-family:var(--f-story)">${grade}</b></div>
-   <div><span>최종 자산</span><b>${won(S.m)}</b></div>
-   <div><span>행복</span><b>${Math.round(S.p)}</b></div>
-   <div><span>평판</span><b>${Math.round(S.r)}</b></div>
-   <div><span>건강</span><b>${Math.round(S.h)}</b></div>
-  </div>
-  <button class="primary" id="againBtn">다시 태어나기</button>`);
-  $("againBtn").onclick=start;
-  try{const k="yuseong-lives";const arr=JSON.parse(localStorage.getItem(k)||"[]");arr.unshift({age:S.age,grade,m:S.m,t:Date.now()});localStorage.setItem(k,JSON.stringify(arr.slice(0,20)))}catch(e){}
+function cont(){
+ if(S.h<=0||isDeadNow())return showEnd();
+ const nx=nextEvent();
+ if(nx)return showEvent(nx);
+ mode="run";tickerCard(S.jail>0?"담장 안에서 시간이 흐른다.":"시간이 흐른다.");schedule();
+}
+function isDeadNow(){return S.h<=0}
+
+/* 엔딩 */
+function showEnd(){
+ mode="end";clearTimeout(timer);S.dead=true;
+ if(!S.cause)S.cause="old";
+ const ep=epilogue();
+ addLog(`${CAUSES[S.cause]||""} 눈을 감았다.`,true);render();renderLog();
+ setCard(`<div class="eyebrow">${BIRTH}–${BIRTH+S.age} · 향년 ${S.age}세</div>
+ <h2>${ep.title}</h2>
+ ${ep.paras.map(p=>`<p class="story">${p}</p>`).join("")}
+ <p class="lesson">${ep.lesson}</p>
+ <p class="words">마지막 말: “${ep.words}”</p>
+ <div class="end-grid">
+  <div><span>평가</span><b style="font-family:var(--f-story)">${ep.grade}</b></div>
+  <div><span>묘비명</span><b style="font-family:var(--f-story);font-size:14px">${ep.epitaph}</b></div>
+  <div><span>최종 자산</span><b>${won(S.m)}</b></div>
+  <div><span>행복</span><b>${Math.round(S.p)}</b></div>
+  <div><span>평판</span><b>${Math.round(S.r)}</b></div>
+ </div>
+ <div class="btns"><button class="primary" id="againBtn">다시 태어나기</button></div>`);
+ $("againBtn").onclick=showDistricts;
+ try{const k="yuseong-lives";const a=JSON.parse(localStorage.getItem(k)||"[]");a.unshift({age:S.age,grade:ep.grade,m:S.m,t:Date.now()});localStorage.setItem(k,JSON.stringify(a.slice(0,50)))}catch(e){}
 }
 
 /* 컨트롤 */
 $("pauseBtn").onclick=()=>{paused=!paused;$("pauseBtn").setAttribute("aria-pressed",paused);$("pauseBtn").textContent=paused?"계속":"일시정지";schedule()};
 document.querySelectorAll("[data-speed]").forEach(b=>b.onclick=()=>{speed=+b.dataset.speed;document.querySelectorAll("[data-speed]").forEach(x=>x.setAttribute("aria-pressed",x===b));schedule()});
 document.addEventListener("keydown",e=>{
-  if(mode==="event"&&/^[1-6]$/.test(e.key)){const b=document.querySelector(`.choice[data-i="${+e.key-1}"]`);if(b&&!b.classList.contains("locked"))b.click()}
-  else if(mode==="result"&&(e.key==="Enter"||e.key===" ")&&document.activeElement.id!=="contBtn"){e.preventDefault();$("contBtn").click()}
+ if(mode==="event"&&/^[1-3]$/.test(e.key)){const b=document.querySelector(`.choice[data-i="${+e.key-1}"]`);if(b)b.click()}
 });
 
-S=fresh(); render(); addLog("광주 양림동에서 태어날 예정이다."); intro();
-</script>
+/* ===== 걷는 캐릭터 ===== */
+const W={cv:null,ctx:null,ph:0,off:0,last:0,cols:null,colAt:0,dpr:1};
+const REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FIG={toddler:{hr:8,body:13,leg:13,arm:10,lw:2.6},child:{hr:7,body:18,leg:19,arm:14,lw:2.7},teen:{hr:6.6,body:23,leg:25,arm:18,lw:2.9},young:{hr:6.5,body:25,leg:28,arm:20,lw:3},adult:{hr:6.5,body:25,leg:27,arm:19,lw:3.3},elder:{hr:6.5,body:23,leg:24,arm:18,lw:3}};
+function hash(i){const s=Math.sin(i*127.1+11.7)*43758.5453;return s-Math.floor(s)}
+function readCols(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();W.cols={fg:g("--fg"),muted:g("--muted"),line:g("--line"),soft:g("--accent-soft"),accent:g("--accent"),light:g("--light"),bg:g("--bg")}}
+function walkerResize(){const r=W.cv.getBoundingClientRect();W.dpr=window.devicePixelRatio||1;W.cv.width=Math.max(1,Math.round(r.width*W.dpr));W.cv.height=Math.max(1,Math.round(r.height*W.dpr))}
+function stageKey(){return S?stageOf(S.age)[3]:"toddler"}
+function motion(st){
+ const moving=S&&mode==="run"&&!paused&&!S.dead&&!(S.jail>0);
+ if(!moving)return{freq:.0025,v:0,amp:0,run:false,idle:true};
+ const base={toddler:{freq:.011,v:.03,amp:.35,run:false},child:{freq:.017,v:.11,amp:.8,run:true},teen:{freq:.016,v:.12,amp:.85,run:true},young:{freq:.011,v:.06,amp:.5,run:false},adult:{freq:.0095,v:.05,amp:.45,run:false},elder:{freq:.0055,v:.022,amp:.25,run:false}}[st];
+ const m=Object.assign({},base);
+ if(st==="young"&&speed>=2){m.run=true;m.freq=.015;m.v=.12;m.amp=.85}
+ m.freq*=1+(speed-1)*.2;m.v*=1+(speed-1)*.45;
+ if(S.h<30){m.freq*=.75;m.v*=.7;m.run=false;m.amp=Math.min(m.amp,.4)}
+ return m;
+}
+function seg(c,a,b){c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}
+function figure(c,x,gy,st,m){
+ const f=FIG[st],ph=W.ph,amp=m.idle?0:m.amp,run=m.run;
+ const bounce=m.idle?Math.sin(ph)*0.6:Math.abs(Math.sin(ph))*(run?4:1.5);
+ const lean=st==="elder"?0.3:run?0.2:0.05;
+ const th=f.leg*.5,sh=f.leg*.5;
+ const sway=st==="toddler"&&!m.idle?Math.sin(ph)*2:0;
+ const hip={x:x+sway,y:gy-f.leg*(run?.93:.98)-bounce};
+ const sho={x:hip.x+Math.sin(lean)*f.body,y:hip.y-Math.cos(lean)*f.body};
+ c.lineCap="round";c.lineJoin="round";c.lineWidth=f.lw;
+ const limbs=i=>{
+  const p=ph+(i?Math.PI:0);
+  const a=amp*Math.sin(p);
+  const bend=m.idle?0:(run?1.3:.7)*Math.max(0,Math.sin(p+Math.PI/2));
+  const knee={x:hip.x+Math.sin(a)*th,y:hip.y+Math.cos(a)*th};
+  const sa=a-bend;let foot={x:knee.x+Math.sin(sa)*sh,y:Math.min(gy,knee.y+Math.cos(sa)*sh)};
+  const u=m.idle?0.05:-amp*.9*Math.sin(p)+lean*.4;
+  const elbow={x:sho.x+Math.sin(u)*f.arm*.5,y:sho.y+Math.cos(u)*f.arm*.5};
+  const fa=u+(run?1.4:.3);
+  const hand={x:elbow.x+Math.sin(fa)*f.arm*.5,y:elbow.y+Math.cos(fa)*f.arm*.5};
+  return{knee,foot,elbow,hand};
+ };
+ const far=limbs(1),near=limbs(0);
+ c.strokeStyle=W.cols.fg;
+ c.globalAlpha=.42;seg(c,hip,far.knee);seg(c,far.knee,far.foot);seg(c,sho,far.elbow);seg(c,far.elbow,far.hand);
+ c.globalAlpha=1;seg(c,hip,sho);seg(c,hip,near.knee);seg(c,near.knee,near.foot);seg(c,sho,near.elbow);seg(c,near.elbow,near.hand);
+ const head={x:sho.x+Math.sin(lean)*(f.hr+2.5),y:sho.y-Math.cos(lean)*(f.hr+2.5)};
+ c.fillStyle=W.cols.fg;c.beginPath();c.arc(head.x,head.y,f.hr,0,Math.PI*2);c.fill();
+ if(st==="elder"){c.strokeStyle=W.cols.light;c.lineWidth=2.2;seg(c,near.hand,{x:near.hand.x+5,y:gy})}
+ if(st==="toddler"){c.strokeStyle=W.cols.fg;c.lineWidth=1.6;c.beginPath();c.moveTo(head.x,head.y-f.hr);c.quadraticCurveTo(head.x+4,head.y-f.hr-6,head.x+6,head.y-f.hr-3);c.stroke()}
+}
+function drawTomb(c,x,gy){
+ c.fillStyle=W.cols.line;c.beginPath();c.moveTo(x-14,gy);c.lineTo(x-14,gy-26);c.arc(x,gy-26,14,Math.PI,0);c.lineTo(x+14,gy);c.closePath();c.fill();
+ c.fillStyle=W.cols.light;[[-20,-3],[-24,-6],[-17,-7]].forEach(([dx,dy])=>{c.beginPath();c.arc(x+dx,gy+dy,2.6,0,Math.PI*2);c.fill()});
+ c.strokeStyle=W.cols.accent;c.lineWidth=1.5;seg(c,{x:x-20,y:gy},{x:x-20,y:gy-4});
+}
+function drawScene(){
+ const c=W.ctx,w=W.cv.width/W.dpr,h=W.cv.height/W.dpr;c.setTransform(W.dpr,0,0,W.dpr,0,0);c.clearRect(0,0,w,h);
+ const col=W.cols,gy=h-18,st=stageKey(),m=motion(st);
+ c.fillStyle=col.soft;c.beginPath();c.moveTo(0,gy);
+ for(let x=0;x<=w;x+=4){const X=x+W.off*.12;c.lineTo(x,gy-34-16*Math.sin(X/95)-9*Math.sin(X/41+1)-5*Math.sin(X/19))}
+ c.lineTo(w,gy);c.closePath();c.fill();
+ const o2=W.off*.45,bw=24;
+ for(let i=Math.floor(o2/bw)-1;i<(o2+w)/bw+1;i++){
+  const r=hash(i);if(r<.3)continue;const bh=10+r*34,x=i*bw-o2;
+  c.fillStyle=col.line;c.fillRect(x,gy-bh,bw-6,bh);
+  if(hash(i*7.3)>.45){c.fillStyle=col.light;c.globalAlpha=.55;for(let wy=gy-bh+5;wy<gy-5;wy+=7)for(let wx=x+3;wx<x+bw-9;wx+=6)if(hash(wx*3.1+wy)>.5)c.fillRect(wx,wy,2,3);c.globalAlpha=1}
+ }
+ c.strokeStyle=col.muted;c.lineWidth=1;seg(c,{x:0,y:gy+.5},{x:w,y:gy+.5});
+ c.globalAlpha=.5;for(let x=-(W.off%22);x<w;x+=22)seg(c,{x,y:gy+7},{x:x+9,y:gy+7});c.globalAlpha=1;
+ const fx=Math.min(w*.32,160);
+ c.save();c.translate(fx,gy);c.scale(1.35,1.35);c.translate(-fx,-gy);
+ if(S&&S.dead)drawTomb(c,fx,gy);else figure(c,fx,gy,st,m);
+ c.restore();
+ if(S&&S.jail>0){c.strokeStyle=col.muted;c.lineWidth=2.5;for(let k=0;k<7;k++){const bx=fx-45+k*15;seg(c,{x:bx,y:gy-78},{x:bx,y:gy})}seg(c,{x:fx-50,y:gy-78},{x:fx+50,y:gy-78})}
+ const label=!S?"출발 전":S.dead?"잠들다":S.jail>0?"수감 중":m.idle?(mode==="event"?"고민하는 중":"잠시 멈춤"):m.run?"달리는 중":(st==="elder"?"지팡이 짚고 걷는 중":st==="toddler"?"아장아장":"걷는 중");
+ $("walkStage").textContent=S?stageOf(S.age)[0]:"유아기";$("walkState").textContent=label;
+ return m;
+}
+function walkerLoop(t){
+ const dt=Math.min(60,t-(W.last||t));W.last=t;
+ if(!W.cols||t-W.colAt>1000){readCols();W.colAt=t}
+ const m=motion(stageKey());
+ if(!REDUCED){W.ph+=dt*m.freq;W.off+=dt*m.v}
+ drawScene();
+ requestAnimationFrame(walkerLoop);
+}
+function walkerInit(){W.cv=$("walk");W.ctx=W.cv.getContext("2d");walkerResize();window.addEventListener("resize",walkerResize);readCols();requestAnimationFrame(walkerLoop)}
 
+/* 부팅 */
+S=fresh(DISTRICTS[0],HOUSES[1]);render();renderLog();walkerInit();showDistricts();
+
+</script>
 </body>
 </html>
