@@ -48,12 +48,20 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outlin
 .stages div.now{background:var(--light)}
 .stage-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:6px}
 .stage-label strong{color:var(--fg);font-weight:600}
-.stats{display:grid;gap:11px}
-.stat{display:grid;grid-template-columns:52px 1fr 44px;align-items:center;gap:10px;font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.stat{display:flex;flex-direction:column;gap:4px;font-size:13px;min-width:0}
+.stat .sl{display:flex;justify-content:space-between}
 .stat .bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
 .stat .bar i{display:block;height:100%;background:var(--accent);transition:width .5s ease}
 .stat .bar i.low{background:var(--bad)}
 .stat .v{font-family:var(--f-num);text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+.traits{display:flex;flex-direction:column;gap:8px}
+.tr-head{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em}
+.tr-head span:last-child{font-family:var(--f-num)}
+.chips,.potential{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:3px 9px;border-radius:20px;background:var(--light-soft);color:var(--fg);border:1px solid var(--light);font-family:var(--f-ui);line-height:1.5}
+.chip.empty{background:transparent;border-style:dashed;border-color:var(--line);color:var(--muted)}
+.potential{margin-top:8px}
 .money{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--line);padding-top:12px}
 .money span{font-size:13px;color:var(--muted)}
 .money b{font-family:var(--f-num);font-size:20px;font-variant-numeric:tabular-nums}
@@ -130,7 +138,7 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outlin
 <div class="app">
   <aside class="panel" aria-label="박유성의 현재 상태">
     <div class="who">
-      <div><h1>박유성 <span class="ver" id="ver">v0.01</span></h1><div class="sub" id="sub">광주광역시</div></div>
+      <div><h1>박유성 <span class="ver" id="ver">v0.02</span></h1><div class="sub" id="sub">광주광역시</div></div>
       <div class="age"><b id="age">0</b><span>세 · <span id="year">2026</span>년</span></div>
     </div>
     <div>
@@ -138,6 +146,7 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outlin
       <div class="stage-label"><strong id="stageName">유아기</strong><span id="stageRange">0–6세</span></div>
     </div>
     <div class="stats" id="stats"></div>
+    <div class="traits"><div class="tr-head"><span>특수 특성</span><span id="trCount">0/3</span></div><div class="chips" id="traits"></div></div>
     <div class="money"><span>자산</span><b id="money">부모님 품</b></div>
     <dl class="facts" id="facts"></dl>
     <div class="ctrl" role="group" aria-label="시간 속도">
@@ -158,6 +167,16 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outlin
 </div>
 <details class="notes">
   <summary>패치 노트</summary>
+  <h4>v0.02</h4>
+  <ul>
+    <li>시작 화면에서 부모님 이름 제거</li>
+    <li>스탯 상승 폭 하향 (건강 40%, 나머지 55~60% 수준). 청소년기 역량 자동 상승과 운동·행복에 따른 건강 회복도 줄임</li>
+    <li>기본 특성 4종 추가: 외모, 싸움, 지혜, 운 (총 8종). 싸움은 몸싸움, 외모는 연애, 지혜는 투자·법적 판정, 운은 모든 확률에 영향</li>
+    <li>특수 특성 20종 추가. 인생마다 잠재 특성 10종이 정해지고, 그중 최대 3종을 얻을 수 있음</li>
+    <li>특수 특성 2~3종 조합으로 열리는 특별한 직업·칭호 20가지 (격투기 선수, 국정원 요원, 미쉐린 셰프, 비엔날레 총감독, 조직 보스 등)</li>
+    <li>교도소 돌발 사건 8종 추가: 교도소장의 제의, 특별한 인연(특성 전수), 의문의 편지, 폭동, 보스 감방 동기, 담장 안의 유혹, 수감 중 병, 재능대회. 출소 후 특별 경로로 이어짐</li>
+    <li>아래 애니메이션은 멈추지 않고 계속 걸으며 건물이 지나감. 스탯이 떨어지거나 손해를 보면 넘어졌다 일어남</li>
+  </ul>
   <h4>v0.01</h4>
   <ul>
     <li>시작할 때 광주 동네(11곳)와 집(6종)을 직접 고를 수 있음. 집에 따라 집안 형편이 정해짐</li>
@@ -180,7 +199,7 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--light);outlin
 
 <script>
 /* ===== 유성, 광주에서 — 엔진 ===== */
-const VERSION="0.01";
+const VERSION="0.02";
 const BIRTH=2026;
 const STAGES=[["유아기",0,6,"toddler"],["아동기",7,12,"child"],["청소년기",13,18,"teen"],["청년기",19,34,"young"],["장년기",35,54,"adult"],["중년기",55,69,"adult"],["노년기",70,120,"elder"]];
 const rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
@@ -218,18 +237,49 @@ const HOUSES=[
 const CLS=["어려운 형편","빠듯한 형편","보통 형편","넉넉한 형편"];
 const NAMES_F=["이서연","정하은","최민지","김다은","윤가람","한지원","오세린","장예린","문채원","송하율","임나래","배수아","고은비","노유진"];
 const KID_NAMES=["하늘","빛찬","새봄","다온","이안","서우","지유","도윤","루아","한결","나린","시온"];
-const JOBS={none:["무직",0],student:["학생",-250],part:["아르바이트",120],kia:["생산직",1000],samsung:["회사원",1200],seoulcorp:["대기업 직원",950],gov:["공공 부문",650],teacher:["교사",700],doctor:["의사",2400],lawyer:["법조인",1800],research:["연구원",950],dev:["개발자",1100],art:["작가",()=>rnd(-500,600)],music:["음악인",()=>rnd(-600,1600)],athlete:["프로 선수",()=>rnd(200,4500)],coach:["지도자",550],startup:["창업가",()=>rnd(-1600,3600)],cafe:["자영업",()=>rnd(-1000,1000)],shop:["자영업",()=>rnd(-600,800)],chef:["요리사",()=>rnd(0,1000)],creator:["방송·유튜브",()=>rnd(-400,2400)],gang:["조직원",()=>rnd(200,2200)],council:["정치인",850],retired:["은퇴",60],stall:["자영업",()=>rnd(-300,400)],prisoner:["수감 중",0]};
+const JOBS={none:["무직",0],student:["학생",-250],part:["아르바이트",120],kia:["생산직",1000],samsung:["회사원",1200],seoulcorp:["대기업 직원",950],gov:["공공 부문",650],teacher:["교사",700],doctor:["의사",2400],lawyer:["법조인",1800],research:["연구원",950],dev:["개발자",1100],art:["작가",()=>rnd(-500,600)],music:["음악인",()=>rnd(-600,1600)],athlete:["프로 선수",()=>rnd(200,4500)],coach:["지도자",550],startup:["창업가",()=>rnd(-1600,3600)],cafe:["자영업",()=>rnd(-1000,1000)],shop:["자영업",()=>rnd(-600,800)],chef:["요리사",()=>rnd(0,1000)],creator:["방송·유튜브",()=>rnd(-400,2400)],gang:["조직원",()=>rnd(200,2200)],council:["정치인",850],retired:["은퇴",60],stall:["자영업",()=>rnd(-300,400)],prisoner:["수감 중",0],
+ agent:["국정원 요원",1800],fighter:["격투기 선수",()=>rnd(-300,5000)],investor:["전업 투자자",()=>rnd(-3000,9000)],star:["배우",()=>rnd(500,9000)],michelin:["셰프",()=>rnd(800,4000)],director:["다큐 감독",()=>rnd(0,2500)],curator:["큐레이터",1600],boss:["조직 보스",()=>rnd(2000,8000)],whitehat:["보안 전문가",2200],tazza:["타짜",()=>rnd(-4000,8000)],healer:["명의",3000],diplomat:["외교관",1300],rescuer:["구조대원",900],counselor:["중독 상담사",650],conman:["사기꾼",()=>rnd(-2000,9000)]};
 const JOB_DREAM={athlete:["baseball","soccer"],doctor:["doctor"],lawyer:["law"],dev:["coder"],chef:["chef"],art:["art"],music:["music"]};
 const DREAMS={baseball:["야구공","야구선수"],soccer:["축구공","축구선수"],study:["연필","공부로 이름난 사람"],money:["오만원권","부자"],art:["붓","화가"],music:["마이크","가수"],doctor:["청진기","의사"],law:["판사봉","법조인"],coder:["마우스","개발자"],chef:["주걱","요리사"],health:["실타래","오래 사는 사람"],gamble:["화투패","노름꾼"]};
 const CRIME={embezzle:"횡령",fix:"승부조작",tax:"탈세",gambleBiz:"불법 도박장 운영",loanShark:"불법 사채",drug:"마약 밀거래",fraud:"사기",bribe:"뇌물",assault:"폭행"};
 const SEV={embezzle:4,fix:2,tax:2,gambleBiz:3,loanShark:3,drug:7,fraud:3,bribe:2,assault:2};
 
+/* 기본 특성 8종 · 특수 특성 20종 */
+const STATS=[["h","건강"],["p","행복"],["r","평판"],["s","역량"],["l","외모"],["f","싸움"],["w","지혜"],["k","운"]];
+const STAT_NAME=Object.fromEntries([["m","자산"],...STATS]);
+const GAIN={h:.4,p:.6,r:.55,s:.6,l:.6,f:.6,w:.6,k:.6};
+const TRAITS={
+ mudeungFist:{n:"무등산 권법",d:"산중 노사범에게 전해 받은 권법. 싸움에서 크게 유리하다.",c:s=>s.f>=55||(s.flags.hiker&&s.f>=45),b:{fight:.2}},
+ marineGrit:{n:"해병대 근성",d:"한 번 해병은 영원한 해병. 버티는 힘이 남다르다.",c:s=>s.flags.marine||s.f>=65,b:{fight:.1}},
+ streetFighter:{n:"골목 싸움꾼",d:"충장로 뒷골목에서 몸으로 배운 싸움.",c:s=>s.flags.delinq||s.flags.gang||s.f>=60,b:{fight:.15,escape:.05}},
+ lawKnow:{n:"법률 지식",d:"법전을 외우다시피 한다. 수사와 재판에서 유리하다.",c:s=>s.w>=55||s.flags.dream==="law"||s.job==="lawyer",b:{law:.2,escape:.1}},
+ medKnow:{n:"의학 지식",d:"몸이 보내는 신호를 읽을 줄 안다. 건강이 덜 깎인다.",c:s=>s.flags.doctorTrack||s.w>=60||s.flags.dream==="doctor"},
+ hacker:{n:"해킹 실력",d:"코드 몇 줄로 문을 연다.",c:s=>(s.flags.coder&&s.s>=48)||(s.flags.dream==="coder"&&s.s>=44)},
+ investSense:{n:"투자 감각",d:"돈의 흐름이 보인다. 투자 성공률이 오른다.",c:s=>s.w>=55||s.flags.dream==="money",b:{money:.15}},
+ historian:{n:"역사 이야기꾼",d:"오월과 광주의 이야기를 누구보다 잘 전한다.",c:s=>!!s.flags.history},
+ secretRecipe:{n:"비법 손맛",d:"할머니에게 물려받은 손맛. 요리 쪽 문이 열린다.",c:s=>s.flags.chef||s.flags.dream==="chef"},
+ polyglot:{n:"언어 천재",d:"외국어를 금방 익힌다.",c:s=>s.flags.abroad||s.flags.abroadExp||s.s>=58},
+ fatalCharm:{n:"치명적 매력",d:"눈길을 끄는 사람. 연애 성공률이 크게 오른다.",c:s=>s.l>=65,b:{love:.2}},
+ silverTongue:{n:"말발",d:"말로 사람을 움직인다.",c:s=>s.r>=55||s.w>=55,b:{law:.05,love:.08,escape:.05}},
+ networker:{n:"광주 인맥왕",d:"광주 어디를 가도 아는 사람이 있다. 평판이 서서히 오른다.",c:s=>s.r>=62},
+ lucky:{n:"행운아",d:"이상하게 일이 잘 풀린다. 모든 확률이 조금 오른다.",c:s=>s.k>=65||s.flags.luck,b:{all:.05}},
+ gamblerHand:{n:"타짜의 손",d:"패를 다루는 손이 빠르다. 도박에서 유리하다.",c:s=>s.flags.dream==="gamble"||s.flags.gambled,b:{gamble:.2}},
+ ironBody:{n:"강철 체력",d:"쉽게 지치지 않는 몸. 건강이 덜 깎인다.",c:s=>s.h>=65&&s.f>=40,b:{fight:.05}},
+ stageBorn:{n:"무대 체질",d:"조명 아래에서 빛나는 사람.",c:s=>s.flags.music||s.flags.famous},
+ artistEye:{n:"예술가의 눈",d:"남들이 못 보는 것을 본다.",c:s=>!!s.flags.art},
+ disguise:{n:"위장의 달인",d:"얼굴과 이름을 바꾸는 데 능하다. 도주와 은폐에 유리하다.",c:s=>(s.flags.crimes||0)>=1||s.flags.fugitive,b:{escape:.2}},
+ instinct:{n:"동물적 직감",d:"위험을 먼저 느낀다. 확률이 조금 오른다.",c:s=>s.k>=55||s.flags.hiker,b:{all:.03,money:.05}}
+};
+const TRAIT_IDS=Object.keys(TRAITS);
+const HAS=(...ts)=>s=>ts.every(t=>s.traits.includes(t));
+const AWAKEN_AGES=[12,17,24,32,42,55];
 let S=null;
-const MAIN=[],PATHS=[],SUDDEN=[],EV={};
-let AMBIENT=[],JAIL_AMB=[];
+const MAIN=[],PATHS=[],SUDDEN=[],JAIL_SUDDEN=[],EV={};
+let AMBIENT=[],JAIL_AMB=[],LAST_AMB_NEG=false;
 function addMain(l){l.forEach(e=>{MAIN.push(e);EV[e.id]=e})}
 function addPath(l){l.forEach(e=>{PATHS.push(e);EV[e.id]=e})}
 function addSudden(l){l.forEach(e=>{SUDDEN.push(e);EV[e.id]=e})}
+function addJailSudden(l){l.forEach(e=>{e.jailOK=true;e.jailOnly=true;JAIL_SUDDEN.push(e);EV[e.id]=e})}
 
 /* 텍스트 도우미 */
 const HOME=()=>S.home.split(" ")[1]||S.home;
@@ -247,16 +297,16 @@ const F=k=>s=>!!s.flags[k];
 const STU=s=>s.job==="student";
 const MARRIED=s=>s.marry==="기혼";
 const SINGLE=s=>["미혼","이혼","사별"].includes(s.marry);
-const EMP=s=>["samsung","seoulcorp","kia","research","dev","teacher","gov","doctor","lawyer","coach"].includes(s.job);
-const BIZ=s=>["cafe","shop","startup","chef","stall"].includes(s.job);
-const ART=s=>["art","music","creator"].includes(s.job);
-const ILL=s=>s.job==="gang";
+const EMP=s=>["samsung","seoulcorp","kia","research","dev","teacher","gov","doctor","lawyer","coach","agent","healer","diplomat","rescuer","counselor","whitehat","curator","director"].includes(s.job);
+const BIZ=s=>["cafe","shop","startup","chef","stall","michelin","investor"].includes(s.job);
+const ART=s=>["art","music","creator","star","fighter"].includes(s.job);
+const ILL=s=>["gang","boss","tazza","conman"].includes(s.job);
 
 function won(m){const neg=m<0,a=Math.abs(Math.round(m)),eok=Math.floor(a/10000),man=a%10000;const t=eok?`${eok}억${man?" "+man.toLocaleString()+"만":""}`:`${man.toLocaleString()}만`;return(neg?"−":"")+t+"원"}
 function stageOf(a){return STAGES.find(x=>a>=x[1]&&a<=x[2])||STAGES[6]}
 
 function fresh(d,h){
- return {age:0,m:0,h:72,p:60,r:40,s:30,job:"none",work:"—",edu:"—",marry:"미혼",partner:null,ex:null,late:null,kids:[],
+ return {age:0,m:0,h:72,p:60,r:40,s:30,l:rnd(30,62),f:rnd(20,45),w:rnd(25,42),k:rnd(25,75),traits:[],potential:shuffle(TRAIT_IDS).slice(0,10),legend:null,job:"none",work:"—",edu:"—",marry:"미혼",partner:null,ex:null,late:null,kids:[],
   dist:d.id,distName:`${d.gu} ${d.dong}`,house:h.id,houseName:h.name,cls:h.cls,home:`${d.gu} ${d.dong}`,loc:"광주",
   flags:{},log:[],queue:[],agenda:[],jail:0,served:0,nextSudden:4,dead:false,cause:""};
 }
@@ -266,7 +316,23 @@ function newLife(d,h){
  addLog(`${BIRTH}년, ${S.home} ${S.houseName}에서 태어났다.`,true);
 }
 function addLog(t,key){S.log.unshift({a:S.age,t,key:!!key});if(S.log.length>400)S.log.length=400}
-function applyEff(e){e=val(e,S);if(!e)return;const re=/([hprsm])(-?\d+)/g;let mm;while((mm=re.exec(e))){const k=mm[1],v=+mm[2];if(k==="m")S.m+=v;else S[k]=clamp(S[k]+v)}}
+function applyEff(e,raw){e=val(e,S);if(!e)return;const re=/([hprsmlfwk])(-?\d+)/g;let mm;while((mm=re.exec(e))){const k=mm[1],v=+mm[2];if(k==="m")S.m+=v;else S[k]=clamp(S[k]+(raw?v:v>0?v*GAIN[k]:(k==="h"?v*.75:v)))}}
+function grantTrait(id){
+ if(!TRAITS[id]||S.traits.includes(id))return false;
+ if(S.traits.length>=3){addLog(`'${TRAITS[id].n}'의 기회가 있었지만 특수 특성 자리가 이미 가득 찼다.`);return false}
+ S.traits.push(id);addLog(`특수 특성 획득 — ${TRAITS[id].n}`,true);return true;
+}
+function traitBonus(tag){let t=0;S.traits.forEach(id=>{const b=TRAITS[id].b;if(b&&b[tag])t+=b[tag]});return t}
+function tiltFor(o){
+ let t=(S.k-50)/600+traitBonus("all");
+ (o.tag?o.tag.split(" "):[]).forEach(tg=>{
+  if(tg==="fight")t+=(S.f-50)/200;
+  if(tg==="love")t+=(S.l-50)/250;
+  if(tg==="money"||tg==="law"||tg==="escape")t+=(S.w-50)/400;
+  t+=traitBonus(tg);
+ });
+ return t;
+}
 function setJob(id,work){S.job=id;S.work=work||JOBS[id][0];if((JOB_DREAM[id]||[]).includes(S.flags.dream))S.flags.dreamDone=1}
 function baseSingle(){return S.flags.widowed?"사별":S.flags.divorces?"이혼":"미혼"}
 function setMarry(m){
@@ -300,6 +366,8 @@ function doOps(o){
  if(o.q)(Array.isArray(o.q[0])?o.q:[o.q]).forEach(([id,d])=>S.queue.push({id,at:S.age+d}));
  if(o.f)o.f(S);
  if(o.jail)sendJail(o.jail[0],o.jail[1]);
+ if(o.trait)grantTrait(o.trait);
+ if(o.title){S.legend=o.title;addLog(`칭호 획득 — ${o.title}`,true)}
  if(o.die){S.cause=o.die;S.h=0}
 }
 
@@ -322,13 +390,18 @@ function economy(){
  if(S.m<-40000){S.m=-8000;S.p=clamp(S.p-10);S.r=clamp(S.r-6);S.flags.bankrupt=(S.flags.bankrupt||0)+1;addLog("빚을 감당할 수 없어 파산을 신청했다. 빚 대부분을 탕감받았지만 신용이 바닥났다.",true)}
 }
 function drift(){
- if(S.age>=7&&S.age<=18&&!S.flags.delinq)S.s=clamp(S.s+1);
+ const T=id=>S.traits.includes(id);
+ if(S.age>=7&&S.age<=18&&!S.flags.delinq)S.s=clamp(S.s+.5);
  let dh=0;
- if(S.age<20)dh+=.3;
- if(S.age>=45)dh-=.5;if(S.age>=70)dh-=2.2;if(S.age>=80)dh-=1.3;
- if(S.flags.exercise)dh+=.7;if(S.flags.neglect)dh-=.7;if(S.flags.smoke)dh-=.7;if(S.flags.drugUse)dh-=1.5;
- if(S.jail>0)dh-=.5;if(S.p>75)dh+=.4;if(S.p<25)dh-=.6;
+ if(S.age>=40)dh-=.4;if(S.age>=55)dh-=.4;if(S.age>=70)dh-=2.2;if(S.age>=80)dh-=1.3;
+ if(S.flags.exercise)dh+=.35;if(S.flags.neglect)dh-=.7;if(S.flags.smoke)dh-=.7;if(S.flags.drugUse)dh-=1.5;
+ if(S.jail>0)dh-=.5;if(S.p>75)dh+=.2;if(S.p<25)dh-=.6;
+ if(T("ironBody"))dh+=.4;if(T("medKnow"))dh+=.15;
  S.h=clamp(S.h+dh);
+ if(S.age<20)S.l=clamp(S.l+.3);if(S.age>=40)S.l=clamp(S.l-.4);
+ if(S.age>=13&&S.age<=30)S.f=clamp(S.f+.2);if(S.age>=45)S.f=clamp(S.f-.6);
+ if(S.age>=25)S.w=clamp(S.w+.3);
+ if(T("networker"))S.r=clamp(S.r+.2);
  S.p=clamp(S.p+(S.p>55?-1:S.p<45?1:0)+(S.jail>0?-1:0));
 }
 function isDead(){
@@ -337,16 +410,17 @@ function isDead(){
  if(S.age>=70){const p=(S.age-70)*.012+Math.max(0,45-S.h)*.006+(S.age>=90?.06:0);if(chance(p)){S.cause=S.jail>0?"prison":S.h<25?"ill":"old";return true}}
  return false;
 }
-function pullDue(){if(S.jail>0)return;const due=S.queue.filter(q=>q.at<=S.age);S.queue=S.queue.filter(q=>q.at>S.age);due.forEach(q=>S.agenda.push(q.id))}
+function pullDue(){const ok=q=>q.at<=S.age&&(S.jail<=0||(EV[q.id]&&EV[q.id].jailOK));const due=S.queue.filter(ok);S.queue=S.queue.filter(q=>!ok(q));due.forEach(q=>S.agenda.push(q.id))}
 function nextEvent(){
  pullDue();
- while(S.agenda.length){const id=S.agenda.shift();const ev=EV[id];if(!ev)continue;if(S.jail>0&&!ev.jailOK)continue;if(ev.req&&!ev.req(S))continue;return ev}
+ while(S.agenda.length){const id=S.agenda.shift();const ev=EV[id];if(!ev)continue;if(S.jail>0&&!ev.jailOK)continue;if(S.jail<=0&&ev.jailOnly)continue;if(ev.req&&!ev.req(S))continue;return ev}
  return null;
 }
 function ambient(){
- if(S.jail>0){const a=pick(JAIL_AMB);applyEff(a[1]);addLog(a[0]);return a[0]}
+ LAST_AMB_NEG=false;
+ if(S.jail>0){const a=pick(JAIL_AMB);applyEff(a[1]);LAST_AMB_NEG=/-/.test(a[1]);addLog(a[0]);return a[0]}
  const pool=AMBIENT.filter(a=>S.age>=a[0]&&S.age<=a[1]&&(!a[4]||a[4](S)));
- if(pool.length&&chance(.65)){const a=pick(pool);const t=val(a[2],S);applyEff(a[3]);addLog(t);return t}
+ if(pool.length&&chance(.65)){const a=pick(pool);const t=val(a[2],S);applyEff(a[3]);LAST_AMB_NEG=/-/.test(a[3]);addLog(t);return t}
  return "조용히 한 해가 지나갔다.";
 }
 function yearTick(){
@@ -355,8 +429,18 @@ function yearTick(){
  economy();drift();
  if(S.age>=72&&S.marry==="기혼"&&chance(.03)){S.late=S.partner;S.partner=null;S.flags.widowed=1;S.marry="사별";S.p=clamp(S.p-15);addLog(`${S.late}${hasJong(S.late)?"이":"가"} 먼저 세상을 떠났다.`,true)}
  if(isDead())return{type:"end"};
- if(S.jail<=0){const m=MAIN.find(e=>(e.age===S.age||(e.ages&&e.ages.includes(S.age)))&&(!e.req||e.req(S)));if(m)S.agenda.push(m.id)}
- else if(chance(.35))S.agenda.push("prison");
+ if(S.jail<=0){
+  const m=MAIN.find(e=>(e.age===S.age||(e.ages&&e.ages.includes(S.age)))&&(!e.req||e.req(S)));if(m)S.agenda.push(m.id);
+  if(AWAKEN_AGES.includes(S.age)&&EV.awaken&&EV.awaken.req(S))S.agenda.push("awaken");
+  if(S.age>=22&&S.age<=62&&EV.golden){
+   if(S.traits.length>=2&&!S.flags.golden1&&EV.golden.req(S)){S.flags.golden1=1;S.agenda.push("golden")}
+   else if(S.traits.length>=3&&!S.flags.golden2&&EV.golden.req(S)){S.flags.golden2=1;S.agenda.push("golden")}
+  }
+ }else{
+  const r=Math.random();
+  if(r<.28)S.agenda.push("prison");
+  else if(r<.62){const pool=JAIL_SUDDEN.filter(e=>!e.req||e.req(S));if(pool.length)S.agenda.push(pick(pool).id)}
+ }
  let ev=nextEvent();
  if(!ev&&S.jail<=0&&S.age>=S.nextSudden&&chance(.15)){
   const pool=SUDDEN.filter(e=>S.age>=e.min&&S.age<=e.max&&(!e.req||e.req(S)));
@@ -372,15 +456,16 @@ function drawOptions(ev){
  return shuffle([...pins,...rest].slice(0,3));
 }
 function resolve(ev,o){
- const b={m:S.m,h:S.h,p:S.p,r:S.r,s:S.s};
+ const keys=["m",...STATS.map(x=>x[0])];const b={};keys.forEach(k=>b[k]=S[k]);
  let eff=o.e,r=o.r,bops=null;
- if(o.odds){const win=chance(Math.max(0,Math.min(1,val(o.odds[0],S))));const br=win?o.odds[1]:o.odds[2];eff=br[0];r=br[1];bops=br[2]}
+ if(o.odds){let p=val(o.odds[0],S);if(p>=.1&&p<=.95)p=Math.max(.03,Math.min(.97,p+tiltFor(o)));const win=chance(p);const br=win?o.odds[1]:o.odds[2];eff=br[0];r=br[1];bops=br[2]}
+ if(o.x)applyEff(o.x);
  const t=val(o.t,S);
  applyEff(eff);doOps(o);doOps(bops);
  const text=val(r,S)||"그렇게 결정했다.";
  addLog(`${val(ev.title,S)} — ${t}. ${text}`,true);
  if(S.h<=0&&!S.cause)S.cause=S.jail>0?"prison":S.age<60?"accident":"ill";
- const d={};["m","h","p","r","s"].forEach(k=>{const v=Math.round(S[k]-b[k]);if(v)d[k]=v});
+ const d={};keys.forEach(k=>{const v=Math.round(S[k]-b[k]);if(v)d[k]=v});
  return{t,text,d};
 }
 function dreamDone(){
@@ -400,6 +485,7 @@ function epilogue(){
  if(S.served>0) paras.push(`인생의 ${S.served}년을 광주교도소 담장 안에서 보냈다. ${f.reconciled?"늦게나마 고개를 숙여 사과했다. 용서를 받았는지는 모르지만, 그 뒤로 잠은 조금 편해졌다.":"끝내 누구에게도 제대로 사과하지 못했다."}`);
  else if(f.murder) paras.push("누구도 모르는 죄 하나를 무덤까지 가져갔다. 잠들기 전마다 그 밤이 떠올랐다.");
  else if(f.guilt&&!f.reconciled) paras.push("들키지 않은 잘못들이 있었다. 들키지 않았다고 사라지는 건 아니었다.");
+ if(S.legend||S.traits.length){paras.push(`${S.traits.length?`타고난 재능은 ${S.traits.map(t=>TRAITS[t].n).join(", ")}.`:""}${S.legend?` 사람들은 그를 '${S.legend}'라 불렀다.`:""}`.trim())}
  let fam="";
  if(S.marry==="기혼")fam=`${JS(S.partner,"과","와")} ${S.age-(f.marriedAt||S.age)}년을 함께 살았다.`;
  else if(S.marry==="사별")fam=`${JS(S.late,"을","를")} 먼저 보내고 남은 날들을 혼자 걸었다.`;
@@ -503,7 +589,7 @@ addMain([
  O("광주FC 유소년 테스트","","",{pin:D("soccer"),odds:[.7,["h8 r4","합격. 광주FC 유소년 유니폼을 받았다.",{set:{sport:1}}],["p-6","떨어졌다. 그래도 공은 계속 찼다.",{set:{sport:1}}]]}),
  O("교내 동요대회에 나간다","p6 r3","대상. 교장 선생님이 '광주의 아이유'라고 했다.",{pin:D("music"),set:{music:1}}),
  O("광주학생미술대회","p6 r4","무등산 그림으로 금상을 받았다.",{pin:D("art"),set:{art:1}}),
- O("과학 영재원에 간다","s8 r3","GIST 영재교육원 토요반에 다니게 됐다.",{req:s=>s.s>=50,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=50,set:{gifted:1}}),
+ O("과학 영재원에 간다","s8 r3","GIST 영재교육원 토요반에 다니게 됐다.",{req:s=>s.s>=44,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=44,set:{gifted:1}}),
  O("챔피언스필드 직관","p8 r2","목이 쉬었다. 기아가 9회말에 이겼다.",{set:{tigers:1}}),
  O("어린이 요리대회","p5","주먹밥으로 장려상. 할머니가 사진을 액자에 넣었다.",{pin:D("chef"),set:{chef:1}}),
  O("모의재판 체험","s4 r2","광주지방법원 견학에서 판사 역할을 맡았다.",{pin:D("law"),set:{law:1}}),
@@ -517,7 +603,7 @@ addMain([
  O("괴롭힘당하는 친구 편에 선다","r6 p-2 h-2","같이 놀림을 받았다. 그 친구와는 평생 친구가 됐다."),
  O("같이 친구를 괴롭힌다","p2 r-6","그때는 장난이라고 생각했다.",{set:{bully:1}}),
  O("선생님께 괴롭힘을 알린다","r4","담임 선생님이 반 전체와 이야기했다."),
- O("수학경시대회에 나간다","s6 r3","광주 지역 은상.",{req:s=>s.s>=50}),
+ O("수학경시대회에 나간다","s6 r3","광주 지역 은상.",{req:s=>s.s>=44}),
  O("첫 휴대폰으로 밤새 게임","p4 s-4 h-2","눈 밑이 거뭇해졌다."),
  O("학예회 주인공을 맡는다","r5 p5","강당이 박수로 가득 찼다.",{pin:D("music")}),
  O("교내 미술상을 휩쓴다","r4 p5","복도에 그림이 걸렸다.",{pin:D("art")}),
@@ -539,7 +625,7 @@ addMain([
  O(s=>`중학교 ${SPT().club}`,"h6 s-2","새벽 훈련이 시작됐다.",{req:F("sport"),pin:true}),
  O("밴드부에 들어간다","p6","베이스 기타를 처음 잡았다.",{pin:D("music"),set:{music:1}}),
  O("웹툰을 그린다","p5","교실 친구들이 연재를 기다렸다.",{pin:D("art"),set:{art:1}}),
- O("과학고 준비반","s7 p-4","주말도 없이 문제집을 풀었다.",{req:s=>s.s>=60})]},
+ O("과학고 준비반","s7 p-4","주말도 없이 문제집을 풀었다.",{req:s=>s.s>=51})]},
 
 {id:"delinq",age:14,title:"일진의 세계",req:F("delinq"),text:"어울리는 무리가 점점 거칠어진다. 형들이 새로운 '일'을 시킨다.",pool:[
  O("후배들 돈을 뺏는다","","",{odds:[.6,["m50 r-6 p2","주머니가 두둑해졌다. 후배들이 눈을 피했다.",{set:{bully:1}}],["r-10 p-4","학교폭력위원회가 열렸다. 출석정지 10일.",{set:{bully:1}}]]}),
@@ -569,8 +655,8 @@ addMain([
 
 {id:"hs",age:16,title:"고등학교 진학",text:"담임 선생님이 진학 상담을 하자고 한다.",pool:[
  O("인문계 일반고","s5","야간 자율학습의 세계가 열렸다.",{edu:"일반고",job:["student","고등학생"]}),
- O("과학고","s8 r4","광주과학고 기숙사에 들어갔다.",{req:s=>s.s>=75,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=75,edu:"과학고",job:["student","과학고 학생"]}),
- O("자율형 사립고","s7 p-3","등록금 고지서를 보고 어머니가 한숨을 쉬었다.",{req:s=>s.s>=68&&s.cls>=2,edu:"자사고",job:["student","자사고 학생"]}),
+ O("과학고","s8 r4","광주과학고 기숙사에 들어갔다.",{req:s=>s.s>=62,pin:s=>["study","coder","doctor"].includes(s.flags.dream)&&s.s>=62,edu:"과학고",job:["student","과학고 학생"]}),
+ O("자율형 사립고","s7 p-3","등록금 고지서를 보고 어머니가 한숨을 쉬었다.",{req:s=>s.s>=57&&s.cls>=2,edu:"자사고",job:["student","자사고 학생"]}),
  O("자동차 특성화고","s3 p2","기아 오토랜드 광주 견학이 1학년 첫 행사였다.",{edu:"특성화고",set:{tech:1},job:["student","특성화고 학생"]}),
  O("소프트웨어 마이스터고","s5","코딩 대회 상장이 쌓였다.",{pin:D("coder"),edu:"마이스터고",set:{coder:1},job:["student","마이스터고 학생"]}),
  O("예술고 미술과","p6","양림동 골목을 스케치북에 담기 시작했다.",{pin:D("art"),edu:"예술고",set:{art:1},job:["student","예술고 학생"]}),
@@ -608,19 +694,19 @@ addMain([
  O("팬카페가 생긴다","p6 r4","광주 고교 스타로 지역 신문에 나왔다.",{inc:{scout:1}})]},
 
 {id:"college",age:19,title:"스무 살의 갈림길",text:s=>s.age>19?"다시 한번 갈림길 앞에 섰다.":"졸업이 다가온다. 앞으로 무엇을 할지 정해야 한다.",pool:[
- O("서울대학교","s8 r8 p4","관악산 아래 캠퍼스. 광주송정역에서 KTX로 1시간 40분.",{req:s=>s.s>=85,pin:true,edu:"서울대",loc:"서울",job:["student","서울대 재학"],set:{outside:1}}),
- O("연세대학교","s6 r6 p4","신촌에서 자취를 시작했다. 월세가 광주의 두 배다.",{req:s=>s.s>=78,edu:"연세대",loc:"서울",job:["student","연세대 재학"],set:{outside:1}}),
- O("고려대학교","s6 r6 p4","안암동 막걸리 골목에서 첫 MT를 했다.",{req:s=>s.s>=78,edu:"고려대",loc:"서울",job:["student","고려대 재학"],set:{outside:1}}),
- O("KAIST","s9 r6","대전 기숙사. 밤마다 과제가 쌓인다.",{req:s=>s.s>=82,pin:s=>["coder","study"].includes(s.flags.dream),edu:"KAIST",loc:"대전",job:["student","KAIST 재학"],set:{outside:1}}),
- O("광주과학기술원(GIST)","s8 r5","오룡동 캠퍼스 기숙사에 들어갔다. 광주에 남았다.",{req:s=>s.s>=74,edu:"GIST",job:["student","GIST 재학"]}),
- O("전남대 의대","s8 r10 p-2","6년짜리 공부가 시작됐다. 외할머니가 동네잔치를 열었다.",{req:s=>s.s>=88,pin:D("doctor"),edu:"전남대 의대",job:["student","전남대 의대 재학"],set:{doctorTrack:1}}),
- O("전남대학교","s5 r3","용봉동 캠퍼스, 후문 밥집이 새 단골이 됐다.",{req:s=>s.s>=55,edu:"전남대",job:["student","전남대 재학"]}),
+ O("서울대학교","s8 r8 p4","관악산 아래 캠퍼스. 광주송정역에서 KTX로 1시간 40분.",{req:s=>s.s>=68,pin:true,edu:"서울대",loc:"서울",job:["student","서울대 재학"],set:{outside:1}}),
+ O("연세대학교","s6 r6 p4","신촌에서 자취를 시작했다. 월세가 광주의 두 배다.",{req:s=>s.s>=64,edu:"연세대",loc:"서울",job:["student","연세대 재학"],set:{outside:1}}),
+ O("고려대학교","s6 r6 p4","안암동 막걸리 골목에서 첫 MT를 했다.",{req:s=>s.s>=64,edu:"고려대",loc:"서울",job:["student","고려대 재학"],set:{outside:1}}),
+ O("KAIST","s9 r6","대전 기숙사. 밤마다 과제가 쌓인다.",{req:s=>s.s>=66,pin:s=>["coder","study"].includes(s.flags.dream),edu:"KAIST",loc:"대전",job:["student","KAIST 재학"],set:{outside:1}}),
+ O("광주과학기술원(GIST)","s8 r5","오룡동 캠퍼스 기숙사에 들어갔다. 광주에 남았다.",{req:s=>s.s>=61,edu:"GIST",job:["student","GIST 재학"]}),
+ O("전남대 의대","s8 r10 p-2","6년짜리 공부가 시작됐다. 외할머니가 동네잔치를 열었다.",{req:s=>s.s>=71,pin:D("doctor"),edu:"전남대 의대",job:["student","전남대 의대 재학"],set:{doctorTrack:1}}),
+ O("전남대학교","s5 r3","용봉동 캠퍼스, 후문 밥집이 새 단골이 됐다.",{req:s=>s.s>=48,edu:"전남대",job:["student","전남대 재학"]}),
  O("조선대학교","s3 p3","하얀 본관이 보이는 캠퍼스에서 새내기가 됐다.",{edu:"조선대",job:["student","조선대 재학"]}),
- O("광주교육대학교","s4 r4","선생님이 되는 길에 들어섰다.",{req:s=>s.s>=65,edu:"광주교대",job:["student","광주교대 재학"],set:{teacherTrack:1}}),
- O("홍익대 미대","p6 s3","홍대 앞 작업실에서 밤을 새웠다.",{req:s=>s.flags.art&&s.s>=45,pin:D("art"),edu:"홍익대 미대",loc:"서울",job:["student","홍익대 재학"],set:{outside:1}}),
+ O("광주교육대학교","s4 r4","선생님이 되는 길에 들어섰다.",{req:s=>s.s>=54,edu:"광주교대",job:["student","광주교대 재학"],set:{teacherTrack:1}}),
+ O("홍익대 미대","p6 s3","홍대 앞 작업실에서 밤을 새웠다.",{req:s=>s.flags.art&&s.s>=40,pin:D("art"),edu:"홍익대 미대",loc:"서울",job:["student","홍익대 재학"],set:{outside:1}}),
  O("서울예대 실용음악과","p7","합정동 연습실이 집보다 익숙해졌다.",{req:F("music"),pin:D("music"),edu:"서울예대",loc:"서울",job:["student","서울예대 재학"],set:{outside:1}}),
- O("하버드 대학교","s10 r12 p3 m-500","합격 소식이 광주 지역 뉴스에 나왔다. 보스턴은 생각보다 추웠다.",{req:s=>s.s>=92&&s.cls>=2,pin:true,edu:"하버드",loc:"미국 보스턴",job:["student","하버드 재학"],set:{outside:1,abroad:1}}),
- O("도쿄대학교","s8 r6 m-300","일본어로 수업을 듣는다. 혼고 캠퍼스 은행나무가 노랗다.",{req:s=>s.s>=80&&s.cls>=1,edu:"도쿄대",loc:"일본 도쿄",job:["student","도쿄대 재학"],set:{outside:1,abroad:1}}),
+ O("하버드 대학교","s10 r12 p3 m-500","합격 소식이 광주 지역 뉴스에 나왔다. 보스턴은 생각보다 추웠다.",{req:s=>s.s>=73&&s.cls>=2,pin:true,edu:"하버드",loc:"미국 보스턴",job:["student","하버드 재학"],set:{outside:1,abroad:1}}),
+ O("도쿄대학교","s8 r6 m-300","일본어로 수업을 듣는다. 혼고 캠퍼스 은행나무가 노랗다.",{req:s=>s.s>=65&&s.cls>=1,edu:"도쿄대",loc:"일본 도쿄",job:["student","도쿄대 재학"],set:{outside:1,abroad:1}}),
  O("미국 커뮤니티칼리지","p4 m-1500","부모님 돈으로 캘리포니아에 갔다. 영어보다 외로움이 어려웠다.",{req:s=>s.cls>=3,edu:"미국 CC",loc:"미국 LA",job:["student","미국 유학"],set:{outside:1,abroad:1}}),
  O(s=>`${SPT().team} 드래프트에 나간다`,"","",{req:F("sportHS"),pin:true,odds:[s=>.25+(s.flags.scout||0)*.12,["r12 p12 m500",s=>`${SPT().team}의 지명을 받았다. 돌잡이 이야기가 신문에 실렸다.`,{job:["athlete",""],f:s=>{s.work=`${SPT().team} 선수`;s.flags.pro=1}}],["p-10","이름이 끝내 불리지 않았다. 대학 체육학과로 방향을 틀었다.",{edu:"조선대 체육학과",job:["student","조선대 체육학과"]}]]}),
  O("기아 오토랜드 광주 고졸 공채","","",{req:F("tech"),pin:true,odds:[s=>.5+s.s/250,["r5 p4","합격 문자를 받고 어머니가 울었다.",{job:["kia","기아 오토랜드 광주"]}],["p-6","아깝게 떨어졌다. 대인시장 가게에서 일을 시작했다.",{job:["part","대인시장 아르바이트"]}]]}),
@@ -654,8 +740,8 @@ addMain([
  O("공군에 지원한다","s3 r3","광주 공군 제1전투비행단. 집이 가까워 부러움을 샀다.",{set:{served:1,unit:"공군 제1전투비행단"},q:["army2",1]}),
  O("해군에 지원한다","h5 r3","진해에서 훈련받고 함정을 탔다. 뱃멀미가 석 달 갔다.",{set:{served:1,unit:"해군"},q:["army2",1]}),
  O("특전사에 지원한다","h12 r5 p-6","검은 베레모를 썼다. 낙하산 강하만 스무 번.",{req:s=>s.h>=60,set:{served:1,unit:"특전사"},q:["army2",1]}),
- O("카투사에 지원한다","","",{req:s=>s.s>=70,odds:[.3,["s6 r4","추첨에 붙었다. 미군 부대에서 영어가 늘었다.",{set:{served:1,unit:"카투사"},q:["army2",1]}],["p-2","추첨에서 떨어져 육군으로 갔다.",{set:{served:1,unit:"육군"},q:["army2",1]}]]}),
- O("학군단(ROTC) 장교로 간다","r6 m200","소위 계급장을 달았다.",{req:s=>s.job==="student"&&s.s>=55,set:{served:1,unit:"장교"},q:["army2",1]}),
+ O("카투사에 지원한다","","",{req:s=>s.s>=58,odds:[.3,["s6 r4","추첨에 붙었다. 미군 부대에서 영어가 늘었다.",{set:{served:1,unit:"카투사"},q:["army2",1]}],["p-2","추첨에서 떨어져 육군으로 갔다.",{set:{served:1,unit:"육군"},q:["army2",1]}]]}),
+ O("학군단(ROTC) 장교로 간다","r6 m200","소위 계급장을 달았다.",{req:s=>s.job==="student"&&s.s>=48,set:{served:1,unit:"장교"},q:["army2",1]}),
  O("군악대에 지원한다","p5 r2","군악대에서 트럼펫을 불었다.",{req:F("music"),pin:D("music"),set:{served:1,unit:"군악대"},q:["army2",1]}),
  O("상무(국군체육부대)에 간다","r4 h4","운동을 이어 가며 군 복무를 했다.",{req:s=>s.job==="athlete",pin:true,set:{served:1,unit:"상무"},q:["army2",1]}),
  O("사회복무요원","p2","주민센터에서 복무했다.",{req:s=>s.h<55,set:{served:1,unit:"사회복무"}}),
@@ -668,7 +754,7 @@ addMain([
  O("창업 동아리","s4 r3","첨단 창업보육센터에서 밤을 새웠다.",{req:STU,set:{startup:1}}),
  O("밴드 동아리","p8 s-2","양림동 작은 공연장에서 첫 공연. 관객은 열두 명.",{req:STU}),
  O("학점 관리","s8 p-3","장학금을 받았다.",{req:STU}),
- O("교환학생을 간다","s6 p6 m-400","네덜란드에서 한 학기. 자전거로 등교했다.",{req:s=>s.job==="student"&&(s.cls>=2||s.s>=75),set:{abroadExp:1}}),
+ O("교환학생을 간다","s6 p6 m-400","네덜란드에서 한 학기. 자전거로 등교했다.",{req:s=>s.job==="student"&&(s.cls>=2||s.s>=62),set:{abroadExp:1}}),
  O("학생회장에 출마한다","","",{req:STU,odds:[s=>.3+s.r/200,["r10 p5","당선. 축제 때 가수를 불렀다.",{}],["p-4","낙선. 그래도 친구가 많아졌다.",{}]]}),
  O("스포츠토토에 빠진다","p3 m-300","주말마다 경기 결과에 돈을 걸었다.",{inc:{gambleAdd:1},set:{gambled:1},q:["gambleDebt",2]}),
  O("야간 대학에 등록한다","s7 m-400 p-2","일 끝나고 수업을 듣는다.",{req:s=>s.job!=="student",f:s=>{if(!/대/.test(s.edu))s.edu="야간대"}}),
@@ -720,18 +806,18 @@ addMain([
  O("그냥 술만 마시고 집에 간다","h-1 p1","다음 날 아침 해장국이 맛있었다.")]},
 
 {id:"job",age:26,title:"첫 직장",req:s=>["student","part","none"].includes(s.job),text:s=>s.loc!=="광주"?`${s.loc}에서 공부를 마쳤다. 광주로 돌아갈지, 남을지.`:"이제 진짜 일을 구해야 한다.",pool:[
- O("삼성전자 광주사업장","","",{req:s=>s.s>=60,odds:[s=>.45+s.s/300,["r6 p5","하남산단으로 출근한다. 첫 월급으로 부모님 내복을 샀다.",{job:["samsung","삼성전자 광주사업장"],loc:"광주"}],["p-6","최종 면접에서 떨어졌다. 편의점 야간 일로 버틴다.",{job:["part","편의점 야간"],loc:"광주"}]]}),
+ O("삼성전자 광주사업장","","",{req:s=>s.s>=51,odds:[s=>.45+s.s/300,["r6 p5","하남산단으로 출근한다. 첫 월급으로 부모님 내복을 샀다.",{job:["samsung","삼성전자 광주사업장"],loc:"광주"}],["p-6","최종 면접에서 떨어졌다. 편의점 야간 일로 버틴다.",{job:["part","편의점 야간"],loc:"광주"}]]}),
  O("광주광역시청 공무원 시험","","",{odds:[s=>.25+s.s/220-(s.flags.exCon?.2:0),["r5 p3","합격. 상무지구 시청으로 출근한다.",{job:["gov","광주광역시청"],loc:"광주"}],["p-8 m-300","두 점 차이로 떨어졌다. 독서실 총무를 하며 다시 준비한다.",{job:["part","독서실 총무"],q:["job",2],loc:"광주"}]]}),
- O("첨단 AI 스타트업","s6 p4","직원 일곱 명. 직함이 세 개다.",{req:s=>s.flags.startup||s.s>=55,job:["startup","첨단 AI 스타트업"],loc:"광주"}),
+ O("첨단 AI 스타트업","s6 p4","직원 일곱 명. 직함이 세 개다.",{req:s=>s.flags.startup||s.s>=48,job:["startup","첨단 AI 스타트업"],loc:"광주"}),
  O("GIST 연구원","s8 r6","연구실 창밖으로 무등산이 보인다.",{req:s=>["GIST","KAIST","도쿄대","하버드","서울대"].includes(s.edu),pin:true,job:["research","GIST 연구원"],loc:"광주"}),
  O("동명동 카페 창업 (대출 3천)","m-3000 p6","동명동 골목 2층에 카페를 열었다. 간판은 직접 칠했다.",{job:["cafe","동명동 카페 사장"],loc:"광주"}),
  O("광주비엔날레재단","p7 r4","전시장 벽에 작품을 거는 일부터 시작했다.",{req:F("art"),pin:D("art"),job:["art","광주비엔날레재단"],loc:"광주"}),
  O("서울 대기업에 입사한다","r8 p3","여의도로 출근한다. 광주는 명절에만 간다.",{req:s=>["서울대","연세대","고려대","KAIST","하버드"].includes(s.edu),job:["seoulcorp","서울 대기업 본사"],loc:"서울"}),
- O("실리콘밸리 빅테크","","",{req:s=>["KAIST","하버드","서울대"].includes(s.edu)&&s.s>=80,odds:[.4,["m3000 r12 p5","캘리포니아 빅테크에 합격했다. 연봉 앞자리가 달라졌다.",{job:["dev","실리콘밸리 엔지니어"],loc:"미국 실리콘밸리",set:{outside:1}}],["p-5","최종에서 떨어졌다. 광주로 돌아와 개발자가 됐다.",{job:["dev","광주 IT 기업"],loc:"광주"}]]}),
+ O("실리콘밸리 빅테크","","",{req:s=>["KAIST","하버드","서울대"].includes(s.edu)&&s.s>=65,odds:[.4,["m3000 r12 p5","캘리포니아 빅테크에 합격했다. 연봉 앞자리가 달라졌다.",{job:["dev","실리콘밸리 엔지니어"],loc:"미국 실리콘밸리",set:{outside:1}}],["p-5","최종에서 떨어졌다. 광주로 돌아와 개발자가 됐다.",{job:["dev","광주 IT 기업"],loc:"광주"}]]}),
  O("전남대병원 레지던트","h-6 r8","당직 서는 밤이 일주일에 네 번.",{req:F("doctorTrack"),pin:true,job:["doctor","전남대병원 의사"],loc:"광주"}),
  O("초등교사 임용시험","","",{req:F("teacherTrack"),pin:true,odds:[.7,["r6 p6","광주 초등학교로 발령. 첫 담임 반 아이들이 스물두 명.",{job:["teacher","광주 초등교사"],loc:"광주"}],["p-6","떨어졌다. 기간제 교사로 1년을 보낸다.",{job:["part","기간제 교사"],q:["job",1],loc:"광주"}]]}),
- O("로스쿨에 진학한다","s6 m-1500","전남대 로스쿨. 3년 뒤 변호사 시험이다.",{req:s=>s.s>=75||(s.flags.dream==="law"&&s.s>=60),pin:D("law"),job:["student","전남대 로스쿨"],q:["barExam",3],loc:"광주"}),
- O("광주 IT 기업 개발자","s5 p3","첨단 소프트웨어 회사. 무등산이 보이는 자리.",{req:s=>s.flags.coder||s.s>=60,pin:D("coder"),job:["dev","광주 IT 기업"],loc:"광주"}),
+ O("로스쿨에 진학한다","s6 m-1500","전남대 로스쿨. 3년 뒤 변호사 시험이다.",{req:s=>s.s>=62||(s.flags.dream==="law"&&s.s>=51),pin:D("law"),job:["student","전남대 로스쿨"],q:["barExam",3],loc:"광주"}),
+ O("광주 IT 기업 개발자","s5 p3","첨단 소프트웨어 회사. 무등산이 보이는 자리.",{req:s=>s.flags.coder||s.s>=51,pin:D("coder"),job:["dev","광주 IT 기업"],loc:"광주"}),
  O("호텔 주방에 들어간다","h-3 s4","상무지구 호텔 주방 막내. 손에 화상 자국이 늘었다.",{req:F("chef"),pin:D("chef"),job:["chef","호텔 주방"],loc:"광주"}),
  O("인디 밴드를 결성한다","p8","양림동 지하 공연장이 무대다.",{req:F("music"),pin:D("music"),job:["music","인디 밴드"],loc:"광주"}),
  O("웹툰 작가에 도전한다","","",{req:F("art"),odds:[.35,["r8 m800 p6","연재가 시작됐다. 광주 배경 학원물.",{job:["art","웹툰 작가"],loc:"광주"}],["p-5","공모전에서 떨어졌다. 그림은 계속 그린다.",{job:["part","카페 아르바이트"],loc:"광주"}]]}),
@@ -809,7 +895,7 @@ addMain([
  O("남는다","m400 p-4","명절에만 내려간다. 어머니가 서운해했다.",{q:["homecoming",8]}),
  O("부모님을 모셔 온다","m-800 p2 r4","부모님이 낯선 도시에서 적적해했다.",{q:["homecoming",10]}),
  O("광주 공공기관 경력직","","",{odds:[.6,["p5 r4","혁신도시 공기업에 붙었다. 주말엔 광주 본가에 간다.",{loc:"광주",job:["gov","공공기관 경력직"]}],["p-3","떨어졌다. 다시 타지 생활.",{q:["homecoming",5]}]]}),
- O("고향 대학 교수로 지원한다","","",{req:s=>s.s>=80,odds:[.4,["r10 p6","모교 교수로 임용됐다.",{loc:"광주",job:["research","광주 대학 교수"]}],["p-3","최종에서 떨어졌다.",{q:["homecoming",5]}]]}),
+ O("고향 대학 교수로 지원한다","","",{req:s=>s.s>=65,odds:[.4,["r10 p6","모교 교수로 임용됐다.",{loc:"광주",job:["research","광주 대학 교수"]}],["p-3","최종에서 떨어졌다.",{q:["homecoming",5]}]]}),
  O("어머니만 자주 찾아뵌다","p3 m-300","한 달에 두 번 KTX를 탔다.",{q:["homecoming",6]}),
  O("도피를 끝내고 돌아온다","r-5","입국장에서 바로 조사를 받았다.",{req:F("fugitive"),pin:true,loc:"광주",set:{fugitive:0},jail:[1,"병역법 위반"]}),
  O("해외 영주권을 신청한다","p2 m500","돌아갈 이유가 점점 줄었다.",{req:s=>/미국|일본|해외/.test(s.loc)&&!s.flags.fugitive,q:["homecoming",10]})]},
@@ -887,11 +973,11 @@ addPath([
  O("스터디 그룹","","",{odds:[s=>.35+s.s/250,["r8 p6","합격. 스터디원 다섯 명 중 셋이 붙었다.",{job:["lawyer","광주 변호사"]}],["p-6","떨어졌다. 법률사무소에 취직했다.",{job:["part","법률사무소 직원"]}]]}),
  O("시험을 포기하고 취업","p2","로스쿨 학위로 공기업 법무팀에 들어갔다.",{job:["gov","공기업 법무팀"]}),
  O("부정행위를 시도한다","","",{odds:[.15,["r6","합격했다. 아무도 모른다. 아직은.",{job:["lawyer","광주 변호사"],set:{guilt:1}}],["r-25","적발됐다. 응시 자격이 5년 정지됐다.",{job:["part","법률사무소 직원"]}]]}),
- O("검사를 목표로 한다","","",{req:s=>s.s>=80,odds:[.35,["r12 p6","광주지검 검사로 임용됐다.",{job:["lawyer","광주지방검찰청 검사"]}],["p-3","변호사로 시작한다.",{job:["lawyer","광주 변호사"]}]]}),
+ O("검사를 목표로 한다","","",{req:s=>s.s>=65,odds:[.35,["r12 p6","광주지검 검사로 임용됐다.",{job:["lawyer","광주지방검찰청 검사"]}],["p-3","변호사로 시작한다.",{job:["lawyer","광주 변호사"]}]]}),
  O("공익 변호사의 길","r10 m-300","광주 인권센터 상근 변호사가 됐다.",{job:["lawyer","공익 변호사"]}),
  O("시험 직전 연애를 시작한다","p6 s-4","…시험은 다음으로.",{q:["barExam",1]}),
  O("부모님 기대 때문에 버틴다","p-6","간신히 붙었다.",{job:["lawyer","광주 변호사"]}),
- O("재판연구원에 지원한다","s5 r6","광주고등법원 재판연구원이 됐다.",{req:s=>s.s>=75,job:["lawyer","재판연구원"]}),
+ O("재판연구원에 지원한다","s5 r6","광주고등법원 재판연구원이 됐다.",{req:s=>s.s>=62,job:["lawyer","재판연구원"]}),
  O("법무사로 방향을 튼다","p3","법무사 사무소를 냈다.",{job:["shop","법무사 사무소"]})]}
 ]);
 
@@ -1457,22 +1543,218 @@ JAIL_AMB=[
  ["감방 창문으로 첫눈이 들어왔다.","p1"]
 ];
 
+/* ===== v0.02: 재능 발견 · 특별한 기회 · 교도소 돌발 ===== */
+const N_=(...ts)=>({need:ts,req:HAS(...ts),pin:true});
+const TN=id=>TRAITS[id].n;
+
+addPath([
+{id:"awaken",title:"재능의 발견",req:s=>s.traits.length<3&&s.potential.some(id=>!s.traits.includes(id)&&TRAITS[id].c(s)),
+ text:s=>s.age<15?"무언가에 유독 손이 가고 눈이 가는 시기다. 숨어 있던 재능이 고개를 든다.":s.age<40?"살다 보니 남들보다 유난히 잘하는 게 있다는 걸 알게 됐다.":"나이가 들어서야 몰랐던 재능을 발견했다.",
+ pool:s=>[
+  ...s.potential.filter(id=>!s.traits.includes(id)&&TRAITS[id].c(s)).map(id=>O(`'${TN(id)}' 재능을 키운다`,"p3",`${TRAITS[id].d}`,{trait:id,pin:true,traitLabel:TN(id)})),
+  O("재능보다 평범한 하루를 택한다","p2","특별하지 않아도 괜찮았다."),
+  O("아직은 잘 모르겠다","w2","조금 더 지켜보기로 했다.")
+ ]},
+
+{id:"golden",title:"특별한 기회",req:s=>EV.golden.pool.some(o=>o.need&&o.req(s)),text:s=>`특수 특성 ${s.traits.map(TN).join(", ")}. 남다른 재능을 알아본 누군가가 연락을 해 왔다.`,pool:[
+ O("종합격투기 무대에 선다","","",{...N_("mudeungFist","ironBody"),tag:"fight",odds:[s=>.45+s.f/250,["r12 p10 m3000","광주 출신 파이터로 메인 이벤트에서 이겼다.",{job:["fighter","종합격투기 선수"],title:"무등산 파이터"}],["h-15 p-4","1라운드 KO 패. 그래도 격투기 체육관에서 코치 제안이 왔다.",{job:["coach","격투기 체육관 코치"]}]]}),
+ O("국정원 특수요원 특채","r6 p4","신분을 숨기는 일. 가족에게는 공기업에 다닌다고 했다.",{...N_("mudeungFist","marineGrit","instinct"),job:["agent","국정원 특수요원"],title:"이름 없는 요원"}),
+ O("국정원 사이버 요원으로 들어간다","r5 s4","해킹 실력을 나라를 위해 쓰기로 했다.",{...N_("hacker","disguise"),job:["agent","국정원 사이버 요원"]}),
+ O("핀테크를 창업한다","","",{...N_("hacker","investSense"),tag:"money",odds:[.5,["m12000 r10","광주 첨단에서 시작한 회사가 유니콘이 됐다.",{job:["startup","핀테크 대표"],title:"첨단의 유니콘"}],["m-3000 p-6","규제에 막혀 문을 닫았다.",{}]]}),
+ O("전업 투자자의 길","","",{...N_("investSense","lucky"),tag:"money",odds:[.6,["m15000 p8","시장을 세 번 연속으로 맞혔다. 증권가에서 이름이 돌았다.",{job:["investor","전업 투자자"],title:"광주 큰손"}],["m-6000 p-10","한 번의 하락장이 모든 걸 가져갔다.",{job:["investor","전업 투자자"]}]]}),
+ O("전설의 판에 앉는다","","",{...N_("gamblerHand","disguise"),tag:"gamble",odds:[.5,["m9000 r-8","전국 노름판에서 손이 제일 빠른 사람이 됐다.",{job:["tazza","타짜"],title:"광주의 타짜",crime:"gambleBiz",q:["probe",3]}],["h-25 m-3000","손기술이 들켰다. 크게 다쳤다.",{}]]}),
+ O("드라마 주연 오디션","","",{...N_("fatalCharm","stageBorn"),tag:"love",odds:[.55,["r15 p12 m4000","광주 사투리 쓰는 주인공으로 캐스팅됐다. 시청률 20%.",{job:["star","배우"],set:{famous:1}}],["p-6","최종에서 떨어졌다. 단역부터 다시 시작했다.",{job:["star","단역 배우"]}]]}),
+ O("칸 영화제 레드카펫을 밟는다","r20 p15 m8000","광주 출신 배우가 칸에서 상을 받았다. 충장로에 현수막이 걸렸다.",{...N_("fatalCharm","stageBorn","silverTongue"),job:["star","세계적 배우"],set:{famous:1},title:"칸의 광주 사람"}),
+ O("광주 첫 미쉐린 레스토랑","","",{...N_("secretRecipe","networker"),odds:[.6,["r15 m3000 p10","양림동 작은 식당에 별이 떴다.",{job:["michelin","미쉐린 셰프"],title:"빛고을 셰프"}],["m-2000 p-4","가게는 사랑받았지만 별은 오지 않았다.",{job:["chef","양림동 식당 셰프"]}]]}),
+ O("오월 다큐멘터리를 찍는다","r12 p6 w5","그날의 목소리를 모은 다큐가 극장에 걸렸다.",{...N_("historian","silverTongue"),job:["director","다큐멘터리 감독"]}),
+ O("응급의학 명의가 된다","r14 m2000","골든타임을 놓치지 않는 의사로 이름이 났다.",{...N_("medKnow","instinct"),job:["healer","전남대병원 응급의학과 명의"],title:"광주의 명의"}),
+ O("비엔날레 총감독을 맡는다","r15 p8","광주비엔날레 총감독. 세계의 작가들이 광주로 왔다.",{...N_("artistEye","polyglot"),job:["curator","광주비엔날레 총감독"],title:"비엔날레의 눈"}),
+ O("광주 밤의 세계를 장악한다","m6000 r-15","상무지구부터 충장로까지, 밤의 질서가 내 손에 있었다.",{...N_("streetFighter","networker","silverTongue"),job:["boss","조직 보스"],set:{gang:2},crime:"gambleBiz",q:["probe",4],title:"밤의 황제"}),
+ O("재심 전문 변호사가 된다","r12 m1000","억울한 옥살이를 한 사람들의 무죄를 받아냈다.",{...N_("lawKnow","silverTongue"),job:["lawyer","재심 전문 변호사"]}),
+ O("국회의원에 출마한다","","",{...N_("lawKnow","silverTongue","historian"),odds:[s=>.35+s.r/250-(s.flags.exCon?.2:0),["r20 p10","광주에서 당선됐다. 첫 연설은 오월 이야기였다.",{job:["council","국회의원"],title:"광주의 대변인"}],["r-4 m-4000","석패했다.",{}]]}),
+ O("외교관 특채","r10 s4","대사관으로 발령이 났다. 명절이면 광주가 그리웠다.",{...N_("polyglot","silverTongue"),job:["diplomat","외교관"],loc:"해외 대사관"}),
+ O("무등산 산악구조대에 들어간다","r10 p6 h3","길 잃은 등산객 마흔 명을 구했다.",{...N_("ironBody","instinct"),job:["rescuer","무등산 산악구조대"]}),
+ O("해양경찰 특공대에 지원한다","r10 f4","바다 위에서 사람을 건졌다.",{...N_("marineGrit","ironBody"),job:["rescuer","해양경찰 특공대"]}),
+ O("1등의 예감을 따른다","","",{...N_("lucky","instinct","investSense"),odds:[.5,["m100000 p15","예감이 맞았다. 로또 1등.",{title:"운명을 읽는 사람"}],["m-50","예감은 예감일 뿐이었다.",{}]]}),
+ O("희대의 사기극을 벌인다","","",{...N_("disguise","silverTongue"),tag:"escape",odds:[.5,["m15000 r-10","가짜 투자회사로 큰돈을 모았다. 아무도 내 진짜 이름을 몰랐다.",{job:["conman","사기꾼"],crime:"fraud",q:["probe",2],title:"천의 얼굴"}],["r-25","첫 피해자가 바로 신고했다.",{jail:[5,"특정경제범죄 사기"]}]]}),
+ O("지금의 삶을 지킨다","p3","좋은 기회였지만 지금이 더 소중했다."),
+ O("기회를 후배에게 양보한다","r5 w3","후배에게 자리를 넘겼다. 후배는 평생 고마워했다."),
+ O("조금 더 준비하고 다음을 노린다","w2","다음을 기약했다.",{f:s=>{s.flags.golden2=0}})]},
+
+{id:"treasure",title:"바위 아래",req:s=>!!s.flags.treasure,text:"출소 후 노인이 말한 무등산 바위가 자꾸 생각난다.",pool:[
+ O("밤에 몰래 파 본다","","",{odds:[.45,["m5000 p8","녹슨 상자 안에 금붙이와 편지가 있었다. '잘 살아라.'",{set:{treasure:0}}],["p-3","빈 상자뿐이었다. 바닥에 '속았제?'라고 적혀 있었다.",{set:{treasure:0}}]]}),
+ O("경찰에 알리고 같이 판다","r6","상자 안의 돈은 국고로 갔다. 대신 표창장을 받았다.",{set:{treasure:0}}),
+ O("노인의 가족을 찾아 준다","r10 p6","노인의 딸이 상자를 받고 오래 울었다.",{set:{treasure:0}}),
+ O("잊어버린다","w3","새 인생에 옛 노인의 비밀은 필요 없었다.",{set:{treasure:0}}),
+ O("친구에게 대신 파 달라고 한다","","",{odds:[.3,["m2500","친구가 반을 나눠 줬다.",{set:{treasure:0}}],["p-6","친구가 들고 사라졌다.",{set:{treasure:0}}]]}),
+ O("파다가 등산객에게 들킨다","r-4 p-2","산림 훼손으로 과태료를 냈다.",{set:{treasure:0}})]}
+]);
+
+addJailSudden([
+{id:"jWarden",title:"교도소장의 제의",text:"교도소장이 따로 불렀다. '자네한테 부탁할 게 있네.'",pool:[
+ O("마약 조직 정보를 넘기고 감형받는다","","",{req:s=>/마약/.test(s.flags.jailReason||"")||s.flags.drug||s.flags.dealer,pin:true,odds:[.7,["r2","형기가 절반으로 줄었다. 대신 바깥에 적이 생겼다.",{f:s=>{s.jail=Math.max(1,Math.ceil(s.jail/2))},set:{marked:1}}],["h-25","정보가 새어 나갔다. 운동장에서 습격을 당했다.",{}]]}),
+ O("교도소 내부 비리 조사에 협조한다","","",{odds:[.6,["r5","교도관 비리가 밝혀졌다. 형기 2년 감면.",{f:s=>{s.jail=Math.max(1,s.jail-2)}}],["h-20","다른 수감자들에게 들켰다.",{}]]}),
+ O("교도소 축구팀 주장을 맡는다","p6 f3 h2","전국 교정시설 축구대회 준우승."),
+ O("교도소 전산 보안 점검을 맡는다","s4 r6","교도소 시스템의 구멍을 찾아 막았다. 교도소장이 출소 후 일자리를 약속했다.",{...N_("hacker"),f:s=>{s.jail=Math.max(1,s.jail-2)},set:{whitehatOffer:1}}),
+ O("수감자 격투 교관이 된다","f4 r4","질서를 잡는 데 권법이 쓰였다. 1년 감면.",{...N_("mudeungFist"),f:s=>{s.jail=Math.max(1,s.jail-1)}}),
+ O("교도소 의무실을 돕는다","r6 w3","쓰러진 수감자를 살렸다. 1년 감면.",{...N_("medKnow"),f:s=>{s.jail=Math.max(1,s.jail-1)}}),
+ O("교도소 급식을 바꾼다","p6 r6","수감자들이 처음으로 밥이 맛있다고 했다. 1년 감면.",{...N_("secretRecipe"),f:s=>{s.jail=Math.max(1,s.jail-1)}}),
+ O("수감자 법률 상담을 맡는다","r8 w4","억울한 수감자 둘의 재심을 도왔다.",{...N_("lawKnow")}),
+ O("제의를 거절한다","p1","조용히 형기를 채우기로 했다."),
+ O("교도소장의 비리를 녹음한다","","",{odds:[.35,["r8 p8","녹음이 언론에 나갔다. 특별사면 대상이 됐다.",{f:s=>{s.jail=0;releaseNow()}}],["p-8","들켰다. 독방에 갇혔고 형기가 늘었다.",{f:s=>{s.jail+=2}}]]}),
+ O("교화 홍보 영상에 출연한다","r5 l2","전국 교도소에 영상이 돌았다.")]},
+
+{id:"jMentor",title:"특별한 인연",text:"같은 방에 들어온 노인이 예사롭지 않다. 다른 수감자들도 그 앞에서는 조용하다.",pool:[
+ O("전직 무술 사범에게 권법을 배운다","f6 h2","'무등산에서 내려온 권법이다.' 새벽마다 몰래 수련했다.",{trait:"mudeungFist",traitLabel:TN("mudeungFist")}),
+ O("전설의 타짜에게 손기술을 배운다","p3","화투 한 벌로 밤을 새웠다. 손이 눈보다 빨라졌다.",{trait:"gamblerHand",traitLabel:TN("gamblerHand")}),
+ O("옥중 변호사에게 법을 배운다","w6","노인은 수감 중인 전직 변호사였다. 법전을 통째로 외웠다.",{trait:"lawKnow",traitLabel:TN("lawKnow")}),
+ O("희대의 사기꾼에게 변장술을 배운다","w2","목소리와 걸음걸이를 바꾸는 법을 배웠다.",{trait:"disguise",traitLabel:TN("disguise")}),
+ O("전직 해커에게 코딩을 배운다","s5","종이에 코드를 쓰며 공부했다.",{trait:"hacker",traitLabel:TN("hacker")}),
+ O("전직 요리사에게 비법을 배운다","p3","교도소 취사장에서 손맛을 전수받았다.",{trait:"secretRecipe",traitLabel:TN("secretRecipe")}),
+ O("노인의 오월 이야기를 듣는다","w5 p3","노인은 1980년 금남로에 있었다. 매일 밤 그 이야기를 들었다.",{trait:"historian",traitLabel:TN("historian")}),
+ O("노스님에게 참선을 배운다","w8 p5","마음을 내려놓는 법을 배웠다."),
+ O("노인을 무시한다","p-1","노인은 몇 달 뒤 다른 곳으로 이감됐다."),
+ O("노인의 유언을 듣는다","p3","'출소하면 무등산 그 바위 아래를 파 보게.' 노인은 그 겨울을 넘기지 못했다.",{set:{treasure:1},q:["treasure",1]})]},
+
+{id:"jLetter",title:"의문의 편지",text:"얼굴도 모르는 사람에게서 편지가 왔다.",pool:[
+ O("답장을 쓴다","p6","편지가 오가기 시작했다. 출소 날짜를 세는 이유가 생겼다.",{set:{penpal:1}}),
+ O("편지를 무시한다","p-1","편지는 서랍 속에 쌓였다."),
+ O("피해자 가족의 편지를 읽는다","p-4 w6","'용서는 아직 못 하지만, 당신이 다르게 살길 바랍니다.'",{req:s=>(s.flags.crimes||0)>0,set:{reconciled:1}}),
+ O("옛 연인의 편지를 받는다","p5",s=>`${s.ex||"옛 연인"}의 편지였다. '기다리진 않을게. 그래도 잘 지내.'`,{req:s=>!!s.ex}),
+ O("자녀의 편지를 받는다","p8",s=>`${K(0)}의 삐뚤빼뚤한 글씨. '아빠 보고 싶어.'`,{req:s=>s.kids.length>0}),
+ O("협박 편지를 받는다","p-8 h-3","'나오면 두고 보자.'",{set:{marked:1}}),
+ O("기자의 편지에 답한다","r4","억울한 사연을 인터뷰했다. 기사가 나갔다.",{f:s=>{if(s.traits.includes("lawKnow")){s.jail=Math.max(1,s.jail-2);addLog("기사가 계기가 되어 재심이 열렸다. 형기가 줄었다.",true)}}}),
+ O("팬레터를 받는다","p6","바깥에서 아직 나를 기억하는 사람이 있었다.",{req:F("famous")}),
+ O("종교 단체 편지에 답한다","p3 w2","매달 책이 한 권씩 왔다."),
+ O("편지들을 모아 책으로 묶는다","w5 r3","출소 후 책이 될 원고가 쌓였다.",{set:{prisonBook:1}})]},
+
+{id:"jRiot",title:"교도소 소란",text:"점심시간, 식당에서 폭동이 일어났다. 의자가 날아다닌다.",pool:[
+ O("폭동에 가담한다","f3 r-10","주동자로 지목됐다. 형기가 3년 늘었다.",{f:s=>{s.jail+=3}}),
+ O("교도관을 구한다","","",{tag:"fight",odds:[.55,["r12","교도관을 감싸고 버텼다. 특별 감형 2년.",{f:s=>{s.jail=Math.max(1,s.jail-2)}}],["h-20 r6","같이 맞았다. 그래도 교도관은 무사했다.",{}]]}),
+ O("구석에 숨는다","p-2","끝날 때까지 숨죽였다."),
+ O("주동자를 설득한다","","",{odds:[s=>s.traits.includes("silverTongue")?.75:.35,["r10 w3","말로 폭동을 멈췄다. 1년 감면.",{f:s=>{s.jail=Math.max(1,s.jail-1)}}],["h-10","말이 통하지 않았다.",{}]]}),
+ O("혼란을 틈타 탈옥한다","","",{tag:"escape",odds:[.08,["p8","담을 넘었다. 사흘 뒤 붙잡혔다. 형기 3년 추가.",{f:s=>{s.jail+=3}}],["h-12","담 앞에서 붙잡혔다. 형기 2년 추가.",{f:s=>{s.jail+=2}}]]}),
+ O("다친 사람들을 돌본다","r6 w2","피투성이 수감자 셋을 지혈했다.",{x:"r3",tag:"",f:s=>{if(s.traits.includes("medKnow")){s.jail=Math.max(1,s.jail-1);addLog("응급처치로 생명을 구해 형기가 1년 줄었다.",true)}}}),
+ O("CCTV 위치를 교도관에게 알린다","r4","진압이 빨리 끝났다."),
+ O("주먹으로 길을 연다","","",{tag:"fight",odds:[.5,["f4 r3","길을 막는 사람들을 쓰러뜨렸다. 아무도 다치지 않게 했다.",{}],["h-15","결국 쓰러졌다.",{}]]}),
+ O("폭동 뒤 증언대에 선다","r5 p-2","주동자를 지목했다. 보복이 걱정됐다.",{set:{marked:1}}),
+ O("폭동 이야기를 기록한다","w4","나중에 쓸 원고의 한 장이 됐다.",{set:{prisonBook:1}})]},
+
+{id:"jCellmate",title:"감방 동기",text:"새로 온 감방 동기가 광주 조직의 보스였다.",pool:[
+ O("형님으로 모신다","r-4 p2","'나가면 내 밑으로 와라.'",{set:{bossOffer:1}}),
+ O("탈옥 계획에 합류한다","","",{tag:"escape",odds:[.08,["p6","정말로 나갔다. 일주일 뒤 영광 앞바다에서 붙잡혔다. 형기 4년 추가.",{f:s=>{s.jail+=4}}],["h-10","계획이 발각됐다. 형기 3년 추가.",{f:s=>{s.jail+=3}}]]}),
+ O("거리를 둔다","p1","보스는 나를 신경 쓰지 않았다."),
+ O("보스의 정보를 교도관에게 넘긴다","","",{odds:[.5,["r4","1년 감면.",{f:s=>{s.jail=Math.max(1,s.jail-1)}}],["h-25","보복당했다.",{set:{marked:1}}]]}),
+ O("보스와 장기를 둔다","w4 p3","매일 밤 한 판씩. 보스는 지면 웃었다."),
+ O("보스의 자서전을 대필한다","w4 m500","보스가 출소 후 원고료를 보냈다."),
+ O("아픈 보스를 돌본다","r5","보스가 고맙다며 손을 잡았다. '이 빚은 꼭 갚는다.'",{set:{bossFavor:1}}),
+ O("보스와 맞붙는다","","",{tag:"fight",odds:[.4,["f5 r6","방 서열이 뒤집혔다.",{}],["h-20","크게 다쳤다.",{}]]}),
+ O("보스를 설득해 손 씻게 한다","","",{odds:[s=>s.traits.includes("silverTongue")?.5:.15,["r10 w4","보스가 출소 후 식당을 차렸다. 첫 손님으로 나를 불렀다.",{set:{bossFavor:1}}],["p-2","'꿈 깨라.'",{}]]}),
+ O("보스의 돈 심부름을 한다","m800 r-4","교도소 안에서도 돈이 돌았다.",{crime:"gambleBiz"})]},
+
+{id:"jDrug",title:"담장 안의 유혹",req:s=>/마약/.test(s.flags.jailReason||"")||s.flags.drug||s.flags.drugUse||s.flags.dealer,text:"교도소 안에서도 약이 돈다는 말을 들었다.",pool:[
+ O("받아서 판다","","",{odds:[.4,["m1000","들키지 않았다. 아직은.",{}],["r-10","적발됐다. 형기 2년 추가.",{f:s=>{s.jail+=2}}]]}),
+ O("다시 투약한다","h-12 p3","몸이 다시 무너지기 시작했다.",{set:{drugUse:1}}),
+ O("교도관에게 신고한다","","",{odds:[.5,["r6","반입 경로가 막혔다. 1년 감면.",{f:s=>{s.jail=Math.max(1,s.jail-1)}}],["h-20","신고자가 누군지 들켰다.",{set:{marked:1}}]]}),
+ O("재활 프로그램에 들어간다","p5 w4 h4","처음으로 약 없이 1년을 버텼다.",{set:{drugUse:0,drug:0}}),
+ O("중독 상담사 자격증을 딴다","w6 r5","같은 길을 걷는 사람을 돕고 싶어졌다.",{set:{drugUse:0,counselorSkill:1}}),
+ O("거절한다","p2","손을 떨면서도 거절했다."),
+ O("금단 증상에 시달리는 동료를 돕는다","r5 w3","밤새 옆을 지켰다."),
+ O("반입 경로를 교도소장에게 알린다","r4","교도소장이 다른 제의를 하겠다고 했다.",{q:[["jWarden",1]]}),
+ O("약 대신 운동에 매달린다","h5 f4","팔굽혀펴기 하루 500개."),
+ O("가족에게 중독 사실을 고백한다","p-3 w4","면회실에서 처음으로 솔직해졌다.")]},
+
+{id:"jSick",title:"수감 중 병",text:"몸에 이상이 생겼다. 밤마다 기침이 멈추지 않는다.",pool:[
+ O("형집행정지를 신청한다","","",{odds:[.3,["p8","외부 병원 치료가 허가됐다. 형기가 끝날 때까지 집에서 지냈다.",{f:s=>{s.jail=0;releaseNow()}}],["p-4","기각됐다.",{}]]}),
+ O("참고 버틴다","h-10","약 몇 알로 버텼다."),
+ O("교도소 의무실에서 치료받는다","h3","의무관이 성의껏 봐 줬다."),
+ O("가족에게 알린다","p2","가족이 영치금과 약을 넣어 줬다."),
+ O("운동으로 이겨 낸다","h4 f2","운동장을 매일 스무 바퀴 돌았다."),
+ O("스스로 진단하고 대처한다","h6","초기에 잡았다.",{...N_("medKnow")}),
+ O("종교에 의지한다","p4 w2","기도가 위로가 됐다."),
+ O("외부 진료를 요구하며 단식한다","","",{odds:[.4,["h-3 r3","외부 병원에 갔다.",{}],["h-12","아무것도 바뀌지 않았다.",{}]]}),
+ O("같은 방 사람들이 돌봐 준다","p4","죄인들 사이에도 정이 있었다."),
+ O("병을 숨긴다","h-15","더 나빠졌다.")]},
+
+{id:"jTalent",title:"교도소 재능대회",text:"연말 교도소 재능대회가 열린다. 방송국 카메라도 온다.",pool:[
+ O("노래를 부른다","","",{odds:[s=>s.traits.includes("stageBorn")?.8:.3,["r8 p8","대상. 방송에 나간 뒤 편지가 쏟아졌다.",{set:{famous:1}}],["p2","박수는 받았다.",{}]]}),
+ O("그림을 출품한다","","",{odds:[s=>s.traits.includes("artistEye")?.8:.3,["r8 p6","무등산을 그린 그림이 교정 미술전에서 상을 받았다.",{}],["p2","입선.",{}]]}),
+ O("시를 낭송한다","w4 p4","'담장 너머 무등산'. 몇몇이 눈물을 훔쳤다."),
+ O("요리 대결에 나간다","","",{odds:[s=>s.traits.includes("secretRecipe")?.85:.3,["r6 p6","교도소 김치찌개로 우승.",{}],["p1","3등.",{}]]}),
+ O("격투 시범을 보인다","f3 r3","박수가 터졌다. 교도관들이 긴장했다."),
+ O("코미디 콩트를 한다","p6","광주 사투리 콩트가 대박이 났다."),
+ O("불참한다","p-1","방에서 소리만 들었다."),
+ O("방송국 인터뷰에 응한다","r4","전국 방송에 얼굴이 나갔다. 어머니가 보고 우셨다."),
+ O("동료의 공연을 돕는다","r4 p3","무대 뒤에서 조명을 맡았다."),
+ O("마술 공연을 한다","p4","교도관 손목시계를 사라지게 했다.",{req:s=>s.traits.includes("disguise")||s.traits.includes("gamblerHand")})]}
+]);
+
+/* 출소 이벤트에 특별 경로 추가 */
+EV.release.pool.push(
+ O("편지의 주인을 만난다","p10",s=>`교도소 문 앞에 편지의 주인 ${JS(SPN(),"이","가")} 서 있었다.`,{req:F("penpal"),pin:true,set:{penpal:0},marry:"연애중",partner:true}),
+ O("보스의 제안을 받아들인다","m1500 r-8","검은 차가 기다리고 있었다.",{req:s=>s.flags.bossOffer||s.flags.bossFavor,pin:true,job:["gang","조직 간부"],set:{gang:2}}),
+ O("보스에게 진 빚을 받는다","p5 m2000","보스가 차려 준 가게로 새 출발을 했다.",{req:F("bossFavor"),pin:true,job:["shop","충장로 식당 사장"],set:{bossFavor:0}}),
+ O("교도소장이 약속한 보안회사 특채","r6 s4","출소 다음 날부터 보안회사로 출근했다.",{req:F("whitehatOffer"),pin:true,job:["whitehat","보안회사 화이트해커"],set:{whitehatOffer:0}}),
+ O("마약 중독 상담사가 된다","r8 w4","나 같은 사람을 붙잡아 주는 일을 시작했다.",{req:F("counselorSkill"),pin:true,job:["counselor","마약 중독 상담사"]}),
+ O("옥중 원고로 책을 낸다","","",{req:F("prisonBook"),pin:true,odds:[.5,["r10 m800 w3","『담장 너머 무등산』이 베스트셀러가 됐다.",{set:{prisonBook:0}}],["p2","작은 출판사에서 500부가 나왔다.",{set:{prisonBook:0}}]]}),
+ O("보복을 피해 몸을 숨긴다","p-4","출소 첫날부터 뒤를 돌아봤다.",{req:F("marked"),pin:true,set:{marked:0}})
+);
+
+/* 군대·직업 선택에서 특수 특성 획득 */
+(function(){
+ const find=(id,t)=>EV[id].pool.find(o=>o.t===t);
+ const a=find("army","해병대에 지원한다");if(a)a.odds[1][2].trait="marineGrit";
+ const b=find("army","특전사에 지원한다");if(b)b.trait="ironBody";
+})();
+
+/* 기존 선택지에 새 특성 효과와 판정 태그 추가 */
+const EXTRA={
+ "태권도장":{x:"f3"},"일진 무리에 낀다":{x:"f4"},"충장로 패싸움에 끼어든다":{x:"f4",tag:"fight"},"특전사에 지원한다":{x:"f8"},"육군 현역으로 간다":{x:"f3"},
+ "해병대에 지원한다":{x:"f6"},"혹한기 훈련을 버틴다":{x:"f2"},"선임에게 주먹을 날린다":{tag:"fight"},"라이벌 조직과 맞붙는다":{x:"f3",tag:"fight"},
+ "교도소 안에서 싸운다":{x:"f3",tag:"fight"},"헬스장을 끊는다":{x:"f2 l4"},"PT를 끊는다":{x:"l3"},"모발이식을 받는다":{x:"l6"},"대형 오토바이를 산다":{x:"l2"},
+ "시니어 모델에 도전한다":{x:"l3"},"다이어트 약에 의존한다":{x:"l3"},"문신을 한다":{x:"l-2 f2"},"마라톤 풀코스에 도전한다":{x:"f2"},
+ "독서에 빠진다":{x:"w7"},"자서전을 쓴다":{x:"w5"},"늦깎이 대학원":{x:"w6"},"해설을 끝까지 듣고 기록한다":{x:"w4"},"할아버지께 그때 이야기를 여쭙는다":{x:"w5"},
+ "할머니가 우신다":{x:"w3"},"바둑 교실":{x:"w5"},"경로당 바둑":{x:"w2"},"바둑 최강자가 된다":{x:"w3"},"정신건강의학과 상담을 받는다":{x:"w3"},
+ "단도박 모임에 나간다":{x:"w4"},"종교에 귀의한다":{x:"w4"},"피해자에게 사과 편지를 쓴다":{x:"w3"},"청소년들 앞에서 실수를 고백한다":{x:"w5"},
+ "노인대학에 다닌다":{x:"w4"},"무등산 산장에서 한 달 산다":{x:"w4"},"할머니 손에서 자란다":{x:"w2"},"국립광주박물관에 간다":{x:"w2"},
+ "오만원권을 잡는다":{x:"k8"},"실타래를 잡는다":{x:"k3"},"길고양이를 돌본다":{x:"k3"},
+ "맞서 싸운다":{tag:"fight"},"흉기를 들고 맞선다":{tag:"fight"},"뛰어들어 말린다":{tag:"fight"},"가해자를 쫓아간다":{tag:"fight"},"빚쟁이와 몸싸움을 벌인다":{tag:"fight"},
+ "주차 시비 끝에 주먹을 휘두른다":{tag:"fight"},"과하게 응징한다":{tag:"fight"},"상사를 들이받는다":{tag:"fight"},"보스와 맞붙는다":{tag:"fight"},
+ "소개팅 앱을 깐다":{tag:"love"},"친구 소개팅에 나간다":{tag:"love"},"직장 동료에게 고백한다":{tag:"love"},"무등산 산악회에 가입한다":{tag:"love"},"광주천 러닝크루":{tag:"love"},
+ "결혼정보회사에 가입한다":{tag:"love"},"첫사랑에게 연락한다":{tag:"love"},"전 연인에게 연락한다":{tag:"love"},"야구장 키스캠을 노린다":{tag:"love"},"교회 청년부에 나간다":{tag:"love"},
+ "동창 모임에서 다시 만난 친구":{tag:"love"},"와인 동호회에 나간다":{tag:"love"},"노래방 번개에서 열창한다":{tag:"love"},"충장로 버스킹에서 번호를 묻는다":{tag:"love"},
+ "독서실 쪽지를 건넨다":{tag:"love"},"교회 수련회에서 고백한다":{tag:"love"},"SNS로 DM을 보낸다":{tag:"love"},"경로당 로맨스":{tag:"love"},
+ "무등산 서석대 일출 앞에서":{tag:"love"},"광주호 호수생태원 피크닉":{tag:"love"},"챔피언스필드 전광판 이벤트":{tag:"love"},"양림동 카페를 통째로 빌린다":{tag:"love"},
+ "반지 없이 담백하게 말한다":{tag:"love"},"상대 부모님의 반대를 설득한다":{tag:"love"},"해외에서 프러포즈":{tag:"love"},
+ "코인에 3천만 원 넣는다":{tag:"money"},"송정역 근처 상가에 투자":{tag:"money"},"미국 주식에 묻어 둔다":{tag:"money"},"모아 둔 돈으로 주식 몰빵":{tag:"money"},
+ "영끌해서 갭투자 세 채":{tag:"money"},"불법 선물 옵션에 손댄다":{tag:"money"},"친구 사업에 보증을 선다":{tag:"money"},"친구 사업에 동업한다":{tag:"money"},
+ "강원랜드에 간다":{tag:"gamble"},"강원랜드 원정을 간다":{tag:"gamble"},"상무지구 하우스 도박판에 앉는다":{tag:"gamble"},"한탕으로 만회한다":{tag:"gamble"},
+ "증거를 인멸한다":{tag:"escape"},"해외로 도피한다":{tag:"escape"},"동료에게 덮어씌운다":{tag:"escape"},"끝까지 침묵한다":{tag:"escape law"},"수사관을 매수하려 한다":{tag:"escape"},
+ "잠적한다":{tag:"escape"},"비싼 변호사를 선임한다":{tag:"law"},"피해를 모두 변제한다":{tag:"law"},"입영을 거부하고 도망친다":{tag:"escape"},"살을 찌워 면제를 노린다":{tag:"escape"},
+ "부대를 이탈한다":{tag:"escape"},"보험 사기를 시도한다":{tag:"escape"},"몰래 챙긴다":{tag:"escape"},"반만 챙기고 신고한다":{tag:"escape"},"탈옥을 시도한다":{tag:"escape"},
+ "가짜 여권으로 귀국한다":{tag:"escape"},"하루 열네 시간 공부":{tag:"law"},"스터디 그룹":{tag:"law"},"검사를 목표로 한다":{tag:"law"},"구의원에 출마한다":{tag:"law"}
+};
+Object.values(EV).forEach(ev=>{if(!Array.isArray(ev.pool))return;ev.pool.forEach(o=>{if(typeof o.t!=="string")return;const e=EXTRA[o.t];if(!e)return;if(e.x)o.x=o.x?o.x+" "+e.x:e.x;if(e.tag&&!o.tag)o.tag=e.tag})});
+
 /* ===== 화면 ===== */
 const $=id=>document.getElementById(id);
 let mode="setup",paused=false,speed=1,timer=null,curEv=null,curOpts=null,pickD=null,pickH=null;
-const STATDEF=[["h","건강"],["p","행복"],["r","평판"],["s","역량"]];
+
 
 function render(){
  $("age").textContent=S.age;$("year").textContent=BIRTH+S.age;
  const st=stageOf(S.age);
  $("stageName").textContent=st[0];$("stageRange").textContent=st[1]>=70?"70세 이상":`${st[1]}–${st[2]}세`;
  $("stages").innerHTML=STAGES.map(x=>{const w=Math.min(x[2],90)-x[1]+1;const c=S.age>x[2]?"on":S.age>=x[1]?"now":"";return `<div class="${c}" style="flex:${w}" title="${x[0]}"></div>`}).join("");
- $("stats").innerHTML=STATDEF.map(([k,n])=>`<div class="stat"><span>${n}</span><div class="bar"><i class="${S[k]<25?"low":""}" style="width:${S[k]}%"></i></div><span class="v">${Math.round(S[k])}</span></div>`).join("");
+ $("stats").innerHTML=STATS.map(([k,n])=>`<div class="stat"><div class="sl"><span>${n}</span><span class="v">${Math.round(S[k])}</span></div><div class="bar"><i class="${S[k]<25?"low":""}" style="width:${S[k]}%"></i></div></div>`).join("");
+ $("trCount").textContent=`${S.traits.length}/3`;
+ $("traits").innerHTML=S.traits.length?S.traits.map(id=>`<span class="chip" title="${TRAITS[id].d}">${TRAITS[id].n}</span>`).join(""):`<span class="chip empty">아직 없음</span>`;
  const mEl=$("money");
  if(S.age<19&&S.m===0){mEl.textContent="부모님 품";mEl.className=""}else{mEl.textContent=won(S.m);mEl.className=S.m<0?"neg":""}
  $("sub").textContent=`광주광역시 · ${BIRTH}년생`;
  const facts=[["집안",CLS[S.cls]],["사는 곳",S.loc==="광주"?S.home:S.loc],["직업",S.age<7?"—":JOBS[S.job][0]],["직장",S.work],["학력",S.edu],
   ["결혼",S.marry+(S.partner&&(S.marry==="기혼"||S.marry==="연애중")?` · ${S.partner}`:"")],["자녀",S.kids.length?`${S.kids.length}명 (${S.kids.map(k=>k.name).join(", ")})`:"없음"]];
+ if(S.legend)facts.unshift(["칭호",S.legend]);
  if(S.jail>0)facts.push(["상태",`수감 중 · 출소까지 ${S.jail}년`,1]);else if(S.served>0)facts.push(["전과",`복역 ${S.served}년`,1]);
  $("facts").innerHTML=facts.map(([a,b,w])=>`<dt>${a}</dt><dd${w?' class="warn"':""}>${b}</dd>`).join("");
 }
@@ -1505,7 +1787,9 @@ function showBirth(){
  newLife(pickD,pickH);render();renderLog();
  setCard(`<div class="eyebrow">${BIRTH}년 · ${S.home}</div>
  <h2>박유성이 태어났다</h2>
- <p class="story">${S.home}의 ${S.houseName}. 3.2kg, 울음소리가 컸다. 아버지 박태수와 어머니 김정희의 첫아이. 창밖으로 무등산 능선이 보인다.</p>
+ <p class="story">${S.home}의 ${S.houseName}. 3.2kg, 울음소리가 컸다. 창밖으로 무등산 능선이 보인다.</p>
+ <p class="story">이번 인생의 잠재 특수 특성 10종: <span class="potential">${S.potential.map(id=>`<span class="chip" title="${TRAITS[id].d}">${TRAITS[id].n}</span>`).join("")}</span></p>
+ <p class="story">조건이 맞으면 '재능의 발견'에서 이 중 최대 3종을 얻는다. 특정 선택이나 교도소의 인연으로 얻는 특성도 있다. 특수 특성 2~3종이 맞물리면 특별한 직업의 길이 열린다.</p>
  <p class="story">시간이 흐르다 갈림길이 오면 멈춘다. 선택지는 매번 열 가지가 넘는 가능성 중 세 개만 보인다.</p>
  <div class="btns"><button class="primary" id="startBtn">인생 시작하기</button><button class="ghost" id="reBtn">다시 고르기</button></div>`);
  $("startBtn").onclick=()=>{mode="run";tickerCard("응애. 세상에 나왔다.");schedule()};
@@ -1518,6 +1802,7 @@ function tickerCard(line){setCard(`<div class="eyebrow">${stageOf(S.age)[0]} · 
 function schedule(){clearTimeout(timer);if(paused||mode!=="run")return;timer=setTimeout(step,1150/speed)}
 function step(){
  const r=yearTick();render();renderLog();
+ if(r.type==="tick"&&LAST_AMB_NEG)stumble();
  if(r.type==="end")return showEnd();
  if(r.type==="event")return showEvent(r.ev);
  tickerCard(r.line);schedule();
@@ -1526,12 +1811,13 @@ function showEvent(ev){
  mode="event";curEv=ev;curOpts=drawOptions(ev);
  setCard(`<div class="eyebrow">${S.age}세 · ${BIRTH+S.age}년 · ${stageOf(S.age)[0]}</div>
  <h2>${val(ev.title,S)}</h2><p class="story">${val(ev.text,S)}</p>
- <div class="choices">${curOpts.map((o,i)=>`<button class="choice" data-i="${i}"><span class="k">${i+1}</span><span>${val(o.t,S)}${o.pin&&val(o.pin,S)?"<small>앞선 선택에서 이어짐</small>":""}</span></button>`).join("")}</div>`);
+ <div class="choices">${curOpts.map((o,i)=>`<button class="choice" data-i="${i}"><span class="k">${i+1}</span><span>${val(o.t,S)}${o.need?`<small>특성 조합 · ${o.need.map(t=>TRAITS[t].n).join(" + ")}</small>`:o.traitLabel?`<small>특수 특성 · ${o.traitLabel}</small>`:o.pin&&val(o.pin,S)?"<small>앞선 선택에서 이어짐</small>":""}</span></button>`).join("")}</div>`);
  document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(+b.dataset.i));
 }
-const NAMES={m:"자산",h:"건강",p:"행복",r:"평판",s:"역량"};
+const NAMES=STAT_NAME;
 function choose(i){
  const o=curOpts[i];const res=resolve(curEv,o);render();renderLog();
+ if(Object.values(res.d).some(v=>v<0))stumble();
  const ds=Object.entries(res.d).map(([k,v])=>`<span class="${v>0?"up":"dn"}">${NAMES[k]} ${v>0?"+":"−"}${k==="m"?won(Math.abs(v)):Math.abs(v)}</span>`).join("");
  mode="result";
  setCard(`<div class="eyebrow">${S.age}세 · ${val(curEv.title,S)}</div>
@@ -1579,21 +1865,23 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ===== 걷는 캐릭터 ===== */
-const W={cv:null,ctx:null,ph:0,off:0,last:0,cols:null,colAt:0,dpr:1};
+const W={cv:null,ctx:null,ph:0,off:0,last:0,cols:null,colAt:0,dpr:1,fall:null,vel:0};
 const REDUCED=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
 const FIG={toddler:{hr:8,body:13,leg:13,arm:10,lw:2.6},child:{hr:7,body:18,leg:19,arm:14,lw:2.7},teen:{hr:6.6,body:23,leg:25,arm:18,lw:2.9},young:{hr:6.5,body:25,leg:28,arm:20,lw:3},adult:{hr:6.5,body:25,leg:27,arm:19,lw:3.3},elder:{hr:6.5,body:23,leg:24,arm:18,lw:3}};
 function hash(i){const s=Math.sin(i*127.1+11.7)*43758.5453;return s-Math.floor(s)}
-function readCols(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();W.cols={fg:g("--fg"),muted:g("--muted"),line:g("--line"),soft:g("--accent-soft"),accent:g("--accent"),light:g("--light"),bg:g("--bg")}}
+function readCols(){const cs=getComputedStyle(document.documentElement);const g=n=>cs.getPropertyValue(n).trim();W.cols={fg:g("--fg"),muted:g("--muted"),line:g("--line"),soft:g("--accent-soft"),accent:g("--accent"),light:g("--light"),bad:g("--bad"),bg:g("--bg")}}
 function walkerResize(){const r=W.cv.getBoundingClientRect();W.dpr=window.devicePixelRatio||1;W.cv.width=Math.max(1,Math.round(r.width*W.dpr));W.cv.height=Math.max(1,Math.round(r.height*W.dpr))}
 function stageKey(){return S?stageOf(S.age)[3]:"toddler"}
+function stumble(){if(!S||S.dead)return;W.fall={t:0}}
 function motion(st){
- const moving=S&&mode==="run"&&!paused&&!S.dead&&!(S.jail>0);
- if(!moving)return{freq:.0025,v:0,amp:0,run:false,idle:true};
+ if(!S||S.dead)return{freq:.0025,v:0,amp:0,run:false,idle:true};
  const base={toddler:{freq:.011,v:.03,amp:.35,run:false},child:{freq:.017,v:.11,amp:.8,run:true},teen:{freq:.016,v:.12,amp:.85,run:true},young:{freq:.011,v:.06,amp:.5,run:false},adult:{freq:.0095,v:.05,amp:.45,run:false},elder:{freq:.0055,v:.022,amp:.25,run:false}}[st];
  const m=Object.assign({},base);
- if(st==="young"&&speed>=2){m.run=true;m.freq=.015;m.v=.12;m.amp=.85}
- m.freq*=1+(speed-1)*.2;m.v*=1+(speed-1)*.45;
+ const fast=mode==="run"&&!paused?speed:1;
+ if(st==="young"&&fast>=2){m.run=true;m.freq=.015;m.v=.12;m.amp=.85}
+ m.freq*=1+(fast-1)*.2;m.v*=1+(fast-1)*.45;
  if(S.h<30){m.freq*=.75;m.v*=.7;m.run=false;m.amp=Math.min(m.amp,.4)}
+ if(S.jail>0)m.v=0;
  return m;
 }
 function seg(c,a,b){c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}
@@ -1611,7 +1899,7 @@ function figure(c,x,gy,st,m){
   const a=amp*Math.sin(p);
   const bend=m.idle?0:(run?1.3:.7)*Math.max(0,Math.sin(p+Math.PI/2));
   const knee={x:hip.x+Math.sin(a)*th,y:hip.y+Math.cos(a)*th};
-  const sa=a-bend;let foot={x:knee.x+Math.sin(sa)*sh,y:Math.min(gy,knee.y+Math.cos(sa)*sh)};
+  const sa=a-bend;const foot={x:knee.x+Math.sin(sa)*sh,y:Math.min(gy,knee.y+Math.cos(sa)*sh)};
   const u=m.idle?0.05:-amp*.9*Math.sin(p)+lean*.4;
   const elbow={x:sho.x+Math.sin(u)*f.arm*.5,y:sho.y+Math.cos(u)*f.arm*.5};
   const fa=u+(run?1.4:.3);
@@ -1626,15 +1914,23 @@ function figure(c,x,gy,st,m){
  c.fillStyle=W.cols.fg;c.beginPath();c.arc(head.x,head.y,f.hr,0,Math.PI*2);c.fill();
  if(st==="elder"){c.strokeStyle=W.cols.light;c.lineWidth=2.2;seg(c,near.hand,{x:near.hand.x+5,y:gy})}
  if(st==="toddler"){c.strokeStyle=W.cols.fg;c.lineWidth=1.6;c.beginPath();c.moveTo(head.x,head.y-f.hr);c.quadraticCurveTo(head.x+4,head.y-f.hr-6,head.x+6,head.y-f.hr-3);c.stroke()}
+ return head;
 }
 function drawTomb(c,x,gy){
  c.fillStyle=W.cols.line;c.beginPath();c.moveTo(x-14,gy);c.lineTo(x-14,gy-26);c.arc(x,gy-26,14,Math.PI,0);c.lineTo(x+14,gy);c.closePath();c.fill();
  c.fillStyle=W.cols.light;[[-20,-3],[-24,-6],[-17,-7]].forEach(([dx,dy])=>{c.beginPath();c.arc(x+dx,gy+dy,2.6,0,Math.PI*2);c.fill()});
  c.strokeStyle=W.cols.accent;c.lineWidth=1.5;seg(c,{x:x-20,y:gy},{x:x-20,y:gy-4});
 }
+function fallAngle(){
+ if(!W.fall)return 0;const t=W.fall.t;
+ if(t<260)return 1.5*Math.sin(t/260*Math.PI/2);
+ if(t<1150)return 1.5+Math.sin((t-260)/90)*.03*Math.max(0,1-(t-260)/300);
+ if(t<1550)return 1.5*(1-(t-1150)/400);
+ return 0;
+}
 function drawScene(){
  const c=W.ctx,w=W.cv.width/W.dpr,h=W.cv.height/W.dpr;c.setTransform(W.dpr,0,0,W.dpr,0,0);c.clearRect(0,0,w,h);
- const col=W.cols,gy=h-18,st=stageKey(),m=motion(st);
+ const col=W.cols,gy=h-18,st=stageKey();let m=motion(st);
  c.fillStyle=col.soft;c.beginPath();c.moveTo(0,gy);
  for(let x=0;x<=w;x+=4){const X=x+W.off*.12;c.lineTo(x,gy-34-16*Math.sin(X/95)-9*Math.sin(X/41+1)-5*Math.sin(X/19))}
  c.lineTo(w,gy);c.closePath();c.fill();
@@ -1646,20 +1942,30 @@ function drawScene(){
  }
  c.strokeStyle=col.muted;c.lineWidth=1;seg(c,{x:0,y:gy+.5},{x:w,y:gy+.5});
  c.globalAlpha=.5;for(let x=-(W.off%22);x<w;x+=22)seg(c,{x,y:gy+7},{x:x+9,y:gy+7});c.globalAlpha=1;
- const fx=Math.min(w*.32,160);
+ const fx=Math.min(w*.32,160),ang=fallAngle();
  c.save();c.translate(fx,gy);c.scale(1.35,1.35);c.translate(-fx,-gy);
- if(S&&S.dead)drawTomb(c,fx,gy);else figure(c,fx,gy,st,m);
+ if(S&&S.dead)drawTomb(c,fx,gy);
+ else if(ang>0){
+  c.save();c.translate(fx+6,gy);c.rotate(ang);c.translate(-fx-6,-gy);
+  const head=figure(c,fx,gy,st,{freq:0,v:0,amp:0,run:false,idle:true});
+  c.restore();
+  if(W.fall.t>200&&W.fall.t<1250){
+   const L=FIG[st].leg+FIG[st].body+FIG[st].hr*2;const hx=fx+6+Math.sin(ang)*L,hy=gy-Math.cos(ang)*L-12;
+   c.fillStyle=col.light;for(let k=0;k<3;k++){const a=W.fall.t/180+k*2.1;c.beginPath();c.arc(hx+Math.cos(a)*10,hy+Math.sin(a)*3,2.2,0,Math.PI*2);c.fill()}
+  }
+ }else figure(c,fx,gy,st,m);
  c.restore();
- if(S&&S.jail>0){c.strokeStyle=col.muted;c.lineWidth=2.5;for(let k=0;k<7;k++){const bx=fx-45+k*15;seg(c,{x:bx,y:gy-78},{x:bx,y:gy})}seg(c,{x:fx-50,y:gy-78},{x:fx+50,y:gy-78})}
- const label=!S?"출발 전":S.dead?"잠들다":S.jail>0?"수감 중":m.idle?(mode==="event"?"고민하는 중":"잠시 멈춤"):m.run?"달리는 중":(st==="elder"?"지팡이 짚고 걷는 중":st==="toddler"?"아장아장":"걷는 중");
+ if(S&&S.jail>0){c.strokeStyle=col.muted;c.lineWidth=2.5;for(let k=0;k<7;k++){const bx=fx-50+k*17;seg(c,{x:bx,y:gy-95},{x:bx,y:gy})}seg(c,{x:fx-55,y:gy-95},{x:fx+55,y:gy-95})}
+ const label=!S?"출발 전":S.dead?"잠들다":ang>0?"꽈당!":S.jail>0?"담장 안을 서성이는 중":mode==="event"?"걸으며 고민하는 중":m.run?"달리는 중":(st==="elder"?"지팡이 짚고 걷는 중":st==="toddler"?"아장아장":"걷는 중");
  $("walkStage").textContent=S?stageOf(S.age)[0]:"유아기";$("walkState").textContent=label;
- return m;
 }
 function walkerLoop(t){
  const dt=Math.min(60,t-(W.last||t));W.last=t;
  if(!W.cols||t-W.colAt>1000){readCols();W.colAt=t}
  const m=motion(stageKey());
- if(!REDUCED){W.ph+=dt*m.freq;W.off+=dt*m.v}
+ if(W.fall){W.fall.t+=dt;if(W.fall.t>1550)W.fall=null}
+ const target=W.fall?0:m.v;W.vel+=(target-W.vel)*Math.min(1,dt/180);
+ if(!REDUCED){if(!W.fall)W.ph+=dt*m.freq;W.off+=dt*W.vel}
  drawScene();
  requestAnimationFrame(walkerLoop);
 }
